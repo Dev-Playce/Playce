@@ -40,7 +40,7 @@ const router = Router();
  *                 example: 펍 카와우소
  *               business_number:
  *                 type: string
- *                 example: 333-33-12345
+ *                 example: 444-44-12345
  *               address:
  *                 type: string
  *                 example: 서울특별시 중구 세종대로 80 지하1층
@@ -232,7 +232,7 @@ router.delete("/:storeId", authenticate, storeController.deleteStore); // 3. 식
  *         description: 식당 고유 ID
  *     responses:
  *       200:
- *         description: 식당 상세 정보
+ *         description: 식당 상세 정보 성공
  *         content:
  *           application/json:
  *             schema:

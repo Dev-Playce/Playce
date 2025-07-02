@@ -8,8 +8,8 @@ const stores = [
     address: "서울 중구 세종대로18길 6 1-2층",
     bigRegionId: 1,
     smallRegionId: 24,
-    longitude: 126.977440016914,
-    latitude: 37.5637251812787,
+    lng: 126.977440016914,   // 경도
+    lat: 37.5637251812787,    // 위도
     phone: "000-111-1234",
     openingHours: "매일 12:00 ~ 24:00",
     menus: "교촌 오리지날",
@@ -23,8 +23,8 @@ const stores = [
     address: "서울특별시 중구 무교로 19",
     bigRegionId: 1,
     smallRegionId: 24,
-    longitude: 126.977945,
-    latitude: 37.566295,
+    lng: 126.977945,
+    lat: 37.566295,
     phone: "02-777-1234",
     openingHours: "매일 08:00 ~ 21:00",
     menus: "북어국, 공기밥",
@@ -38,8 +38,8 @@ const stores = [
     address: "서울특별시 중구 세종대로 18길 6",
     bigRegionId: 1,
     smallRegionId: 24,
-    longitude: 126.977945,
-    latitude: 37.566295,
+    lng: 126.977945,
+    lat: 37.566295,
     phone: "02-123-4567",
     openingHours: "매일 08:00 ~ 21:00",
     menus: "북어국, 공기밥",
@@ -79,15 +79,15 @@ export const seedStores = async () => {
       await queryRunner.query(
         `
         INSERT INTO stores
-          (store_name, address, location, phone, opening_hours, menus, type, description, user_id, business_number_id, big_region_id, small_region_id)
+          (store_name, address, lat, lng, phone, opening_hours, menus, type, description, user_id, business_number_id, big_region_id, small_region_id)
         VALUES
-          (?, ?, POINT(?, ?), ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
         [
           s.storeName,
           s.address,
-          s.longitude,
-          s.latitude,
+          s.lat,
+          s.lng,
           s.phone,
           s.openingHours,
           s.menus,

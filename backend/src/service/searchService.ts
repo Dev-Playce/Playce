@@ -2,15 +2,8 @@ import { AppDataSource } from "../data-source";
 import { Store } from "../entities/Store";
 import { createError } from "../utils/createError";
 
-const parsePoint = (point: string) => {
-  const match = /POINT\(([^ ]+) ([^ ]+)\)/.exec(point);
-  return match
-    ? { lng: parseFloat(match[1]), lat: parseFloat(match[2]) }
-    : { lng: null, lat: null };
-};
-
 const searchService = {
-  // 현재 위치 기반 검색
+  // ✅ 현재 위치 기반 검색
   getNearbyStores: async (lat: number, lng: number, radius: number = 5) => {
     console.log(`\n📍 [현재 위치 검색] lat: ${lat}, lng: ${lng}, radius: ${radius}km`);
 
@@ -22,49 +15,52 @@ const searchService = {
       .leftJoinAndSelect("store.broadcasts", "broadcast")
       .leftJoinAndSelect("broadcast.sport", "sport")
       .leftJoinAndSelect("broadcast.league", "league")
-      .where(
-        `ST_Distance_Sphere(POINT(:lng, :lat), store.location) <= :radius`,
-        { lat, lng, radius: radius * 1000 }
-      )
+      .addSelect(`
+        (6371 * acos(
+          cos(radians(:lat))
+          * cos(radians(store.lat))
+          * cos(radians(store.lng) - radians(:lng))
+          + sin(radians(:lat))
+          * sin(radians(store.lat))
+        ))
+      `, "distance")
+      .where(`
+        (6371 * acos(
+          cos(radians(:lat))
+          * cos(radians(store.lat))
+          * cos(radians(store.lng) - radians(:lng))
+          + sin(radians(:lat))
+          * sin(radians(store.lat))
+        )) <= :radius
+      `, { lat, lng, radius })
       .getMany();
 
     console.log(`- 검색 결과: ${stores.length}개`);
 
-    if (stores.length === 0) {
-      console.log("❌ 근처 식당 없음");
-      return [];
-    }
-
-    const result = stores.map((store) => {
-      const { lat, lng } = store.location
-        ? parsePoint(store.location as any)
-        : { lat: null, lng: null };
-
-      return {
-        store_id: store.id,
-        store_name: store.storeName,
-        type: store.type,
-        main_img: store.images[0]?.imgUrl ?? null,
-        address: store.address,
-        lat,
-        lng,
-        broadcasts: store.broadcasts.map((b) => ({
-          match_date: b.matchDate,
-          match_time: b.matchTime,
-          sport: b.sport.name,
-          league: b.league.name,
-          team_one: b.teamOne,
-          team_two: b.teamTwo,
-          etc: b.etc,
-        })),
-      };
-    });
+    const result = stores.map((store) => ({
+      store_id: store.id,
+      store_name: store.storeName,
+      type: store.type,
+      main_img: store.images[0]?.imgUrl ?? null,
+      address: store.address,
+      lat: store.lat,
+      lng: store.lng,
+      broadcasts: store.broadcasts.map((b) => ({
+        match_date: b.matchDate,
+        match_time: b.matchTime,
+        sport: b.sport.name,
+        league: b.league.name,
+        team_one: b.teamOne,
+        team_two: b.teamTwo,
+        etc: b.etc,
+      })),
+    }));
 
     console.log("✅ 현재 위치 검색 완료");
     return result;
   },
 
-  // 통합 검색
+  // ✅ 통합 검색
   searchStores: async (filters: {
     search?: string;
     sport?: string;
@@ -97,7 +93,7 @@ const searchService = {
       .leftJoinAndSelect("store.bigRegion", "bigRegion")
       .leftJoinAndSelect("store.smallRegion", "smallRegion");
 
-    // 필터링
+    // 🔍 필터 처리
     if (search) {
       console.log(`- 필터: 검색어 '${search}'`);
       query.andWhere(
@@ -136,7 +132,7 @@ const searchService = {
       });
     }
 
-    // 정렬
+    // 🔃 정렬
     if (sort === "date") {
       console.log("- 정렬: 날짜순");
       query.orderBy("broadcast.matchDate", "ASC");
@@ -149,31 +145,19 @@ const searchService = {
 
     console.log(`- 검색 결과: ${stores.length}개`);
 
-    if (stores.length === 0) {
-      console.log("❌ 검색 결과 없음");
-      return [];
-    }
-
-    const result = stores.map((store) => {
-      const { lat, lng } = store.location
-        ? parsePoint(store.location as any)
-        : { lat: null, lng: null };
-
-      return {
-        id: store.id,
-        store_name: store.storeName,
-        img_url: store.images[0]?.imgUrl ?? null,
-        address: store.address,
-        lat,
-        lng,
-        match_id: store.broadcasts[0]?.id ?? null,
-      };
-    });
+    const result = stores.map((store) => ({
+      id: store.id,
+      store_name: store.storeName,
+      img_url: store.images[0]?.imgUrl ?? null,
+      address: store.address,
+      lat: store.lat,
+      lng: store.lng,
+      match_id: store.broadcasts[0]?.id ?? null,
+    }));
 
     console.log("✅ 통합 검색 완료");
     return result;
   },
 };
-
 
 export default searchService;

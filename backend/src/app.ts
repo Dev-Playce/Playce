@@ -25,7 +25,7 @@ const port = process.env.PORT || 3000;
 
 // ✅ CORS 허용
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "*", // 배포 시 도메인 설정 가능
+  origin: ['http://localhost:5173', 'http://3.35.146.155:3000'], // 배포 시 도메인 설정 가능
   credentials: true,
 }));
 

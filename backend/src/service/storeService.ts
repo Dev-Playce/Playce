@@ -43,7 +43,8 @@ const storeService = {
       const bigRegionRepo = AppDataSource.getRepository(BigRegion);
       const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
       
-      const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(address, bigRegionRepo, smallRegionRepo);
+      // const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(address, bigRegionRepo, smallRegionRepo);
+      const { lat, lng, bigRegion, smallRegion } = await getLocationDataFromAddress(address, bigRegionRepo, smallRegionRepo);
 
       // stores에 정보 저장
       const storeRepo = AppDataSource.getRepository(Store);
@@ -54,7 +55,8 @@ const storeService = {
         address,
         bigRegion,
         smallRegion,
-        location,
+        lat,
+        lng,
         phone,
         openingHours,
         menus,
@@ -138,14 +140,17 @@ const storeService = {
         const bigRegionRepo = AppDataSource.getRepository(BigRegion);
         const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
 
-        const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(
+        // const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(
+        const { lat, lng, bigRegion, smallRegion } = await getLocationDataFromAddress(
           updateData.address,
           bigRegionRepo,
           smallRegionRepo
         );
 
         storeToUpdate.address = updateData.address;
-        storeToUpdate.location = location;
+        // storeToUpdate.location = location;
+        storeToUpdate.lat = lat;
+        storeToUpdate.lng = lng;
         storeToUpdate.bigRegion = bigRegion;
         storeToUpdate.smallRegion = smallRegion;
       }
