@@ -53,7 +53,7 @@ export const getLocationDataFromAddress = async (
   const findBigRegion = await bigRegionRepo.findOne({
     where: { name: Like(`${normalizeRegionName(bigRegionName)}%`) },
   });
-  if(!findBigRegion) throw createError('유효하지 않은 지역-대분류입니다.', 400);
+  if (!findBigRegion) throw createError('유효하지 않은 지역-대분류입니다.', 400);
 
   const findSmallRegion = await smallRegionRepo.findOne({
     where: {
@@ -65,7 +65,10 @@ export const getLocationDataFromAddress = async (
   console.log(`- 지역 id : 대분류(id: ${findBigRegion.id}, name: ${bigRegionName}), 소분류(id: ${findSmallRegion.id}, name: ${smallRegionName})`);
 
   // Point 객체 생성
-  const location = `POINT(${lng} ${lat})`;
+  const location = {
+    x: lng,
+    y: lat,
+  };
   console.log('- Point 객체 : ', location);
 
   return { location, bigRegion: findBigRegion, smallRegion: findSmallRegion };

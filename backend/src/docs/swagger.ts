@@ -27,7 +27,7 @@ const swaggerDefinition = {
 
 const options = {
     swaggerDefinition,
-    apis: ['src/routes/*.ts'], // JSDoc 주석을 읽어올 경로
+    apis: ['./src/routes/*.ts'], // JSDoc 주석을 읽어올 경로
 };
 
 const swaggerSpec = swaggerJSDoc(options);

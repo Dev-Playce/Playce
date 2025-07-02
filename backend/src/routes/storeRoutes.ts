@@ -61,10 +61,10 @@ const router = Router();
  *                 nullable: true
  *                 example: 축구 경기 생중계가 있는 강남 최고의 스포츠펍
  *               img_urls:
- *                 type: string[]
- *                 example:
- *                   - 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EC%95%88%EA%B2%BD%EA%B3%BC-%EC%96%91%EC%B4%88%EA%B0%80%EC%9E%88%EB%8A%94-%ED%85%8C%EC%9D%B4%EB%B8%94-NXzahh27tDQ'
- *                   - 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EB%B0%98%EC%AF%A4-%EC%B1%84%EC%9B%8C%EC%A7%84-%EC%99%80%EC%9D%B8-%EC%9E%94-%EC%98%86%EC%97%90-%EB%B0%98%EC%AF%A4-%EB%B9%88-%ED%88%AC%EB%AA%85-%ED%8C%8C%EC%9D%B8%ED%8A%B8-%EC%9E%94-OxKFC5u0980'
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EC%95%88%EA%B2%BD%EA%B3%BC-%EC%96%91%EC%B4%88%EA%B0%80%EC%9E%88%EB%8A%94-%ED%85%8C%EC%9D%B4%EB%B8%94-NXzahh27tDQ", "https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EB%B0%98%EC%AF%A4-%EC%B1%84%EC%9B%8C%EC%A7%84-%EC%99%80%EC%9D%B8-%EC%9E%94-%EC%98%86%EC%97%90-%EB%B0%98%EC%AF%A4-%EB%B9%88-%ED%88%AC%EB%AA%85-%ED%8C%8C%EC%9D%B8%ED%8A%B8-%EC%9E%94-OxKFC5u0980"]
  *     responses:
  *       201:
  *         description: 식당이 등록되었습니다.
@@ -89,7 +89,7 @@ router.post("/", authenticate, createStoreValidator, storeController.registerSto
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: 사용자가 등록한 식당 목록
+ *         description: 내 식당 목록 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -116,11 +116,9 @@ router.post("/", authenticate, createStoreValidator, storeController.registerSto
  *                         type: string
  *                         example: 서울특별시 강남구 테헤란로 123
  *                         description: 식당 주소
- *       200:
- *         description: 내 식당 목록 조회 성공
  *       401:
  *         description: 잘못된 인증 형식 또는 유효하지 않은 토큰
- *       403:
+ *       404:
  *         description: 사용자를 찾을 수 없음
  */
 router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식당 목록 조회 (🔒) <- 라우팅 순서 문제로 위치 수정
@@ -166,11 +164,11 @@ router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식�
  *               type:
  *                 type: string
  *                 example: 치킨
- *              img_urls:
- *                 type: string[]
- *                 example:
- *                   - 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EC%95%88%EA%B2%BD%EA%B3%BC-%EC%96%91%EC%B4%88%EA%B0%80%EC%9E%88%EB%8A%94-%ED%85%8C%EC%9D%B4%EB%B8%94-NXzahh27tDQ'
- *                   - 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EB%B0%98%EC%AF%A4-%EC%B1%84%EC%9B%8C%EC%A7%84-%EC%99%80%EC%9D%B8-%EC%9E%94-%EC%98%86%EC%97%90-%EB%B0%98%EC%AF%A4-%EB%B9%88-%ED%88%AC%EB%AA%85-%ED%8C%8C%EC%9D%B8%ED%8A%B8-%EC%9E%94-OxKFC5u0980'
+ *               img_urls:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EC%95%88%EA%B2%BD%EA%B3%BC-%EC%96%91%EC%B4%88%EA%B0%80%EC%9E%88%EB%8A%94-%ED%85%8C%EC%9D%B4%EB%B8%94-NXzahh27tDQ", "https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EB%B0%98%EC%AF%A4-%EC%B1%84%EC%9B%8C%EC%A7%84-%EC%99%80%EC%9D%B8-%EC%9E%94-%EC%98%86%EC%97%90-%EB%B0%98%EC%AF%A4-%EB%B9%88-%ED%88%AC%EB%AA%85-%ED%8C%8C%EC%9D%B8%ED%8A%B8-%EC%9E%94-OxKFC5u0980"]
  *               description:
  *                 type: string
  *                 example: 
@@ -294,8 +292,6 @@ router.delete("/:storeId", authenticate, storeController.deleteStore); // 3. 식
  *                       etc:
  *                         type: string
  *                         example: 경기 후 이벤트 있음
- *       200:
- *         description: 식당 상세 조회 성공
  *       404:
  *         description: 식당을 찾을 수 없음
  */

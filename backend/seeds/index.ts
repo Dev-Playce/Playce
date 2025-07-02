@@ -10,6 +10,7 @@ import { seedStores } from "./storeSeeder";
 import { seedBroadcasts } from "./broadcastSeeder";
 import { seedFavorites } from "./favoriteSeeder";
 
+
 const runSeeders = async () => {
   await AppDataSource.initialize();
   console.log("📦 DB 연결");

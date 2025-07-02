@@ -130,14 +130,14 @@ router.get("/nearby", NearbySearchValidator, searchController.getNearbyStores);
  *         schema:
  *           type: string
  *           example: soccer
- *         description: 종목 (예: 축구, 야구 등)
+ *         description: "종목 (예: 축구, 야구 등)"
  *       - in: query
  *         name: league
  *         required: false
  *         schema:
  *           type: string
  *           example: K League
- *         description: 리그 (예: 프리미어리그)
+ *         description: "리그 (예: 프리미어리그)"
  *       - in: query
  *         name: team
  *         required: false

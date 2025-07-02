@@ -22,9 +22,9 @@ export class Store {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => User, (user) => user.stores, { 
+  @ManyToOne(() => User, (user) => user.stores, {
     nullable: false,
-    onDelete: 'CASCADE' 
+    onDelete: 'CASCADE'
   })
   @JoinColumn({
     name: "user_id",
@@ -66,7 +66,10 @@ export class Store {
     spatialFeatureType: "Point",
     srid: 4326,
   })
-  location!: string;
+  location!: {
+    x: number; // longitude
+    y: number; // latitude
+  };
 
   @Column({ name: "phone" })
   phone!: string;
