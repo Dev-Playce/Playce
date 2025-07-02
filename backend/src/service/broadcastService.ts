@@ -35,6 +35,14 @@ const createBroadcast = async (data: any, userId: number) => {
   const league = await leagueRepo.findOneBy({ id: data.league_id });
   if (!league) throw createError("존재하지 않는 리그입니다.", 404);
 
+  if (!sport.isTeamCompetition) {
+    if (data.team_one || data.team_two) {
+      data.team_one = undefined;
+      data.team_two = undefined;
+      throw createError(`해당 스포츠(${sport.name})는 팀 이름을 입력할 필요가 없습니다.`, 400);
+    }
+  }
+
   const newBroadcast = broadcastRepo.create({
     store,
     sport,
@@ -108,14 +116,25 @@ const deleteBroadcast = async (broadcastId: number, userId: number) => {
   console.log("✅ 중계 일정 삭제 완료");
 };
 
+// 중계 일정 목록 조회
 const getBroadcastsByStore = async (storeId: number) => {
   const broadcasts = await broadcastRepo.find({
     where: { store: { id: storeId } },
-    relations: ["store", "sport", "league"],
+    relations: ["sport", "league"],
     order: { matchDate: "ASC", matchTime: "ASC" },
   });
+
+  const responseData = broadcasts.map(b => ({
+    match_data: b.matchDate,
+    match_time: b.matchTime,
+    sport: b.sport.name,
+    league: b.league.name,
+    team_one: b.teamOne,
+    team_two: b.teamTwo,
+    ect: b.etc
+  }));
   console.log(`✅ 조회 완료 - ${broadcasts.length}건`);
-  return broadcasts;
+  return responseData
 };
 
 export default {

@@ -74,7 +74,9 @@ const router = Router();
  *                     broadcast_id:
  *                       type: integer
  *                       example: 1
- */
+ *       400:
+ *         description: 해당 스포츠는 팀 이름을 입력할 필요가 없습니다.
+*/
 router.post('/', authenticate, createBroadcastValidator, broadcastController.createBroadcast);
 
 /**

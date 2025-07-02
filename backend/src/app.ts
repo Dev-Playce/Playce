@@ -16,6 +16,7 @@ import storeRoutes from "./routes/storeRoutes";
 import searchRoutes from "./routes/searchRoutes";
 import broadcastRoutes from "./routes/broadcastRoutes";
 import favoriteRoutes from "./routes/favoriteRoutes";
+import staticdataRoutes from "./routes/staticdataRoutes";
 
 //헬퍼
 import { fail } from "./utils/response";
@@ -40,6 +41,7 @@ app.use("/stores", storeRoutes); // 식당
 app.use("/search", searchRoutes); // 검색
 app.use("/broadcasts", broadcastRoutes); // 중계 일정
 app.use("/favorites", favoriteRoutes); // 즐겨찾기
+app.use("/staticdata", staticdataRoutes); // 지역/경기 관련
 
 // 정의되지 않은 라우터 -> 404 에러 처리
 app.use((req: Request, res: Response, next: NextFunction) => {
