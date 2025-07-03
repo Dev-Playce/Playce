@@ -68,7 +68,7 @@ const searchService = {
     team?: string;
     big_region?: string;
     small_region?: string;
-    sort?: "date" | "name";
+    // sort?: "date" | "name";
   }) => {
     console.log("\n🔎 [통합 검색] 요청 필터:", filters);
 
@@ -79,7 +79,7 @@ const searchService = {
       team,
       big_region,
       small_region,
-      sort,
+      // sort,
     } = filters;
 
     const storeRepo = AppDataSource.getRepository(Store);
@@ -126,21 +126,20 @@ const searchService = {
       query.andWhere("bigRegion.name = :bigRegion", { bigRegion: big_region });
     }
 
-
     if (small_region && small_region !== "전체" && small_region !== "all") {
       query.andWhere("smallRegion.name = :smallRegion", { smallRegion: small_region });
     } else {
       console.log("- 필터: 소지역 전체 (필터 생략)");
     }
 
-    // 🔃 정렬
-    if (sort === "date") {
-      console.log("- 정렬: 날짜순");
-      query.orderBy("broadcast.matchDate", "ASC");
-    } else if (sort === "name") {
-      console.log("- 정렬: 이름순");
-      query.orderBy("store.storeName", "ASC");
-    }
+    // // 🔃 정렬
+    // if (sort === "date") {
+    //   console.log("- 정렬: 날짜순");
+    //   query.orderBy("broadcast.matchDate", "ASC");
+    // } else if (sort === "name") {
+    //   console.log("- 정렬: 이름순");
+    //   query.orderBy("store.storeName", "ASC");
+    // }
 
     const stores = await query.getMany();
 

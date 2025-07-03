@@ -45,6 +45,7 @@ const storeService = {
       
       // const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(address, bigRegionRepo, smallRegionRepo);
       const { lat, lng, bigRegion, smallRegion } = await getLocationDataFromAddress(address, bigRegionRepo, smallRegionRepo);
+      console.log(`- 지역 : 대분류(${bigRegion.id}, ${bigRegion.name}), 소분류(${smallRegion.id}, ${smallRegion.name}), 위도(${lat}), 경도(${lng})`);
 
       // stores에 정보 저장
       const storeRepo = AppDataSource.getRepository(Store);

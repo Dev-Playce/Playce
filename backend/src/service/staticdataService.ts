@@ -39,11 +39,14 @@ const staticdataService = {
     }
 
     console.log(`지역 소분류 조회 완료 - ${smallRegions.length}건`);
-    return smallRegions.map((region) => ({
-      id: region.id,
-      name: region.name,
-      big_region_id: bigRegionId,
-    }));
+    return [
+      { id: 0, name: "전체", big_region_id: bigRegionId },
+      ...smallRegions.map((region) => ({
+        id: region.id,
+        name: region.name,
+        big_region_id: bigRegionId,
+      })),
+    ];
   },
 
   // 3. 종목 전체 조회
@@ -79,11 +82,14 @@ const staticdataService = {
     }
 
     console.log(`리그 목록 조회 완료 - ${leagues.length}건`);
-    return leagues.map((league) => ({
-      id: league.id,
-      name: league.name,
-      sport_id: sportId,
-    }));
+    return [
+      { id: 0, name: "전체", sport_id: sportId },
+      ...leagues.map((league) => ({
+        id: league.id,
+        name: league.name,
+        sport_id: sportId,
+      })),
+    ];
   },
 };
 
