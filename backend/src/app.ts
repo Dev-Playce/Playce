@@ -22,7 +22,8 @@ import staticdataRoutes from "./routes/staticdataRoutes";
 import { fail } from "./utils/response";
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
+// const port = process.env.PORT || 3000;
 
 // ✅ CORS 허용
 app.use(cors({
@@ -58,15 +59,18 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   return fail(res, message, status);
 });
 
-// TypeORM 연결 후 서버 실행
+
+
 AppDataSource.initialize()
   .then(() => {
     console.log("📦 DB 연결 성공(TypeORM)");
-    app.listen(port, () => {
-      console.log(`🚀서버 실행 중 : http://localhost:${port}`);
-      console.log(`💡 Swagger 문서 :  http://localhost:${port}/api-docs`);
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`🚀 서버 실행 중 : http://3.35.146.155:${port}`);
+      console.log(`💡 Swagger 문서 :  http://3.35.146.155:${port}/api-docs`);
     });
   })
   .catch((error: any) => {
     console.error("❌ DB 연결 실패:", error);
   });
+
+
