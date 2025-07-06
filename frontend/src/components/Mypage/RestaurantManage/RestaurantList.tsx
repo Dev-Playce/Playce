@@ -2,19 +2,16 @@ import { useEffect, useState } from "react";
 import { dummyRestaurantDetails } from "../../../data/dummyRestaurantDetail";
 import { FiChevronLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
 import DetailStores from "../../RestaurantDetail/RestaurantDetail.tsx";
-import type {
-  MyStore,
-  RestaurantDetail,
-} from "../../../types/restaurant.types";
+import type { MyStore } from "../../../types/restaurant.types";
 import useMypageStore from "../../../stores/mypageStore.ts";
 import { dummyMyStores } from "../../../data/dummy-my-stores.ts";
 import { deleteStore } from "../../../api/restaurant.api.ts";
 
 const RestaurantList = () => {
   const [stores, setStores] = useState<MyStore[]>([]);
-  const [selectedDetail, setSelectedDetail] = useState<RestaurantDetail | null>(
-    null
-  );
+  const [selectedDetailStoreId, setSelectedDetailStoreId] = useState<
+    number | null
+  >(null);
   const { setRestaurantSubpage, setRestaurantEdit } = useMypageStore();
 
   // Todo: 내 식당 목록 불러오기
@@ -65,13 +62,7 @@ const RestaurantList = () => {
                 </div>
                 {/* 상세보기 < 버튼 */}
                 <button
-                  onClick={() =>
-                    setSelectedDetail(
-                      dummyRestaurantDetails.find(
-                        (d) => d.store_name === store.store_name
-                      ) || null
-                    )
-                  }
+                  onClick={() => setSelectedDetailStoreId(store.store_id)}
                   className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-primary4 transition ml-1"
                   aria-label="상세보기"
                 >
@@ -104,10 +95,12 @@ const RestaurantList = () => {
         </>
       )}
       {/* 상세보기 */}
-      {selectedDetail && (
+      {selectedDetailStoreId && (
         <DetailStores
-          detail={selectedDetail}
-          onClose={() => setSelectedDetail(null)}
+          // Todo: 수정해야 함
+          detail={dummyRestaurantDetails[0]}
+          storeId={selectedDetailStoreId}
+          onClose={() => setSelectedDetailStoreId(null)}
         />
       )}
     </section>
