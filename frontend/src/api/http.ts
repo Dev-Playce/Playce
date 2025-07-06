@@ -18,6 +18,7 @@ export const createClient = (config?: AxiosRequestConfig) => {
 
   axiosInstance.interceptors.request.use((config) => {
     const token = getToken();
+     console.log("Axios 요청 토큰:", token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
