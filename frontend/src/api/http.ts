@@ -18,7 +18,6 @@ export const createClient = (config?: AxiosRequestConfig) => {
 
   axiosInstance.interceptors.request.use((config) => {
     const token = getToken();
-     console.log("Axios 요청 토큰:", token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -41,7 +40,7 @@ export const createClient = (config?: AxiosRequestConfig) => {
 
 export const httpClient = createClient();
 
-export type RequestMethod = "get" | "post" | "put" | "delete";
+export type RequestMethod = "get" | "post" | "put" | "patch" | "delete";
 
 export const requestHandler = async <T = unknown>(
   method: RequestMethod,
@@ -61,6 +60,9 @@ export const requestHandler = async <T = unknown>(
     }
     case "post":
       response = await httpClient.post(url, payload);
+      break;
+    case "patch":
+      response = await httpClient.patch(url, payload);
       break;
     case "put":
       response = await httpClient.put(url, payload);

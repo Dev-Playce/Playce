@@ -13,7 +13,6 @@ export const useAuth = () => {
   const userLogin = async (data: LoginProps) => {
     try {
       const res = await login(data);
-      localStorage.setItem("accessToken", res.data.token);
       storeLogin(res.data.token);
       alert("로그인이 완료되었습니다.");
       setIsLoginModalOpen(false);

@@ -154,4 +154,52 @@ export const dummyRestaurantDetails: RestaurantDetail[] = [
       },
     ],
   },
+  {
+    id: 6,
+    store_name: "레드풋볼 강남점",
+    address: "서울 강남구 역삼로 111",
+    phone: "051-555-7777",
+    opening_hours: "매일 18:00 ~ 03:00",
+    menus: ["나쵸", "핫도그", "버드와이저", "하이네켄"],
+    type: "스포츠 바",
+    img_list: [
+      "https://images.pexels.com/photos/1395967/pexels-photo-1395967.jpeg?auto=compress&w=400&q=80",
+    ],
+    description: "바다 보며 보는 축구는 또 다른 재미! 외국인 손님도 많아요.",
+    broadcasts: [
+      {
+        match_date: "2025-07-06",
+        match_time: "22:00",
+        sport: "축구",
+        league: "유로 2024",
+        team_one: "프랑스",
+        team_two: "독일",
+        etc: "4강전",
+      },
+    ],
+  },
+  {
+    id: 6,
+    store_name: "레드풋볼 강남점",
+    address: "서울 강남구 역삼로 111",
+    phone: "051-555-7777",
+    opening_hours: "매일 18:00 ~ 03:00",
+    menus: ["나쵸", "핫도그", "버드와이저", "하이네켄"],
+    type: "스포츠 바",
+    img_list: [
+      "https://images.pexels.com/photos/1395967/pexels-photo-1395967.jpeg?auto=compress&w=400&q=80",
+    ],
+    description: "바다 보며 보는 축구는 또 다른 재미! 외국인 손님도 많아요.",
+    broadcasts: [
+      {
+        match_date: "2025-07-06",
+        match_time: "22:00",
+        sport: "축구",
+        league: "유로 2024",
+        team_one: "프랑스",
+        team_two: "독일",
+        etc: "4강전",
+      },
+    ],
+  },
 ];

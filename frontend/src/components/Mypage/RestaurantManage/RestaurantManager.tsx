@@ -23,6 +23,10 @@ const RestaurantManager = ({ onClose }: MypageProps) => {
                 if (restaurantSubpage === "schedule-view-broadcasts") {
                   setRestaurantSubpage("schedule-view-restaurants");
                   resetYMD();
+                } else if (restaurantSubpage === "restaurant-list-edit") {
+                  if (window.confirm("식당 수정을 취소하시겠습니까?")) {
+                    setRestaurantSubpage("restaurant-list");
+                  }
                 } else {
                   setRestaurantSubpage("restaurant-home");
                 }
