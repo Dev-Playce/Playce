@@ -4,6 +4,7 @@ import { dummyRestaurantDetails } from "../../../data/dummyRestaurantDetail";
 import { FiChevronLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
 import DetailStores from "../../RestaurantDetail/RestaurantDetail.tsx";
 import type { RestaurantDetail } from "../../../types/restaurant.types";
+import useMypageStore from "../../../stores/mypageStore.ts";
 // import StoreFormModal from "./modals/RestaurantFormModal.tsx";
 // import Button from "../../Common/Button";
 
@@ -29,6 +30,7 @@ const MyStoreList = () => {
   const [selectedDetail, setSelectedDetail] = useState<RestaurantDetail | null>(
     null
   );
+  const { setRestaurantSubpage, setRestaurantEdit } = useMypageStore();
   // const [formOpen, setFormOpen] = useState(false);
   // const [editTarget, setEditTarget] = useState<StoreFormRequest | null>(null);
 
@@ -119,6 +121,8 @@ const MyStoreList = () => {
                   onClick={() => {
                     // setFormOpen(true);
                     // setEditTarget(store);
+                    setRestaurantEdit(store);
+                    setRestaurantSubpage("restaurant-list-edit");
                   }}
                   className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-blue-50 transition ml-1"
                   aria-label="수정"

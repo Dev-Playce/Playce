@@ -10,7 +10,8 @@ const RestaurantHome = () => {
         .filter(
           (item) =>
             item.key !== "restaurant-home" &&
-            item.key !== "schedule-view-broadcasts"
+            item.key !== "schedule-view-broadcasts" &&
+            item.key !== "restaurant-list-edit"
         )
         .map((item) => (
           <button

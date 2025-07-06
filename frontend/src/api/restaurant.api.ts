@@ -3,7 +3,7 @@ import { requestHandler } from "./http";
 export const getStoreDetail = (storeId: number) =>
   requestHandler("get", `/stores/${storeId}`);
 
-export interface RegisterStoreProps {
+export interface RegisterEditStoreProps {
   store_name: string;
   business_number: string;
   address: string;
@@ -15,6 +15,10 @@ export interface RegisterStoreProps {
   images: string[];
 }
 
-export const registerStore = (data: RegisterStoreProps) => {
+export const registerStore = (data: RegisterEditStoreProps) => {
   return requestHandler("post", "/stores", data);
+};
+
+export const editStore = (data: RegisterEditStoreProps, storeId: number) => {
+  return requestHandler("patch", `/stores/${storeId}`, data);
 };

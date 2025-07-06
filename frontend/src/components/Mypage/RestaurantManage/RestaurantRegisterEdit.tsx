@@ -1,38 +1,40 @@
 import { useState } from "react";
-import type { StoreFormRequest } from "../../../types/restaurantFormRequest";
 import validateStoreForm from "./modals/validateStoreForm";
 import ErrorMessage from "./modals/ErrorMessage";
 import MenuInputList from "./modals/MenuInputList";
 import ImageUrlInputList from "./modals/ImageUrlInputList";
 import {
+  editStore,
   registerStore,
-  type RegisterStoreProps,
+  type RegisterEditStoreProps,
 } from "../../../api/restaurant.api";
 import useMypageStore from "../../../stores/mypageStore";
-import { getToken } from "../../../stores/authStore";
 import FindAddressButton from "../../Common/FindAddressButton";
 
 interface StoreFormModalProps {
   mode: "create" | "edit";
-  initial?: StoreFormRequest;
 }
 
-const RestaurantRegisterEdit = ({ mode, initial }: StoreFormModalProps) => {
-  const { setRestaurantSubpage } = useMypageStore();
+const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
+  const { restaurantEdit, setRestaurantSubpage } = useMypageStore();
 
-  const [storeName, setStoreName] = useState(initial?.store_name || "");
+  const [storeName, setStoreName] = useState(restaurantEdit?.store_name || "");
   const [businessNumber, setBusinessNumber] = useState(
-    initial?.business_number || ""
+    restaurantEdit?.business_number || ""
   );
-  const [address, setAddress] = useState(initial?.address || "");
-  const [phone, setPhone] = useState(initial?.phone || "");
+  const [address, setAddress] = useState(restaurantEdit?.address || "");
+  const [phone, setPhone] = useState(restaurantEdit?.phone || "");
   const [openingHours, setOpeningHours] = useState(
-    initial?.opening_hours || ""
+    restaurantEdit?.opening_hours || ""
   );
-  const [type, setType] = useState(initial?.type || "");
-  const [description, setDescription] = useState(initial?.description || "");
-  const [menus, setMenus] = useState<string[]>(initial?.menus || [""]);
-  const [imgUrls, setImgUrls] = useState<string[]>(initial?.img_urls || [""]);
+  const [type, setType] = useState(restaurantEdit?.type || "");
+  const [description, setDescription] = useState(
+    restaurantEdit?.description || ""
+  );
+  const [menus, setMenus] = useState<string[]>(restaurantEdit?.menus || [""]);
+  const [imgUrls, setImgUrls] = useState<string[]>(
+    restaurantEdit?.img_urls || [""]
+  );
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [agree, setAgree] = useState(false);
 
@@ -54,21 +56,30 @@ const RestaurantRegisterEdit = ({ mode, initial }: StoreFormModalProps) => {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
+    const data: RegisterEditStoreProps = {
+      store_name: storeName,
+      business_number: businessNumber,
+      address,
+      phone,
+      opening_hours: openingHours,
+      menus: menus.filter(Boolean)[0],
+      type,
+      description,
+      images: imgUrls.filter(Boolean),
+    };
     if (mode === "create") {
-      const data: RegisterStoreProps = {
-        store_name: storeName,
-        business_number: businessNumber,
-        address,
-        phone,
-        opening_hours: openingHours,
-        menus: menus.filter(Boolean)[0],
-        type,
-        description,
-        images: imgUrls.filter(Boolean),
-      };
       try {
-        console.log(getToken());
         await registerStore(data);
+        alert(`식당 등록이 완료되었습니다.`);
+        setRestaurantSubpage("restaurant-home");
+      } catch (e) {
+        console.log(data);
+        alert(`${e}\n식당을 등록할 수 없습니다.`);
+      }
+    } else if (mode === "edit") {
+      try {
+        // await registerStore(data);
+        await editStore(data, 1);
         alert(`식당 등록이 완료되었습니다.`);
         setRestaurantSubpage("restaurant-home");
       } catch (e) {

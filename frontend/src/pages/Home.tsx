@@ -26,11 +26,12 @@ const Home: React.FC = () => {
   useGeoLocation(geolocationOptions);
 
   useEffect(() => {
-    fetchRestaurants({
-      lat: position.lat,
-      lng: position.lng,
-      radius: SEARCHNEARBY_RADIUS,
-    });
+    // 서버 닫혔을 때 주석처리
+    // fetchRestaurants({
+    //   lat: position.lat,
+    //   lng: position.lng,
+    //   radius: SEARCHNEARBY_RADIUS,
+    // });
   }, [setRestaurants]);
 
   return (
