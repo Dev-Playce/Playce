@@ -10,7 +10,7 @@ interface ModalBaseProps {
   title?: string;
   hideHeader?: boolean;
   className?: string;
-  type?: "auth";
+  type?: "auth" | "mypage";
 }
 
 const ModalBase = ({
@@ -29,8 +29,11 @@ const ModalBase = ({
       <div
         className={classNames(
           "bg-white rounded-xl shadow-lg max-h-[90vh] overflow-hidden flex flex-col",
-          { "w-[400px]": type === "auth" },
-          { "w-[600px]": type !== "auth" },
+          type === "auth"
+            ? "w-[400px]"
+            : type === "mypage"
+            ? "w-[750px]"
+            : "w-[600px]",
           className
         )}
         onClick={(e) => e.stopPropagation()}
@@ -40,13 +43,18 @@ const ModalBase = ({
             <h2 className="text-lg font-bold text-mainText items-center m-0">
               {title}
             </h2>
-            <Button onClick={onClose} scheme="close" size="icon" className="text-mainText">
+            <Button
+              onClick={onClose}
+              scheme="close"
+              size="icon"
+              className="text-mainText"
+            >
               <FaTimes />
             </Button>
           </div>
         )}
 
-        <div className="overflow-y-auto px-4 py-3 flex-grow">{children}</div>
+        <div className="flex-grow">{children}</div>
       </div>
     </div>,
     document.body
