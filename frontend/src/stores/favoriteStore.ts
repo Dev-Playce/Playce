@@ -9,14 +9,16 @@ interface FavoriteStoreState {
   removeFavorite: (store_id: number) => Promise<void>;
 }
 
-const useFavoriteStore = create<FavoriteStoreState>((set, get) => ({
+const useFavoriteStore = create<
+  FavoriteStoreState & { resetFavorites: () => void }
+>((set, get) => ({
   favorites: [],
   fetchFavorites: async () => {
     try {
       const res = await getFavorites();
       set({ favorites: res.data.stores || [] });
     } catch {
-      set({ favorites: [] }); // 에러 시 빈 배열로
+      set({ favorites: [] });
     }
   },
   addFavorite: async (store_id) => {
@@ -27,6 +29,7 @@ const useFavoriteStore = create<FavoriteStoreState>((set, get) => ({
     await removeFavorite(store_id);
     await get().fetchFavorites();
   },
+  resetFavorites: () => set({ favorites: [] }), // 추가!
 }));
 
 export default useFavoriteStore;
