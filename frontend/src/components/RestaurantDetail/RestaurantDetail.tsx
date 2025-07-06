@@ -37,7 +37,7 @@ export default function RestaurantDetailComponent({
 
   const handleToggleFavorite = async () => {
     if (!isLoggedIn) {
-      alert("로그인 후 즐겨찾기 기능을 이용해보세요.");
+      alert("로그인 후 이용할 수 있는 기능입니다.");
       return;
     }
     if (isFavorite) {
