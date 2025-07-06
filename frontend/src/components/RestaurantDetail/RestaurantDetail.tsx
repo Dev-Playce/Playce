@@ -13,30 +13,37 @@ import type { RestaurantDetail } from "../../types/restaurant.types";
 import Button from "../Common/Button";
 import classNames from "classnames";
 import useFavoriteStore from "../../stores/favoriteStore";
+import useAuthStore from "../../stores/authStore";
 
 const TABS = ["홈", "메뉴", "중계"] as const;
 type Tab = (typeof TABS)[number];
 
 interface RestaurantDetailComponentProps {
   detail: RestaurantDetail;
+  storeId: number;
   onClose?: () => void;
 }
 
 export default function RestaurantDetailComponent({
   detail,
+  storeId,
   onClose,
 }: RestaurantDetailComponentProps) {
   const [currentTab, setCurrentTab] = useState<Tab>("홈");
 
-  // 즐겨찾기 글로벌 상태 사용
-  const { favoriteIds, addFavorite, removeFavorite } = useFavoriteStore();
-  const isFavorite = favoriteIds.includes(detail.id);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
+  const isFavorite = favorites.some((fav) => fav.store_id === storeId);
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = async () => {
+    if (!isLoggedIn) {
+      alert("로그인 후 이용할 수 있는 기능입니다.");
+      return;
+    }
     if (isFavorite) {
-      removeFavorite(detail.id);
+      await removeFavorite(storeId);
     } else {
-      addFavorite(detail.id);
+      await addFavorite(storeId);
     }
   };
 
