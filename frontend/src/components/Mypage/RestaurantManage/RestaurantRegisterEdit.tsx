@@ -6,7 +6,8 @@ import ImageUrlInputList from "./modals/ImageUrlInputList";
 import {
   editStore,
   registerStore,
-  type RegisterEditStoreProps,
+  type EditStoreProps,
+  type RegisterStoreProps,
 } from "../../../api/restaurant.api";
 import useMypageStore from "../../../stores/mypageStore";
 import FindAddressButton from "../../Common/FindAddressButton";
@@ -24,6 +25,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
     mode === "create" ? null : dummyRestaurantDetails[restaurantEditId! - 1];
 
   const [storeName, setStoreName] = useState(storeDetail?.store_name || "");
+  const [businessNumber, setBusinessNumber] = useState("");
   const [address, setAddress] = useState(storeDetail?.address || "");
   const [phone, setPhone] = useState(storeDetail?.phone || "");
   const [openingHours, setOpeningHours] = useState(
@@ -33,7 +35,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
   const [description, setDescription] = useState(
     storeDetail?.description || ""
   );
-  const [menus, setMenus] = useState<string[]>([]); // Todo
+  const [menus, setMenus] = useState<string[]>([""]); // Todo
   const [imgUrls, setImgUrls] = useState<string[]>(
     storeDetail?.img_list || [""]
   );
@@ -44,30 +46,32 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
     e.preventDefault();
     const newErrors = validateStoreForm({
       store_name: storeName,
+      business_number: businessNumber,
       address,
       phone,
       opening_hours: openingHours,
       menus,
       type,
       description,
-      img_urls: imgUrls,
+      images: imgUrls,
     });
     if (!agree)
       newErrors.agree = "중계권 관련 약관에 동의해야 등록이 가능합니다.";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    const data: RegisterEditStoreProps = {
-      store_name: storeName,
-      address,
-      phone,
-      opening_hours: openingHours,
-      menus: menus.filter(Boolean)[0],
-      type,
-      description,
-      images: imgUrls.filter(Boolean),
-    };
     if (mode === "create") {
+      const data: RegisterStoreProps = {
+        store_name: storeName,
+        address,
+        phone,
+        business_number: businessNumber,
+        opening_hours: openingHours,
+        menus: menus.filter(Boolean),
+        type,
+        description,
+        images: imgUrls.filter(Boolean),
+      };
       try {
         await registerStore(data);
         alert(`식당 등록이 완료되었습니다.`);
@@ -78,12 +82,21 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
       }
     } else if (mode === "edit") {
       try {
+        const data: EditStoreProps = {
+          store_name: storeName,
+          address,
+          phone,
+          opening_hours: openingHours,
+          menus: menus.filter(Boolean),
+          type,
+          description,
+          images: imgUrls.filter(Boolean),
+        };
         // await registerStore(data);
         await editStore(data, 1);
         alert(`식당 등록이 완료되었습니다.`);
         setRestaurantSubpage("restaurant-home");
       } catch (e) {
-        console.log(data);
         alert(`${e}\n식당을 등록할 수 없습니다.`);
       }
     }
@@ -115,17 +128,19 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
           />
           <ErrorMessage message={errors.store_name} />
         </div>
-        {/* <div>
-          <label className="block mb-1 font-semibold text-gray-700">
-            사업자등록번호 <span className="text-red-500">*</span>
-          </label>
-          <input
-            className="w-full border rounded px-3 py-2"
-            value={businessNumber}
-            onChange={(e) => setBusinessNumber(e.target.value)}
-          />
-          <ErrorMessage message={errors.business_number} />
-        </div> */}
+        {mode === "create" && (
+          <div>
+            <label className="block mb-1 font-semibold text-gray-700">
+              사업자등록번호 <span className="text-red-500">*</span>
+            </label>
+            <input
+              className="w-full border rounded px-3 py-2"
+              value={businessNumber}
+              onChange={(e) => setBusinessNumber(e.target.value)}
+            />
+            <ErrorMessage message={errors.business_number} />
+          </div>
+        )}
         <div>
           <label className="block mb-1 font-semibold text-gray-700">
             주소 <span className="text-red-500">*</span>

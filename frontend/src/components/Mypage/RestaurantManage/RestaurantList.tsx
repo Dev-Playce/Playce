@@ -8,6 +8,7 @@ import type {
 } from "../../../types/restaurant.types";
 import useMypageStore from "../../../stores/mypageStore.ts";
 import { dummyMyStores } from "../../../data/dummy-my-stores.ts";
+import { deleteStore } from "../../../api/restaurant.api.ts";
 
 const RestaurantList = () => {
   const [stores, setStores] = useState<MyStore[]>([]);
@@ -23,11 +24,10 @@ const RestaurantList = () => {
   }, []);
 
   // 삭제
-  const handleRemove = (store_name: string) => {
+  const handleRemove = (id: number) => {
     if (window.confirm("정말 이 식당을 삭제하시겠습니까?")) {
-      setStores((stores) =>
-        stores!.filter((store) => store.store_name !== store_name)
-      );
+      deleteStore(id);
+      setStores((stores) => stores!.filter((store) => store.store_id !== id));
     }
   };
 
@@ -92,7 +92,7 @@ const RestaurantList = () => {
                 </button>
                 {/* 삭제 버튼 */}
                 <button
-                  onClick={() => handleRemove(store.store_name)}
+                  onClick={() => handleRemove(store.store_id)}
                   className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-red-50 transition ml-1"
                   aria-label="삭제"
                 >

@@ -40,7 +40,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const sizeStyle = {
       small: "px-3 py-1 text-sm",
       medium: "px-4 py-2 text-base",
-      large: "px-5 py-3 text-lg",
+      large: "px-5 py-3 text-xl",
       semi: "px-4 py-1.5 text-sm",
       icon: "p-2 text-lg",
     };

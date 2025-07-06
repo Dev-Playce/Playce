@@ -1,6 +1,6 @@
-import type { StoreFormRequest } from "../../../../types/restaurantFormRequest";
+import type { RegisterStoreProps } from "../../../../api/restaurant.api";
 
-const validateStoreForm = (data: StoreFormRequest) => {
+const validateStoreForm = (data: RegisterStoreProps) => {
   const newErrors: { [key: string]: string } = {};
   if (!data.store_name.trim())
     newErrors.store_name = "가게명은 필수 입력입니다.";

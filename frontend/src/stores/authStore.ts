@@ -13,16 +13,16 @@ interface AuthState {
 }
 
 export const getToken = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   return token;
 };
 
 const setToken = (token: string) => {
-  localStorage.setItem("token", token);
+  localStorage.setItem("accessToken", token);
 };
 
 export const removeToken = () => {
-  localStorage.removeItem("token");
+  localStorage.removeItem("accessToken");
 };
 
 const useAuthStore = create<AuthState>((set) => ({
