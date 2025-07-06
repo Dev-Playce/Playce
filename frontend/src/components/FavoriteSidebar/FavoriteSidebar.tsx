@@ -1,41 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiStar } from "react-icons/fi";
-import { dummyRestaurantDetails } from "../../data/dummyRestaurantDetail";
 import useFavoriteStore from "../../stores/favoriteStore";
+import useAuthStore from "../../stores/authStore";
 import RestaurantCardList from "../RestaurantCardList/RestaurantCardList";
 import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail.tsx";
 import type { RestaurantDetail } from "../../types/restaurant.types";
+import { getStoreDetail } from "../../api/restaurant.api";
 
 export default function FavoriteSidebar() {
-  const { favoriteIds, removeFavorite } = useFavoriteStore();
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const { favorites, fetchFavorites, removeFavorite } = useFavoriteStore();
   const [expanded, setExpanded] = useState(false);
-  const [selectedDetail, setSelectedDetail] = useState<RestaurantDetail | null>(
-    null
-  );
 
-  // 즐겨찾기된 식당 리스트 필터링 및 필요한 필드만 추출
-  const favorites = dummyRestaurantDetails
-    .filter((store) => favoriteIds.includes(store.id))
-    .map((store) => ({
-      store_id: store.id,
-      store_name: store.store_name,
-      main_img: store.img_list?.[0] || "",
-      address: store.address,
-      type: store.type,
-    }));
+  // storeId와 detail을 함께 관리
+  const [selectedDetail, setSelectedDetail] = useState<{
+    storeId: number;
+    detail: RestaurantDetail;
+  } | null>(null);
 
-  // 펼침 여부에 따라 보여줄 식당 리스트 제한
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchFavorites();
+    }
+  }, [isLoggedIn, fetchFavorites]);
+
   const visibleFavorites = expanded ? favorites : favorites.slice(0, 3);
 
-  // 상세보기 버튼 클릭 시 해당 식당 상세 데이터 찾아 상태에 저장
-  const handleDetail = (store_id: number) => {
-    const detail = dummyRestaurantDetails.find((d) => d.id === store_id);
-    if (detail) setSelectedDetail(detail);
+  // 상세보기 버튼 클릭 시 storeId와 detail을 함께 저장
+  const handleDetail = async (store_id: number) => {
+    try {
+      const res = await getStoreDetail(store_id);
+      if (res.success && res.data) {
+        setSelectedDetail({ storeId: store_id, detail: res.data });
+      } else {
+        alert("상세 정보를 찾을 수 없습니다.");
+      }
+    } catch {
+      alert("상세 정보를 불러오지 못했습니다.");
+    }
   };
 
   return (
     <section className="w-full bg-white px-4 pt-4 pb-3 rounded-xl shadow">
-      {/* 헤더 및 펼침/접기 토글 버튼 */}
       <button
         className="flex items-center w-full h-8 border-b border-gray-100 bg-white group mb-3"
         onClick={() => setExpanded((prev) => !prev)}
@@ -48,22 +54,28 @@ export default function FavoriteSidebar() {
         </span>
       </button>
 
-      {/* 공통 식당 카드 리스트 컴포넌트 */}
-      <RestaurantCardList
-        stores={visibleFavorites}
-        onRemove={removeFavorite}
-        showDelete
-        showDetail
-        compact
-        onDetail={handleDetail}
-      />
-
-      {/* 상세보기 모달/사이드바 */}
-      {selectedDetail && (
-        <RestaurantDetailComponent
-          detail={selectedDetail}
-          onClose={() => setSelectedDetail(null)}
-        />
+      {!isLoggedIn ? (
+        <div className="py-8 text-center text-gray-400 text-base">
+          즐겨찾기 기능은 로그인이 필요합니다.
+        </div>
+      ) : (
+        <>
+          <RestaurantCardList
+            stores={visibleFavorites}
+            onRemove={removeFavorite}
+            showDelete
+            showDetail
+            compact
+            onDetail={handleDetail}
+          />
+          {selectedDetail && (
+            <RestaurantDetailComponent
+              detail={selectedDetail.detail}
+              storeId={selectedDetail.storeId}
+              onClose={() => setSelectedDetail(null)}
+            />
+          )}
+        </>
       )}
     </section>
   );

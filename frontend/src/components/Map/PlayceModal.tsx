@@ -1,8 +1,10 @@
 import type { RestaurantBasic } from "../../types/restaurant.types";
 import { CustomOverlayMap } from "react-kakao-maps-sdk";
 import { FiStar, FiMapPin, FiX } from "react-icons/fi";
+import { FaStar } from "react-icons/fa";
 import Button from "../Common/Button";
 import useFavoriteStore from "../../stores/favoriteStore";
+import useAuthStore from "../../stores/authStore";
 
 const defaultImage = "https://placehold.co/300x200?text=No+Image";
 
@@ -17,14 +19,22 @@ const PlayceModal = ({
   onDetailClick,
   onClose,
 }: PlayceModalProps) => {
-  const { favoriteIds, addFavorite, removeFavorite } = useFavoriteStore();
-  const isFavorite = favoriteIds.includes(restaurant.store_id);
+  const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
+  const isFavorite = favorites.some(
+    (fav) => fav.store_id === restaurant.store_id
+  );
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isLoggedIn) {
+      alert("로그인 후 이용할 수 있는 기능입니다.");
+      return;
+    }
     if (isFavorite) {
-      removeFavorite(restaurant.store_id);
+      await removeFavorite(restaurant.store_id);
     } else {
-      addFavorite(restaurant.store_id);
+      await addFavorite(restaurant.store_id);
     }
   };
 
@@ -42,25 +52,25 @@ const PlayceModal = ({
             className="w-full h-full object-cover"
           />
           {/* 좌상단: 저장(즐겨찾기) 버튼 */}
-          <div className="absolute left-2 top-2 flex gap-2 z-10">
-            <button
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={handleToggleFavorite}
-              className="bg-white/80 rounded-full p-2 shadow hover:bg-primary3 transition flex items-center justify-center"
-              aria-label={isFavorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
-            >
-              {isFavorite ? (
-                <FiStar className="text-yellow-400 text-lg" />
-              ) : (
-                <FiStar className="text-primary5 text-lg" />
-              )}
-            </button>
-          </div>
+          <button
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={handleToggleFavorite}
+            className="absolute left-2 top-2 bg-white/80 rounded-full p-2 shadow flex items-center justify-center transition"
+            aria-label={isFavorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
+            style={{ border: "none" }}
+          >
+            {isFavorite ? (
+              <FaStar className="text-yellow-400 text-lg" />
+            ) : (
+              <FiStar className="text-primary5 text-lg" />
+            )}
+          </button>
           {/* 우상단: 닫기 버튼 */}
           <button
             onClick={onClose}
-            className="absolute right-2 top-2 z-10 bg-white/80 rounded-full p-2 shadow hover:bg-primary3 transition flex items-center justify-center"
+            className="absolute right-2 top-2 bg-white/80 rounded-full p-2 shadow flex items-center justify-center transition"
             aria-label="닫기"
+            style={{ border: "none" }}
           >
             <FiX className="text-primary5 text-lg" />
           </button>

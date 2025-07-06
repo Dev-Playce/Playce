@@ -1,35 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
-import { dummyRestaurantDetails } from "../../data/dummyRestaurantDetail";
 import useFavoriteStore from "../../stores/favoriteStore";
 import RestaurantCardList from "../RestaurantCardList/RestaurantCardList";
-import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail.tsx";
+import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail";
 import type { RestaurantDetail } from "../../types/restaurant.types";
+import { getStoreDetail } from "../../api/restaurant.api";
 
 interface FavoriteListProps {
   onClose: () => void;
 }
 
 const FavoriteList = ({ onClose }: FavoriteListProps) => {
-  const { favoriteIds, removeFavorite } = useFavoriteStore();
-  const [selectedDetail, setSelectedDetail] = useState<RestaurantDetail | null>(
-    null
-  );
+  const { favorites, fetchFavorites, removeFavorite } = useFavoriteStore();
+  // storeId와 detail을 함께 관리
+  const [selectedDetail, setSelectedDetail] = useState<{
+    storeId: number;
+    detail: RestaurantDetail;
+  } | null>(null);
 
-  const favoriteStores = dummyRestaurantDetails
-    .filter((store) => favoriteIds.includes(store.id))
-    .map((store) => ({
-      store_id: store.id,
-      store_name: store.store_name,
-      main_img: store.img_list?.[0] || "",
-      address: store.address,
-      type: store.type,
-    }));
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
-  // 상세보기 버튼 클릭 시
-  const handleDetail = (store_id: number) => {
-    const detail = dummyRestaurantDetails.find((d) => d.id === store_id);
-    if (detail) setSelectedDetail(detail);
+  // 상세보기 버튼 클릭 시 storeId와 detail을 함께 저장
+  const handleDetail = async (store_id: number) => {
+    try {
+      const res = await getStoreDetail(store_id);
+      if (res.success && res.data) {
+        setSelectedDetail({ storeId: store_id, detail: res.data });
+      } else {
+        alert("상세 정보를 찾을 수 없습니다.");
+      }
+    } catch {
+      alert("상세 정보를 불러오지 못했습니다.");
+    }
   };
 
   return (
@@ -45,7 +49,7 @@ const FavoriteList = ({ onClose }: FavoriteListProps) => {
         </button>
       </div>
       <RestaurantCardList
-        stores={favoriteStores}
+        stores={favorites}
         onRemove={removeFavorite}
         showDelete
         showDetail
@@ -55,7 +59,8 @@ const FavoriteList = ({ onClose }: FavoriteListProps) => {
       {/* 상세보기 모달/사이드바 */}
       {selectedDetail && (
         <RestaurantDetailComponent
-          detail={selectedDetail}
+          detail={selectedDetail.detail}
+          storeId={selectedDetail.storeId}
           onClose={() => setSelectedDetail(null)}
         />
       )}
