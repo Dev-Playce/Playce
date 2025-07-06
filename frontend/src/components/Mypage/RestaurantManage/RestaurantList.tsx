@@ -1,80 +1,41 @@
-import { useState } from "react";
-import type { StoreFormRequest } from "../../../types/restaurantFormRequest.ts";
+import { useEffect, useState } from "react";
 import { dummyRestaurantDetails } from "../../../data/dummyRestaurantDetail";
 import { FiChevronLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
 import DetailStores from "../../RestaurantDetail/RestaurantDetail.tsx";
-import type { RestaurantDetail } from "../../../types/restaurant.types";
+import type {
+  MyStore,
+  RestaurantDetail,
+} from "../../../types/restaurant.types";
 import useMypageStore from "../../../stores/mypageStore.ts";
-// import StoreFormModal from "./modals/RestaurantFormModal.tsx";
-// import Button from "../../Common/Button";
+import { dummyMyStores } from "../../../data/dummy-my-stores.ts";
 
-// 변환 함수: RestaurantDetail → StoreFormRequest
-const toStoreFormRequest = (store: RestaurantDetail): StoreFormRequest => ({
-  store_name: store.store_name,
-  business_number: "",
-  address: store.address,
-  phone: store.phone ?? "",
-  opening_hours: store.opening_hours ?? "",
-  menus: [], // Todo
-  type: store.type ?? "",
-  description: store.description ?? "",
-  img_urls: store.img_list ?? [],
-});
-
-// 초기값: dummyRestaurantDetails를 StoreFormRequest로 변환
-const myStores: StoreFormRequest[] =
-  dummyRestaurantDetails.map(toStoreFormRequest);
-
-const MyStoreList = () => {
-  const [stores, setStores] = useState<StoreFormRequest[]>(myStores);
+const RestaurantList = () => {
+  const [stores, setStores] = useState<MyStore[]>([]);
   const [selectedDetail, setSelectedDetail] = useState<RestaurantDetail | null>(
     null
   );
   const { setRestaurantSubpage, setRestaurantEdit } = useMypageStore();
-  // const [formOpen, setFormOpen] = useState(false);
-  // const [editTarget, setEditTarget] = useState<StoreFormRequest | null>(null);
+
+  // Todo: 내 식당 목록 불러오기
+  useEffect(() => {
+    const myStores = dummyMyStores.stores;
+    setStores(myStores);
+  }, []);
 
   // 삭제
   const handleRemove = (store_name: string) => {
     if (window.confirm("정말 이 식당을 삭제하시겠습니까?")) {
       setStores((stores) =>
-        stores.filter((store) => store.store_name !== store_name)
+        stores!.filter((store) => store.store_name !== store_name)
       );
     }
   };
-
-  // 등록/수정 폼 제출
-  // const handleSubmit = (data: StoreFormRequest) => {
-  //   if (editTarget) {
-  //     // 수정
-  //     setStores((stores) =>
-  //       stores.map((store) =>
-  //         store.store_name === data.store_name ? data : store
-  //       )
-  //     );
-  //   } else {
-  //     setStores((stores) => [...stores, data]);
-  //   }
-  //   setFormOpen(false);
-  //   setEditTarget(null);
-  // };
 
   return (
     <section>
       {stores.length === 0 ? (
         <div className="text-gray-400 text-center text-lg tracking-wide">
           등록된 식당이 없습니다.
-          {/* <div className="flex justify-center">
-            <Button
-              onClick={() => {
-                setFormOpen(true);
-                setEditTarget(null);
-              }}
-            >
-              <FiPlus className="text-lg mr-1 text-bold" />
-              식당 등록
-            </Button>
-          </div> */}
         </div>
       ) : (
         <>
@@ -85,7 +46,7 @@ const MyStoreList = () => {
                 className="flex items-center gap-4 p-3 border-b border-gray-100 last:border-b-0"
               >
                 <img
-                  src={store.img_urls?.[0] || "/noimg.png"}
+                  src={store.main_img || "/noimg.png"}
                   alt={store.store_name}
                   className="w-16 h-16 rounded-lg object-cover border border-gray-200 bg-gray-100"
                 />
@@ -94,9 +55,9 @@ const MyStoreList = () => {
                     <span className="block text-lg font-semibold text-gray-900 truncate">
                       {store.store_name}
                     </span>
-                    <span className="text-xs bg-primary3 text-primary5 px-2 py-0.5 rounded-full font-medium">
+                    {/* <span className="text-xs bg-primary3 text-primary5 px-2 py-0.5 rounded-full font-medium">
                       {store.type}
-                    </span>
+                    </span> */}
                   </div>
                   <div className="text-gray-500 text-sm truncate mt-1">
                     {store.address}
@@ -121,7 +82,7 @@ const MyStoreList = () => {
                   onClick={() => {
                     // setFormOpen(true);
                     // setEditTarget(store);
-                    setRestaurantEdit(store);
+                    setRestaurantEdit(store.store_id);
                     setRestaurantSubpage("restaurant-list-edit");
                   }}
                   className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-blue-50 transition ml-1"
@@ -140,18 +101,6 @@ const MyStoreList = () => {
               </li>
             ))}
           </ul>
-          {/* 등록 버튼 (리스트 하단) */}
-          {/* <div className="flex justify-end mt-6">
-            <Button
-              onClick={() => {
-                setFormOpen(true);
-                setEditTarget(null);
-              }}
-            >
-              <FiPlus className="text-lg mr-1 text-bold" />
-              식당 등록
-            </Button>
-          </div> */}
         </>
       )}
       {/* 상세보기 */}
@@ -161,20 +110,8 @@ const MyStoreList = () => {
           onClose={() => setSelectedDetail(null)}
         />
       )}
-      {/* 등록/수정 폼 모달 */}
-      {/* {formOpen && (
-        <StoreFormModal
-          mode={editTarget ? "edit" : "create"}
-          initial={editTarget ?? undefined}
-          onSubmit={handleSubmit}
-          onClose={() => {
-            setFormOpen(false);
-            setEditTarget(null);
-          }}
-        />
-      )} */}
     </section>
   );
 };
 
-export default MyStoreList;
+export default RestaurantList;

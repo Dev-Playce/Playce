@@ -4,6 +4,7 @@ import Sidebar from "../Mypage/Sidebar";
 import FavoriteList from "./FavoriteList";
 import UserInfo from "./UserInfo";
 import RestaurantManager from "./RestaurantManage/RestaurantManager";
+import useMypageStore from "../../stores/mypageStore";
 
 type TabType = "favorite" | "profile" | "restaurant";
 
@@ -13,10 +14,16 @@ export interface MypageProps {
 
 const MypageModal = ({ onClose }: MypageProps) => {
   const [selectedTab, setSelectedTab] = useState<TabType>("favorite");
+  const { setRestaurantSubpage } = useMypageStore();
+
+  const handleClose = () => {
+    setRestaurantSubpage("restaurant-home");
+    onClose();
+  };
 
   return (
     <ModalBase
-      onClose={onClose}
+      onClose={handleClose}
       type="mypage"
       hideHeader
       className="min-h-[700px] max-h-[700px] min-w-[900px] p-0"

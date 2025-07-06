@@ -31,3 +31,10 @@ export interface RestaurantDetail {
   description: string;
   broadcasts: Broadcast[];
 }
+
+export interface MyStore {
+  store_id: number;
+  store_name: string;
+  main_img: string;
+  address: string;
+}

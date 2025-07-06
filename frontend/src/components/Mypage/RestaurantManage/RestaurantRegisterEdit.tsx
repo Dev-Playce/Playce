@@ -10,30 +10,32 @@ import {
 } from "../../../api/restaurant.api";
 import useMypageStore from "../../../stores/mypageStore";
 import FindAddressButton from "../../Common/FindAddressButton";
+import { dummyRestaurantDetails } from "../../../data/dummyRestaurantDetail";
 
 interface StoreFormModalProps {
   mode: "create" | "edit";
 }
 
 const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
-  const { restaurantEdit, setRestaurantSubpage } = useMypageStore();
+  const { restaurantEditId, setRestaurantSubpage } = useMypageStore();
 
-  const [storeName, setStoreName] = useState(restaurantEdit?.store_name || "");
-  const [businessNumber, setBusinessNumber] = useState(
-    restaurantEdit?.business_number || ""
-  );
-  const [address, setAddress] = useState(restaurantEdit?.address || "");
-  const [phone, setPhone] = useState(restaurantEdit?.phone || "");
+  // Todo: edit인 경우 받아온 number로 식당 상세 조회
+  const storeDetail =
+    mode === "create" ? null : dummyRestaurantDetails[restaurantEditId! - 1];
+
+  const [storeName, setStoreName] = useState(storeDetail?.store_name || "");
+  const [address, setAddress] = useState(storeDetail?.address || "");
+  const [phone, setPhone] = useState(storeDetail?.phone || "");
   const [openingHours, setOpeningHours] = useState(
-    restaurantEdit?.opening_hours || ""
+    storeDetail?.opening_hours || ""
   );
-  const [type, setType] = useState(restaurantEdit?.type || "");
+  const [type, setType] = useState(storeDetail?.type || "");
   const [description, setDescription] = useState(
-    restaurantEdit?.description || ""
+    storeDetail?.description || ""
   );
-  const [menus, setMenus] = useState<string[]>(restaurantEdit?.menus || [""]);
+  const [menus, setMenus] = useState<string[]>([]); // Todo
   const [imgUrls, setImgUrls] = useState<string[]>(
-    restaurantEdit?.img_urls || [""]
+    storeDetail?.img_list || [""]
   );
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [agree, setAgree] = useState(false);
@@ -42,7 +44,6 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
     e.preventDefault();
     const newErrors = validateStoreForm({
       store_name: storeName,
-      business_number: businessNumber,
       address,
       phone,
       opening_hours: openingHours,
@@ -58,7 +59,6 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
 
     const data: RegisterEditStoreProps = {
       store_name: storeName,
-      business_number: businessNumber,
       address,
       phone,
       opening_hours: openingHours,
@@ -115,7 +115,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
           />
           <ErrorMessage message={errors.store_name} />
         </div>
-        <div>
+        {/* <div>
           <label className="block mb-1 font-semibold text-gray-700">
             사업자등록번호 <span className="text-red-500">*</span>
           </label>
@@ -125,7 +125,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
             onChange={(e) => setBusinessNumber(e.target.value)}
           />
           <ErrorMessage message={errors.business_number} />
-        </div>
+        </div> */}
         <div>
           <label className="block mb-1 font-semibold text-gray-700">
             주소 <span className="text-red-500">*</span>
@@ -135,6 +135,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
             <input
               className="w-full border rounded px-3 py-2"
               value={address}
+              readOnly={true}
             />
             <FindAddressButton
               onCompleted={(address) => {
@@ -142,11 +143,6 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
               }}
             />
           </div>
-          {/* <input
-            className="w-full border rounded px-3 py-2"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          /> */}
           <ErrorMessage message={errors.address} />
         </div>
         <div>

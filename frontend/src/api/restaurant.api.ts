@@ -5,14 +5,13 @@ export const getStoreDetail = (storeId: number) =>
 
 export interface RegisterEditStoreProps {
   store_name: string;
-  business_number: string;
   address: string;
   phone: string;
   opening_hours: string;
   menus: string;
   type: string;
-  description: string;
   images: string[];
+  description: string;
 }
 
 export const registerStore = (data: RegisterEditStoreProps) => {

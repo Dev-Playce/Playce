@@ -1,7 +1,11 @@
+import useMypageStore from "../../../stores/mypageStore";
 import RestaurantRegisterEdit from "./RestaurantRegisterEdit";
 
 const RestaurantEdit = () => {
-  return <RestaurantRegisterEdit mode="edit" />;
+  const { restaurantEditId } = useMypageStore();
+  return (
+    <RestaurantRegisterEdit key={`create${restaurantEditId}`} mode="edit" />
+  );
 };
 
 export default RestaurantEdit;
