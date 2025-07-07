@@ -6,7 +6,7 @@ import { success } from "../utils/response";
 
 const storeController = {
   // 1. 식당 등록
-  registerStore: async (req: AuthRequest, res: Response, next: NextFunction) => {
+  createStore: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       console.log("\n🍴 [식당 등록] 요청");
       const userId: number = req.user!.userId;

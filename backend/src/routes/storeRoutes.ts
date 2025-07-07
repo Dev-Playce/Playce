@@ -79,7 +79,7 @@ const router = Router();
  *       409:
  *         description: 이미 등록된 사업자등록번호
  */
-router.post("/", authenticate, createStoreValidator, storeController.registerStore); // 1. 식당 등록 (🔒 토큰 검사)
+router.post("/", authenticate, createStoreValidator, storeController.createStore); // 1. 식당 등록 (🔒 토큰 검사)
 
 /**
  * @swagger
