@@ -27,9 +27,10 @@ export interface RestaurantDetail {
   opening_hours: string;
   menus: string | string[];
   type: string;
-  img_list: string[];
+  img_urls: string[];
   description: string;
   broadcasts: Broadcast[];
+  // is_owner?: boolean;   // 필요하면 추가
 }
 
 export interface MyStore {
