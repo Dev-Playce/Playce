@@ -30,7 +30,7 @@ export interface RestaurantDetail {
   img_urls: string[];
   description: string;
   broadcasts: Broadcast[];
-  // is_owner?: boolean;   // 필요하면 추가
+  is_owner?: boolean;
 }
 
 export interface MyStore {
