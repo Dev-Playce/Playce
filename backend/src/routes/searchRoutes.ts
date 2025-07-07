@@ -159,14 +159,6 @@ router.get("/nearby", NearbySearchValidator, searchController.getNearbyStores);
  *           type: string
  *           example: 강남구
  *         description: 구/군 단위 지역명
- *       - in: query
- *         name: sort
- *         required: false
- *         schema:
- *           type: string
- *           enum: [date, name]
- *           example: date
- *         description: 정렬 기준
  *     responses:
  *       200:
  *         description: 통합 검색 성공 또는 검색 결과 없음
@@ -205,10 +197,37 @@ router.get("/nearby", NearbySearchValidator, searchController.getNearbyStores);
  *                       lng:
  *                         type: number
  *                         example: 126.9780
- *                       match_id:
- *                         type: integer
- *                         example: 3
- *                         description: 가장 가까운 중계 일정 ID
+ *                       broadcast:
+ *                         type: object
+ *                         nullable: true
+ *                         description: 최신 중계 일정 (없을 경우 null)
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 3
+ *                           match_date:
+ *                             type: string
+ *                             format: date
+ *                             example: 2025-06-30
+ *                           match_time:
+ *                             type: string
+ *                             format: time
+ *                             example: 18:30:00
+ *                           sport:
+ *                             type: string
+ *                             example: soccer
+ *                           league:
+ *                             type: string
+ *                             example: K League
+ *                           team_one:
+ *                             type: string
+ *                             example: FC서울
+ *                           team_two:
+ *                             type: string
+ *                             example: 수원삼성
+ *                           etc:
+ *                             type: string
+ *                             example: 선두 경쟁 매치
  */
 
 router.get("/", searchController.searchStores);
