@@ -1,10 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import searchService from "../service/searchService";
+import { success } from "../utils/response";
+import { logApiError } from "../utils/errorHandler";
 
 const searchController = {
   // 1. 현재 위치 기반 검색
   getNearbyStores: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log("\n📍 [현재 위치 기반 검색] 요청");
+
       const { lat, lng, radius } = req.query;
 
       const result = await searchService.getNearbyStores(
@@ -13,8 +17,11 @@ const searchController = {
         Number(radius)
       );
 
-      res.status(200).json({ success: true, data: result });
+      console.log("✅ [현재 위치 기반 검색] 성공");
+
+      return success(res, "현재 위치 기반 검색 성공", result);
     } catch (error) {
+      logApiError("현재 위치 기반 검색", error);
       next(error);
     }
   },
@@ -22,6 +29,8 @@ const searchController = {
   // 2. 통합 검색
   searchStores: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log("\n🔍 [통합 검색] 요청");
+
       const {
         search,
         sport,
@@ -29,7 +38,7 @@ const searchController = {
         team,
         big_region,
         small_region,
-        sort
+        sort,
       } = req.query;
 
       const result = await searchService.searchStores({
@@ -42,8 +51,11 @@ const searchController = {
         sort: String(sort || '') as 'date' | 'name',
       });
 
-      res.status(200).json({ success: true, data: result });
+      console.log("✅ [통합 검색] 성공");
+
+      return success(res, "통합 검색 성공", result);
     } catch (error) {
+      logApiError("통합 검색", error);
       next(error);
     }
   },

@@ -1,33 +1,24 @@
 import { Request } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
-import bcrpyt from "bcrypt";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { createError } from "../utils/createError";
 require("dotenv").config();
+
+const userRepository = AppDataSource.getRepository(User);
 
 const userService = {
   // 1. 회원가입
   join: async (req: Request) => {
-    console.log("req.body:", req.body);
     const { email, password, name, nickname, phone } = req.body;
-
-    if (!email || !password || !name || !nickname || !phone) {
-      const error = new Error("모든 필드를 입력해주세요.");
-      (error as any).status = 400;
-      throw error;
-    }
-
-    const userRepository = AppDataSource.getRepository(User);
 
     const existingEmail = await userRepository.findOneBy({ email });
     if (existingEmail) {
-      const error = new Error("이미 존재하는 이메일입니다.");
-      (error as any).status = 409;
-      throw error;
+      throw createError("이미 존재하는 이메일입니다.", 409);
     }
+    console.log("유효성 검사 완료 - 이메일 중복 없음");
 
-    const hashPassword = await bcrpyt.hash(password, 10);
-    
     const formatPhone = (phone: string): string => {
       const onlyDigits = phone.replace(/\D/g, "");
       return onlyDigits.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
@@ -35,35 +26,45 @@ const userService = {
 
     const formattedPhone = formatPhone(phone);
 
+    const existingPhone = await userRepository.findOneBy({
+      phone: formattedPhone,
+    });
+    if (existingPhone) {
+      throw createError("이미 등록된 전화번호입니다.", 409);
+    }
+    console.log("유효성 검사 완료 - 전화번호 중복 없음");
+
+    const hashPassword = await bcrypt.hash(password, 10);
+    console.log("비밀번호 해싱 완료");
 
     const newUser = userRepository.create({
       email,
       password: hashPassword,
       name,
       nickname,
-      phone:formattedPhone,
+      phone: formattedPhone,
     });
 
     await userRepository.save(newUser);
+    console.log("[UserService] 회원가입 완료 - email:", email);
   },
   // 2. 로그인
   login: async (req: Request) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      const error = new Error("이메일과 비밀번호를 입력해주세요.");
-      (error as any).status = 400;
-      throw error;
-    }
-
-    const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOneBy({ email });
-
-    if (!user || !(await bcrpyt.compare(password, user.password))) {
-      const error = new Error("이메일 또는 비밀번호가 일치하지 않습니다.");
-      (error as any).status = 401;
-      throw error;
+    if (!user) {
+      console.warn("⚠️ 존재하지 않는 사용자");
+      throw createError("이메일 또는 비밀번호가 일치하지 않습니다.", 401);
     }
+    console.log("유효성 검사 완료 - 사용자 존재 확인");
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      console.warn("⚠️ 비밀번호 불일치");
+      throw createError("이메일 또는 비밀번호가 일치하지 않습니다.", 401);
+    }
+    console.log("유효성 검사 완료 - 비밀번호 일치");
 
     const token = jwt.sign(
       { userId: user.id, email: user.email },
@@ -71,6 +72,7 @@ const userService = {
       { expiresIn: "1h" }
     );
 
+    console.log("[UserService] 로그인 성공 - userId:", user.id);
     return token;
   },
   // 3. 비밀번호 초기화 요청
@@ -83,34 +85,24 @@ const userService = {
   },
   // 5. 내 정보 조회
   getMyInfo: async (userId: number) => {
-    const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { id: userId },
       select: ["email", "name", "nickname", "phone"],
     });
 
     if (!user) {
-      const error = new Error("사용자를 찾을 수 없습니다.");
-      (error as any).status = 404;
-      throw error;
+      throw createError("사용자를 찾을 수 없습니다.", 404);
     }
 
+    console.log("[UserService] 사용자 정보 조회 성공");
+    console.log("응답 데이터:", user);
     return user;
   },
 
   // 6. 닉네임 변경
   updateNickname: async (userId: number, newNickname: string) => {
-    const userRepository = AppDataSource.getRepository(User);
-
-    const user = await userRepository.findOneBy({ id: userId });
-    if (!user) {
-      const error = new Error("사용자를 찾을 수 없습니다.");
-      (error as any).status = 404;
-      throw error;
-    }
-
-    user.nickname = newNickname;
-    await userRepository.save(user);
+    await userRepository.update({ id: userId }, { nickname: newNickname });
+    console.log("[UserService] 닉네임 변경 완료 - nickname:", newNickname);
   },
 };
 

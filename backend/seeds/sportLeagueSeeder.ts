@@ -18,7 +18,7 @@ const sportsData = {
   농구: { is_team_competition: true, leagues: ["KBL", "NBA", "WKBL", "올림픽"] },
   배구: { is_team_competition: true, leagues: ["V-리그", "올림픽"] },
   골프: { is_team_competition: false, leagues: ["KLPGA 투어", "KPGA 코리안 투어", "LPGA 투어", "올림픽", "PGA 리그"] },
-  격투기: { is_team_competition: false, leagues: ["UFC", "올림픽"] },
+  격투기: { is_team_competition: true, leagues: ["UFC", "올림픽"] },
   e스포츠: { is_team_competition: true, leagues: ["LCK", "올림픽"] }
 };
 

@@ -1,7 +1,11 @@
-import { Router} from 'express';
-import userController from '../controller/userController';
-import { JoinValidator } from '../middlewares/userValidator';
-import { authenticate } from '../middlewares/authMiddleware';
+import { Router } from "express";
+import userController from "../controller/userController";
+import {
+  JoinValidator,
+  LoginValidator,
+  NicknameValidator,
+} from "../middlewares/userValidator";
+import { authenticate } from "../middlewares/authMiddleware";
 
 const router = Router();
 
@@ -41,10 +45,10 @@ const router = Router();
  *                example: your_password
  *              name:
  *                type: string
- *                example: your_name
+ *                example: 홍길동
  *              nickname:
  *                type: string
- *                example: your_nickname
+ *                example: 길동이
  *              phone:
  *                type: string
  *                example: 010-1234-5678
@@ -56,15 +60,19 @@ const router = Router();
  *            schema:
  *              type: object
  *              properties:
+ *                success:
+ *                  type: boolean
+ *                  example: true
  *                message:
  *                  type: string
- *                  example: "회원가입 성공!"
+ *                  example: "회원가입이 완료되었습니다."
  *      400:
- *        description: 필수 입력값 누락
+ *        description: 필수 여부, 타입, 형식 등 유효성 검사 실패
  *      409:
- *        description: 중복된 이메일 입력
+ *        description: 중복된 이메일 또는 전화번호 입력
  */
-router.post('/join', JoinValidator, userController.join); // 1. 회원가입
+
+router.post("/join", JoinValidator, userController.join); // 1. 회원가입
 
 /**
  * @swagger
@@ -91,25 +99,28 @@ router.post('/join', JoinValidator, userController.join); // 1. 회원가입
  *                format: password
  *                example: your_password
  *    responses:
- *      201:
+ *      200:
  *        description: 로그인 성공
  *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              properties:
+ *                success:
+ *                  type: boolean
+ *                  example: true
  *                message:
  *                  type: string
- *                  example: "로그인 성공!"
+ *                  example: "로그인 성공"
  *                token:
  *                  type: string
  *                  example: your_jwt_token
  *      400:
- *        description: 필수 입력값 누락
+ *        description: 필수 여부, 타입, 형식 등 유효성 검사 실패
  *      401:
  *        description: 이메일 또는 비밀번호 불일치
  */
-router.post('/login', userController.login); // 2. 로그인
+router.post("/login", LoginValidator, userController.login); // 2. 로그인
 
 /**
  * @swagger
@@ -130,21 +141,24 @@ router.post('/login', userController.login); // 2. 로그인
  *                type: string
  *                format: email
  *                example: user@mail.com
- *            responses:
- *              201:
- *                description: 요청 성공
- *                content:
- *                  application/json:
- *                    schema:
- *                      type: object
- *                      properties:
- *                        message:
- *                          type: string
+ *    responses:
+ *      201:
+ *        description: 비밀번호 초기화 메일 전송 성공
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                success:
+ *                  type: boolean
+ *                  example: true
+ *                message:
+ *                  type: string
  *                  example: "메일이 전송되었습니다."
  *      400:
- *        description: 이메일 미입력 또는 유효하지 않은 이메일
+ *        description: 이메일 누락 또는 유효하지 않은 형식
  */
-router.post('/reset', userController.requestResetPassword); // 3. 비밀번호 초기화 요청
+router.post("/reset", userController.requestResetPassword); // 3. 비밀번호 초기화 요청
 
 /**
  * @swagger
@@ -164,20 +178,27 @@ router.post('/reset', userController.requestResetPassword); // 3. 비밀번호 �
  *              password:
  *                type: string
  *                format: password
- *                example: your_password
+ *                example: your_new_password
  *    responses:
  *      200:
- *        description: 초기화 성공
+ *        description: 비밀번호 초기화 성공
  *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              properties:
+ *                success:
+ *                  type: boolean
+ *                  example: true
  *                message:
  *                  type: string
  *                  example: "비밀번호가 변경되었습니다."
+ *      400:
+ *        description: 비밀번호 누락 또는 유효하지 않은 형식
+ *      401:
+ *        description: 유효하지 않은 토큰
  */
-router.patch('/reset', userController.resetPassword); // 4. 비밀번호 초기화
+router.patch("/reset", userController.resetPassword); // 4. 비밀번호 초기화
 
 /**
  * @swagger
@@ -195,23 +216,34 @@ router.patch('/reset', userController.resetPassword); // 4. 비밀번호 초기�
  *            schema:
  *              type: object
  *              properties:
- *                email:
+ *                success:
+ *                  type: boolean
+ *                  example: true
+ *                message:
  *                  type: string
- *                  format: email
- *                  example: user@mail.com
- *                name:
- *                  type: string
- *                  example: your_name
- *                nickname:
- *                  type: string
- *                  example: your_nickname
- *                phone:
- *                  type: string
- *                  example: 010-1234-5678
+ *                  example: "내 정보 조회 성공"
+ *                data:
+ *                  type: object
+ *                  properties:
+ *                    email:
+ *                      type: string
+ *                      format: email
+ *                      example: user@mail.com
+ *                    name:
+ *                      type: string
+ *                      example: 홍길동
+ *                    nickname:
+ *                      type: string
+ *                      example: 길동이
+ *                    phone:
+ *                      type: string
+ *                      example: 010-1234-5678
  *      401:
- *        description: 유효하지 않은 토큰
+ *        description: 잘못된 인증 형식 또는 유효하지 않은 토큰
+ *      404:
+ *        description: 사용자를 찾을 수 없음
  */
-router.get('/me', authenticate, userController.getMyInfo); // 5. 내 정보 조회
+router.get("/me", authenticate, userController.getMyInfo); // 5. 내 정보 조회
 
 /**
  * @swagger
@@ -232,7 +264,7 @@ router.get('/me', authenticate, userController.getMyInfo); // 5. 내 정보 조�
  *            properties:
  *              nickname:
  *                type: string
- *                example: your_new_nickname
+ *                example: 짱구
  *    responses:
  *      200:
  *        description: 닉네임 변경 성공
@@ -241,10 +273,24 @@ router.get('/me', authenticate, userController.getMyInfo); // 5. 내 정보 조�
  *            schema:
  *              type: object
  *              properties:
+ *                success:
+ *                  type: boolean
+ *                  example: true
  *                message:
  *                  type: string
  *                  example: "닉네임이 변경되었습니다."
+ *      400:
+ *        description: 필수 여부, 타입, 형식 등 유효성 검사 실패
+ *      401:
+ *        description: 잘못된 인증 형식 또는 유효하지 않은 토큰
+ *      404:
+ *        description: 사용자를 찾을 수 없음
  */
-router.patch('/nickname',authenticate, userController.updateNickname); // 6. 닉네임 변경
+router.patch(
+  "/nickname",
+  authenticate,
+  NicknameValidator,
+  userController.updateNickname
+); // 6. 닉네임 변경
 
 export default router;

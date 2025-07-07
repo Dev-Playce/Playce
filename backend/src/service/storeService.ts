@@ -1,4 +1,3 @@
-import { Like } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { BigRegion } from "../entities/BigRegion";
 import { BusinessNumber } from "../entities/BusinessNumber";
@@ -6,6 +5,7 @@ import { SmallRegion } from "../entities/SmallRegion";
 import { Store } from "../entities/Store";
 import { StoreImage } from "../entities/StoreImage";
 import { getLocationDataFromAddress } from "../utils/locationUtils";
+import { createError } from "../utils/createError";
 
 const storeService = {
   // 1. 식당 등록
@@ -22,151 +22,166 @@ const storeService = {
       img_urls: imgUrls
     } = createData;
 
-    // 사업자등록번호 유효성 검사
-    const businessNumberRepo = AppDataSource.getRepository(BusinessNumber);
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const findBusinessNumber = await businessNumberRepo.findOne({
-      where: { businessNumber: businessNumber },
-      relations: ['store'],
-    });
-    if (!findBusinessNumber) {
-      const error = new Error('유효하지 않은 사업자등록번호입니다.');
-      (error as any).status = 400;
+    try {
+      // 사업자등록번호 유효성 검사
+      const businessNumberRepo = AppDataSource.getRepository(BusinessNumber);
+
+      const findBusinessNumber = await businessNumberRepo.findOne({
+        where: { businessNumber: businessNumber },
+        relations: ['store'],
+      });
+
+      if (!findBusinessNumber || !findBusinessNumber.isValid) throw createError('유효하지 않은 사업자등록번호입니다.', 400);
+      if (findBusinessNumber.store) throw createError('이미 등록된 사업자등록번호입니다.', 409);
+      console.log(`- 사업자등록번호(id: ${findBusinessNumber.id}, number: ${findBusinessNumber.businessNumber})`);
+
+      // 주소-위치-지역 변환 및 DB 조회
+      const bigRegionRepo = AppDataSource.getRepository(BigRegion);
+      const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
+      
+      // const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(address, bigRegionRepo, smallRegionRepo);
+      const { lat, lng, bigRegion, smallRegion } = await getLocationDataFromAddress(address, bigRegionRepo, smallRegionRepo);
+      console.log(`- 지역 : 대분류(${bigRegion.id}, ${bigRegion.name}), 소분류(${smallRegion.id}, ${smallRegion.name}), 위도(${lat}), 경도(${lng})`);
+
+      // stores에 정보 저장
+      const storeRepo = AppDataSource.getRepository(Store);
+      const newStore = storeRepo.create({
+        user: { id: userId },
+        storeName,
+        businessNumber: findBusinessNumber,
+        address,
+        bigRegion,
+        smallRegion,
+        lat,
+        lng,
+        phone,
+        openingHours,
+        menus,
+        type,
+        description,
+      });
+
+      const saveStore = await storeRepo.save(newStore);
+      console.log('- stores : 데이터 저장 완료');
+
+      // store_images에 데이터 저장
+      if (imgUrls && Array.isArray(imgUrls) && imgUrls.length > 0) {
+        const storeImageRepo = AppDataSource.getRepository(StoreImage);
+        const newStoreImages = imgUrls.map((url: string, index: number) =>
+          storeImageRepo.create({
+            store: saveStore,
+            imgUrl: url,
+            isMain: index === 0
+          })
+        );
+
+        await storeImageRepo.save(newStoreImages);
+        console.log(`- store_image : ${newStoreImages.length}개의 이미지 저장 완료`);
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      console.error('❌ 식당 등록 : 트랜잭션 롤백됨');
       throw error;
-    }
-    if (findBusinessNumber.store) {
-      const error = new Error('이미 등록된 사업자등록번호입니다. 하나의 번호는 하나의 식당만 가질 수 있습니다.');
-      (error as any).status = 409;
-      throw error;
-    }
-
-    console.log(`- 사업자등록번호(id: ${findBusinessNumber.id}, number: ${findBusinessNumber.businessNumber})`);
-
-    // 주소-위치-지역 변환 및 DB 조회
-    const bigRegionRepo = AppDataSource.getRepository(BigRegion);
-    const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
-    
-    const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(address, bigRegionRepo, smallRegionRepo);
-
-    // stores에 정보 저장
-    const storeRepo = AppDataSource.getRepository(Store);
-    const newStore = storeRepo.create({
-      user: { id: userId },
-      storeName,
-      businessNumber: findBusinessNumber,
-      address,
-      bigRegion,
-      smallRegion,
-      location,
-      phone,
-      openingHours,
-      menus,
-      type,
-      description,
-    });
-
-    const saveStore = await storeRepo.save(newStore);
-    console.log('- stores : 데이터 저장 완료');
-
-    // store_images에 데이터 저장
-    if (imgUrls && Array.isArray(imgUrls) && imgUrls.length > 0) {
-      const storeImageRepo = AppDataSource.getRepository(StoreImage);
-      const newStoreImages = imgUrls.map((url: string, index: number) =>
-        storeImageRepo.create({
-          store: saveStore,
-          imgUrl: url,
-          isMain: index === 0
-        })
-      );
-
-      await storeImageRepo.save(newStoreImages);
-      console.log(`- store_image : ${newStoreImages.length}개의 이미지 저장 완료`);
+    } finally {
+      await queryRunner.release();
     }
   },
   // 2. 식당 수정
   updateStore: async (userId: number, storeId: number, updateData: any) => {
-    const storeRepo = AppDataSource.getRepository(Store);
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const storeToUpdate = await storeRepo.findOne({
-      where: { id: storeId },
-      relations: ['user']
-    });
+    try {
+      const storeRepo = AppDataSource.getRepository(Store);
 
-    // 식당 유효성 검사
-    if (!storeToUpdate) {
-      const error = new Error('해당 식당을 찾을 수 없습니다.');
-      (error as any).status = 404;
+      const storeToUpdate = await storeRepo.findOne({
+        where: { id: storeId },
+        relations: ['user']
+      });
+
+      // 식당 유효성 검사
+      if (!storeToUpdate) throw createError('해당 식당을 찾을 수 없습니다.', 404);
+      console.log('- 식당 유효성 검사 완료 : DB에 있는지');
+
+      if (storeToUpdate.user.id !== userId) throw createError('해당 식당에 대한 수정 권한이 없습니다.', 403);
+      console.log('- 식당 유효성 검사 완료 : 소유권 확인');
+
+      const allowedFields = [
+        'store_name',
+        'address',
+        'phone',
+        'opening_hours',
+        'menus',
+        'type',
+        'description',
+        'img_urls',
+      ];
+      const receiveFields = Object.keys(updateData);
+      const invalidFields = receiveFields.filter(field => !allowedFields.includes(field));
+
+      if (invalidFields.length > 0) throw createError(`수정할 수 없는 항목(들)이 포함되어 있습니다. (${invalidFields.join(', ')})`, 400);
+      console.log('- 식당 유효성 검사 완료 : 수정할 수 없는 필드 포함 여부');
+
+      // DB 업데이트
+      if (updateData.store_name !== undefined) storeToUpdate.storeName = updateData.store_name;
+      if (updateData.phone !== undefined) storeToUpdate.phone = updateData.phone;
+      if (updateData.opening_hours !== undefined) storeToUpdate.openingHours = updateData.opening_hours;
+      if (updateData.menus !== undefined) storeToUpdate.menus = updateData.menus;
+      if (updateData.type !== undefined) storeToUpdate.type = updateData.type;
+      if (updateData.description !== undefined) storeToUpdate.description = updateData.description;
+      
+      if (updateData.address !== undefined) { // 주소 -> location, bigRegion, smallRegion 같이 수정
+        const bigRegionRepo = AppDataSource.getRepository(BigRegion);
+        const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
+
+        // const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(
+        const { lat, lng, bigRegion, smallRegion } = await getLocationDataFromAddress(
+          updateData.address,
+          bigRegionRepo,
+          smallRegionRepo
+        );
+
+        storeToUpdate.address = updateData.address;
+        // storeToUpdate.location = location;
+        storeToUpdate.lat = lat;
+        storeToUpdate.lng = lng;
+        storeToUpdate.bigRegion = bigRegion;
+        storeToUpdate.smallRegion = smallRegion;
+      }
+
+      if (updateData.img_urls !== undefined) { // 이미지 -> 전체 삭제 후 재등록
+        const storeImageRepo = AppDataSource.getRepository(StoreImage);
+
+        await storeImageRepo.delete({ store: { id: storeId } }); // 기존 이미지 삭제
+
+        const newImages = updateData.img_urls.map((url: string, index: number) =>
+          storeImageRepo.create({
+            store: storeToUpdate,
+            imgUrl: url,
+            isMain: index ===0
+          })
+        );
+        await storeImageRepo.save(newImages);
+      }
+
+      await storeRepo.save(storeToUpdate);
+      console.log('- 수정 완료');
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      console.error('❌ 식당 수정 : 트랜잭션 롤백됨');
       throw error;
+    } finally {
+      await queryRunner.release();
     }
-    console.log('- 식당 유효성 검사 완료 : DB에 있는지');
-
-    if (storeToUpdate.user.id !== userId) {
-      const error = new Error('해당 식당을 수정할 권한이 없습니다.');
-      (error as any).status = 403;
-      throw error;
-    }
-    console.log('- 식당 유효성 검사 완료 : 소유권 확인');
-
-    const allowedFields = [
-      'store_name',
-      'address',
-      'phone',
-      'opening_hours',
-      'menus',
-      'type',
-      'description',
-      'img_urls',
-    ];
-    const receiveFields = Object.keys(updateData);
-    const invalidFields = receiveFields.filter(field => !allowedFields.includes(field));
-    if (invalidFields.length > 0) {
-      const error = new Error(`수정할 수 없는 항목(들)이 포함되어 있습니다. (${invalidFields.join(', ')})`);
-      (error as any).status = 400;
-      throw error;
-    }
-    console.log('- 식당 유효성 검사 완료 : 수정할 수 없는 필드 포함 여부');
-
-    // DB 업데이트
-    if (updateData.store_name !== undefined) storeToUpdate.storeName = updateData.store_name;
-    if (updateData.phone !== undefined) storeToUpdate.phone = updateData.phone;
-    if (updateData.opening_hours !== undefined) storeToUpdate.openingHours = updateData.opening_hours;
-    if (updateData.menus !== undefined) storeToUpdate.menus = updateData.menus;
-    if (updateData.type !== undefined) storeToUpdate.type = updateData.type;
-    if (updateData.description !== undefined) storeToUpdate.description = updateData.description;
-    
-    if (updateData.address !== undefined) { // 주소 -> location, bigRegion, smallRegion 같이 수정
-      const bigRegionRepo = AppDataSource.getRepository(BigRegion);
-      const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
-
-      const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(
-        updateData.address,
-        bigRegionRepo,
-        smallRegionRepo
-      );
-
-      storeToUpdate.address = updateData.address;
-      storeToUpdate.location = location;
-      storeToUpdate.bigRegion = bigRegion;
-      storeToUpdate.smallRegion = smallRegion;
-    }
-
-    if (updateData.img_urls !== undefined) { // 이미지 -> 전체 삭제 후 재등록
-      const storeImageRepo = AppDataSource.getRepository(StoreImage);
-
-      await storeImageRepo.delete({ store: { id: storeId } }); // 기존 이미지 삭제
-
-      const newImages = updateData.img_urls.map((url: string, index: number) =>
-        storeImageRepo.create({
-          store: storeToUpdate,
-          imgUrl: url,
-          isMain: index ===0
-        })
-      );
-      await storeImageRepo.save(newImages);
-    }
-
-    await storeRepo.save(storeToUpdate);
-    console.log('- 수정 완료');
   },
   // 3. 식당 삭제
   deleteStore: async (userId: number, storeId: number) => {
@@ -178,19 +193,10 @@ const storeService = {
     });
 
     // 식당 유효성 검사
-    if (!storeToDelete) {
-      const error = new Error('식당을 찾을 수 없습니다.');
-      (error as any).status = 404;
-      throw error;
-    }
+    if (!storeToDelete) throw createError('해당 식당을 찾을 수 없습니다.', 404);
     console.log('- 식당 유효성 검사 통과');
 
-    // 소유권 확인
-    if (storeToDelete.user.id !== userId) {
-      const error = new Error('해당 식당에 대한 삭제 권한이 없습니다.');
-      (error as any).status = 403;
-      throw error;
-    }
+    if (storeToDelete.user.id !== userId) throw createError('해당 식당에 대한 삭제 권한이 없습니다.', 403);
     console.log('- 식당 소유권 확인');
 
     // 삭제
@@ -212,14 +218,10 @@ const storeService = {
       ]
     });
 
-    if (!store) {
-      const error = new Error('존재하지 않는 식당입니다.');
-      (error as any).status = 404;
-      throw error;
-    }
+    if (!store) throw createError('해당 식당을 찾을 수 없습니다.', 404);
     console.log('- store 유효성 검사');
 
-    const imgListData = store.images.map(img => img.imgUrl);
+    const imgUrlsData = store.images.map(img => img.imgUrl);
     const broadcastData = store.broadcasts.map(bc => ({
       match_date: bc.matchDate,
       match_time: bc.matchTime,
@@ -238,7 +240,7 @@ const storeService = {
       opening_hours: store.openingHours,
       menus: store.menus,
       type: store.type,
-      img_list: imgListData,
+      img_urls: imgUrlsData,
       description: store.description,
       broadcasts: broadcastData,
       is_owner: isOwner,

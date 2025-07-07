@@ -11,7 +11,7 @@ export const createStoreValidator = [
     .notEmpty().withMessage('사업자등록번호를 입력해주세요.').bail()
     .isString().withMessage('사업자등록번호는 문자열이어야 합니다.').bail()
     .matches(/^\d{3}-\d{2}-\d{5}$/, 'i')
-    .withMessage('사업자등록번호를 형식에 맞게 입력해주세요. 예: 123-45-67890'),
+    .withMessage('사업자등록번호를 형식에 맞게 입력해주세요. (예: 123-45-67890)'),
 
   body('address')
     .notEmpty().withMessage('주소를 입력해주세요.').bail()
@@ -21,7 +21,7 @@ export const createStoreValidator = [
     .notEmpty().withMessage('전화번호를 입력해주세요.').bail()
     .isString().withMessage('전화번호는 문자열이어야 합니다.').bail()
     .matches(/^(0?(2|3[1-3]|4[1-4]|5[1-5]|6[1-4])-\d{3,4}-\d{4}|01[016789]-\d{4}-\d{4})$/, 'i')
-    .withMessage('전화번호를 형식에 맞게 입력해주세요. 예: 02-123-1111, 031-1234-1111, 010-1234-1111'),
+    .withMessage('전화번호를 형식에 맞게 입력해주세요. (예: 02-123-1111, 031-1234-1111, 010-1234-1111)'),
 
   body('opening_hours')
     .notEmpty().withMessage('영업 시간을 입력해주세요.').bail()
@@ -63,7 +63,7 @@ export const updateStoreValidator = [
     .optional()
     .isString().withMessage('전화번호는 문자열이어야 합니다.').bail()
     .matches(/^(0?(2|3[1-3]|4[1-4]|5[1-5]|6[1-4])-\d{3,4}-\d{4}|01[016789]-\d{4}-\d{4})$/, 'i')
-    .withMessage('전화번호 형식이 올바르지 않습니다. 예: 02-123-1111, 010-1234-1111'),
+    .withMessage('전화번호 형식이 올바르지 않습니다. (예: 02-123-1111, 010-1234-1111)'),
 
   body('opening_hours')
     .optional()

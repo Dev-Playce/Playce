@@ -14,6 +14,7 @@ const validate = (req: Request, res: Response, next: NextFunction): void => {
     });
     return; 
   }
+  console.log("✅ [validate] 유효성 검사 통과");
   next();
 };
 

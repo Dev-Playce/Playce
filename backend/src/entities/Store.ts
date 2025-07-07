@@ -6,8 +6,8 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
-  Point,
-  Index,
+  // Point,
+  // Index,
 } from "typeorm";
 import { User } from "./User";
 import { StoreImage } from "./StoreImage";
@@ -59,14 +59,20 @@ export class Store {
   })
   smallRegion!: SmallRegion;
 
-  @Index({ spatial: true })
-  @Column({
-    name: "location",
-    type: "point",
-    spatialFeatureType: "Point",
-    srid: 4326,
-  })
-  location!: string;
+  // @Index({ spatial: true })
+  // @Column({
+  //   name: "location",
+  //   type: "point",
+  //   spatialFeatureType: "Point",
+  //   srid: 4326,
+  // })
+  // location!: string;
+
+  @Column({ name: "lat", type: "float"})
+  lat!: number;
+
+  @Column({ name: "lng", type: "float"})
+  lng!: number;
 
   @Column({ name: "phone" })
   phone!: string;
