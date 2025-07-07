@@ -63,9 +63,9 @@ export default function RestaurantDetailComponent({
 
       {/* 이미지 */}
       <div className="w-full h-56 bg-gradient-to-tr via-white to-orange-50 flex items-center justify-center relative">
-        {detail.img_list?.[0] ? (
+        {detail.img_urls?.[0] ? (
           <img
-            src={detail.img_list[0]}
+            src={detail.img_urls[0]}
             alt={detail.store_name}
             className="w-full h-full object-cover rounded-b-xl"
           />
