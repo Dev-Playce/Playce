@@ -27,9 +27,15 @@ export const createStoreValidator = [
     .notEmpty().withMessage('영업 시간을 입력해주세요.').bail()
     .isString().withMessage('영업 시간은 문자열이어야 합니다.'),
 
-  body('menus')
-    .notEmpty().withMessage('메뉴를 입력해주세요.').bail()
-    .isString().withMessage('메뉴는 문자열이어야 합니다.'),
+  body("menus")
+    .optional({ checkFalsy: true })
+    .isArray().withMessage("메뉴는 배열이어야 합니다."),
+  body("menus.*.name")
+    .notEmpty().withMessage("메뉴 이름을 입력해주세요.").bail()
+    .isString().withMessage("메뉴 이름은 문자열이어야 합니다."),
+  body("menus.*.price")
+    .notEmpty().withMessage("메뉴 가격을 입력해주세요.").bail()
+    .isString().withMessage("메뉴 가격은 문자열이어야 합니다."),
 
   body('type')
     .notEmpty().withMessage('업종을 입력해주세요.').bail()
@@ -69,13 +75,15 @@ export const updateStoreValidator = [
     .optional()
     .isString().withMessage('영업 시간은 문자열이어야 합니다.'),
 
-  body('menus')
-    .optional()
-    .isString().withMessage('메뉴는 문자열이어야 합니다.'),
-
-  body('type')
-    .optional()
-    .isString().withMessage('업종은 문자열이어야 합니다.'),
+  body("menus")
+    .optional({ checkFalsy: true })
+    .isArray().withMessage("메뉴는 배열이어야 합니다."),
+  body("menus.*.name")
+    .notEmpty().withMessage("메뉴 이름을 입력해주세요.").bail()
+    .isString().withMessage("메뉴 이름은 문자열이어야 합니다."),
+  body("menus.*.price")
+    .notEmpty().withMessage("메뉴 가격을 입력해주세요.").bail()
+    .isString().withMessage("메뉴 가격은 문자열이어야 합니다."),
 
   body('description')
     .optional()

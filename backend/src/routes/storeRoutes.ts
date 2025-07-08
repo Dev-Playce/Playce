@@ -51,8 +51,20 @@ const router = Router();
  *                 type: string
  *                 example: 매일 11:00 ~ 24:00
  *               menus:
- *                 type: string
- *                 example: 뇨끼, 샐러드, 피시 앤 칩스
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: 뇨끼
+ *                     price:
+ *                       type: string
+ *                       example: "15000"
+ *                 example:
+ *                  - { name: "뇨끼", price: "25000" }
+ *                  - { name: "샐러드", price: "18000"}
+ *                  - { name: "피시앤칩스", price: "22000"}
  *               type:
  *                 type: string
  *                 example: 펍
@@ -161,8 +173,19 @@ router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식�
  *                 type: string
  *                 example: 매일 12:00 ~ 24:00
  *               menus:
- *                 type: string
- *                 example: 교촌 오리지날
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: 교촌 오리지널
+ *                     price:
+ *                       type: string
+ *                       example: "20000"
+ *                 example:
+ *                  - { name: "교촌 오리지널", price: "20000" }
+ *                  - { name: "교촌 허니콤보", price: "23000"}
  *               type:
  *                 type: string
  *                 example: 치킨
@@ -255,8 +278,20 @@ router.delete("/:storeId", authenticate, storeController.deleteStore); // 3. 식
  *                   type: string
  *                   example: 매일 10:00 ~ 23:00
  *                 menus:
- *                   type: string
- *                   example: 맥주, 피자, 치킨
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         example: 맥주
+ *                       price:
+ *                         type: string
+ *                         example: "8000"
+ *                   example:
+ *                     - { name: "맥주", price: "8000" }
+ *                     - { name: "피자", price: "28000"}
+ *                     - { name: "치킨", price: "22000"}
  *                 type:
  *                   type: string
  *                   example: 스포츠펍

@@ -17,6 +17,11 @@ import { BusinessNumber } from "./BusinessNumber";
 import { BigRegion } from "./BigRegion";
 import { SmallRegion } from "./SmallRegion";
 
+export interface MenuItem {
+  name: string;
+  price: string;
+}
+
 @Entity("stores")
 export class Store {
   @PrimaryGeneratedColumn()
@@ -59,15 +64,6 @@ export class Store {
   })
   smallRegion!: SmallRegion;
 
-  // @Index({ spatial: true })
-  // @Column({
-  //   name: "location",
-  //   type: "point",
-  //   spatialFeatureType: "Point",
-  //   srid: 4326,
-  // })
-  // location!: string;
-
   @Column({ name: "lat", type: "float"})
   lat!: number;
 
@@ -80,8 +76,8 @@ export class Store {
   @Column({ name: "opening_hours" })
   openingHours!: string;
 
-  @Column("text", { name: "menus" })
-  menus!: string;
+  @Column({ name: "menus", type: "json" })
+  menus!: MenuItem[];
 
   @Column({ name: "type" })
   type!: string;

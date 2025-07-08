@@ -14,7 +14,11 @@ const stores = [
     lng: 126.977440016914,
     phone: "000-111-1234",
     openingHours: "매일 12:00 ~ 24:00",
-    menus: "교촌 오리지날",
+    menus: [
+      { name: "교촌 오리지날", price: "16000"},
+      { name: "교촌 허니", price: "17000"},
+      { name: "교촌 레드윙", price: "18000"},
+    ],
     type: "치킨",
     description: undefined,
   },
@@ -29,7 +33,10 @@ const stores = [
     lng: 126.977945,
     phone: "02-777-1234",
     openingHours: "매일 08:00 ~ 21:00",
-    menus: "북어국, 공기밥",
+    menus: [
+      { name: "북어국", price: "9000"},
+      { name: "공기밥", price: "1000"},
+    ],
     type: "한식",
     description: "서울 시청 근처에서 유명한 해장국 맛집. 진하고 깔끔한 국물이 특징",
   },
@@ -44,9 +51,14 @@ const stores = [
     lng: 126.977945,
     phone: "02-123-4567",
     openingHours: "매일 08:00 ~ 21:00",
-    menus: "북어국, 공기밥",
+    menus: [
+      { name: "김밥", price: "3000"},
+      { name: "라면", price: "4500"},
+      { name: "돈까스", price: "8000"},
+      { name: "쫄면", price: "6500"},
+    ],
     type: "한식",
-    description: "서울 시청 근처에서 유명한 해장국 맛집. 진하고 깔끔한 국물이 특징",
+    description: "간단하고 저렴하게 식사하기 좋은 김밥천국",
   },
 ];
 
