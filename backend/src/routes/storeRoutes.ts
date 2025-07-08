@@ -216,12 +216,19 @@ router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식�
  *               type:
  *                 type: string
  *                 example: 치킨
-  *               images:
+ *               img_urls:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: 기존 이미지 S3 URL 배열 (유지할 이미지)
+ *                 example:
+ *                   - https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/교촌1.webp
+ *               images:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: 새로 추가할 이미지 파일들
+ *                 description: 새로 추가할 이미지 파일들 (form-data)
  *               description:
  *                 type: string
  *                 example: 설명
