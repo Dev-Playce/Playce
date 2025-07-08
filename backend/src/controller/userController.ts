@@ -4,7 +4,6 @@ import { AuthRequest } from "../middlewares/authMiddleware";
 import { success } from "../utils/response";
 import { logApiError } from "../utils/errorHandler";
 
-
 const userController = {
   join: async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -23,19 +22,24 @@ const userController = {
       console.log("\n🔐 [로그인] 요청");
       const token = await userService.login(req);
       console.log("✅ [로그인] 성공");
-      return success(res, "로그인이 완료되었습니다.", { token }, 201);
+      return success(res, "로그인이 완료되었습니다.", { token });
     } catch (error) {
       logApiError("로그인", error);
       next(error);
     }
   },
 
-  requestResetPassword: async (req: Request, res: Response, next: NextFunction) => {
+  requestResetPassword: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       console.log("\n🔄 [비밀번호 초기화 요청]");
-      await userService.requestResetPassword();
+      const { email } = req.body;
+      await userService.requestResetPassword(email);
       console.log("✅ [비밀번호 초기화 메일 전송] 성공");
-      return success(res, "메일이 전송되었습니다.");
+      return success(res, "메일이 전송되었습니다.", undefined, 201);
     } catch (error) {
       logApiError("비밀번호 초기화 요청", error);
       next(error);
@@ -45,7 +49,16 @@ const userController = {
   resetPassword: async (req: Request, res: Response, next: NextFunction) => {
     try {
       console.log("\n🔁 [비밀번호 초기화]");
-      await userService.resetPassword();
+
+      const token = req.params.token; 
+      const { newPassword } = req.body; 
+
+      if (!token || !newPassword) {
+        throw new Error("토큰과 새 비밀번호가 필요합니다.");
+      }
+
+      await userService.resetPassword(token, newPassword);
+
       console.log("✅ [비밀번호 변경] 성공");
       return success(res, "비밀번호가 변경되었습니다.");
     } catch (error) {
@@ -68,7 +81,11 @@ const userController = {
     }
   },
 
-  updateNickname: async (req: AuthRequest, res: Response, next: NextFunction) => {
+  updateNickname: async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       console.log("\n✏️ [닉네임 변경] 요청");
       const userId = req.user!.userId;
