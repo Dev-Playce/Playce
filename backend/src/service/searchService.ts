@@ -68,7 +68,7 @@ const searchService = {
     team?: string;
     big_region?: string;
     small_region?: string;
-    sort?: "date" | "name";
+    // sort?: "date" | "name";
   }) => {
     console.log("\n🔎 [통합 검색] 요청 필터:", filters);
 
@@ -79,7 +79,7 @@ const searchService = {
       team,
       big_region,
       small_region,
-      sort,
+      // sort,
     } = filters;
 
     const storeRepo = AppDataSource.getRepository(Store);
@@ -131,28 +131,50 @@ const searchService = {
       console.log("- 필터: 소지역 전체 (필터 생략)");
     }
 
-    // 🔃 정렬
-    if (sort === "date") {
-      console.log("- 정렬: 날짜순");
-      query.orderBy("broadcast.matchDate", "ASC");
-    } else if (sort === "name") {
-      console.log("- 정렬: 이름순");
-      query.orderBy("store.storeName", "ASC");
-    }
+    // // 🔃 정렬
+    // if (sort === "date") {
+    //   console.log("- 정렬: 날짜순");
+    //   query.orderBy("broadcast.matchDate", "ASC");
+    // } else if (sort === "name") {
+    //   console.log("- 정렬: 이름순");
+    //   query.orderBy("store.storeName", "ASC");
+    // }
 
     const stores = await query.getMany();
 
     console.log(`- 검색 결과: ${stores.length}개`);
 
-    const result = stores.map((store) => ({
-      id: store.id,
-      store_name: store.storeName,
-      img_url: store.images[0]?.imgUrl ?? null,
-      address: store.address,
-      lat: store.lat,
-      lng: store.lng,
-      match_id: store.broadcasts[0]?.id ?? null,
-    }));
+    const result = stores.map((store) => {
+      // 최신 중계 일정 1개 추출
+      const latestBroadcast = store.broadcasts
+        .slice()
+        .sort((a, b) => {
+          const aDate = new Date(`${a.matchDate}T${a.matchTime}`);
+          const bDate = new Date(`${b.matchDate}T${b.matchTime}`);
+          return bDate.getTime() - aDate.getTime(); // 최신순
+        })[0];
+
+      return {
+        id: store.id,
+        store_name: store.storeName,
+        img_url: store.images[0]?.imgUrl ?? null,
+        address: store.address,
+        lat: store.lat,
+        lng: store.lng,
+        broadcast: latestBroadcast
+          ? {
+            id: latestBroadcast.id,
+            match_date: latestBroadcast.matchDate,
+            match_time: latestBroadcast.matchTime,
+            sport: latestBroadcast.sport?.name,
+            league: latestBroadcast.league?.name,
+            team_one: latestBroadcast.teamOne,
+            team_two: latestBroadcast.teamTwo,
+            etc: latestBroadcast.etc,
+          }
+          : null, // 중계 일정이 없을 경우 null
+      };
+    });
 
     console.log("✅ 통합 검색 완료");
     return result;
