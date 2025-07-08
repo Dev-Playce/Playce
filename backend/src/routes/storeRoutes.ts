@@ -117,7 +117,7 @@ router.post(
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: 내 식당 목록 조회 성공
+ *         description: 사용자가 등록한 식당 목록
  *         content:
  *           application/json:
  *             schema:

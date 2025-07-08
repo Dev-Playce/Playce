@@ -19,7 +19,7 @@ export const uploadToS3 = multer({
   storage: multerS3({
     s3,
     bucket: process.env.AWS_S3_BUCKET_NAME!,
-    acl: 'public-read',
+    // acl: 'public-read',
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: (_req, file, cb) => {
       const filename = `${Date.now()}-${file.originalname}`;
@@ -34,7 +34,7 @@ export const uploadToS3 = multer({
     cb(null, true);
   },
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 20 * 1024 * 1024, // 20MB
   },
 });
 

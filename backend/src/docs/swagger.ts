@@ -9,8 +9,8 @@ const swaggerDefinition = {
     },
     servers: [
         {
-            url: `http://localhost:${process.env.PORT || 3000}`,
-            description: "local server",
+            url: "http://3.35.146.155:3000",
+            description: "EC2 배포 서버",
         }
     ],
     // 토큰 인증 

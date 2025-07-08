@@ -52,19 +52,19 @@ const storeImages = [
   {
     storeId: 1,
     imgUrl:
-      "https://unsplash.com/ko/%EC%82%AC%EC%A7%84/a-plate-of-food-KOK0p9rBCmA",
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/%EA%B5%90%EC%B4%8C1.webp",
     isMain: true,
   },
   {
     storeId: 1,
     imgUrl:
-      "https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%ED%9D%B0%EC%83%89-%EC%84%B8%EB%9D%BC%EB%AF%B9-%EC%A0%91%EC%8B%9C%EC%97%90-%EA%B5%AC%EC%9A%B4-%EB%8B%AD%EA%B3%A0%EA%B8%B0-4qJlXK4mYzU",
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/%EA%B5%90%EC%B4%8C2.webp",
     isMain: false,
   },
   {
     storeId: 2,
     imgUrl:
-      "https://unsplash.com/ko/%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8/%ED%8C%8C%EB%9E%80-%EB%88%88%EC%9D%84-%EA%B0%80%EC%A7%84-%EB%85%B8%EB%9E%80-%EC%83%9D%EB%AC%BC%EC%9D%98-%EA%B7%B8%EB%A6%BC-z7wBtlhHfYs",
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/%EB%B6%81%EC%96%B41.webp",
     isMain: true,
   },
 ];
