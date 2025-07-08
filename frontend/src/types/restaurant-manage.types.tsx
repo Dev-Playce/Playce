@@ -2,7 +2,7 @@ import BroadcastRestaurants from "../components/Mypage/RestaurantManage/Broadcas
 import BroadcastView from "../components/Mypage/RestaurantManage/Broadcasts/BroadcastView";
 import RestaurantEdit from "../components/Mypage/RestaurantManage/RestaurantEdit";
 import RestaurantHome from "../components/Mypage/RestaurantManage/RestaurantHome";
-import RestaurantList from "../components/Mypage/RestaurantManage/RestaurantList";
+import RestaurantList from "../components/Mypage/RestaurantManage/StoreList";
 import RestaurantRegister from "../components/Mypage/RestaurantManage/RestaurantRegister";
 
 export const menuItems = [
