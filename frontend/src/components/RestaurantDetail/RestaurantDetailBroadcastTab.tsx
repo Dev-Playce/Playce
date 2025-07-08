@@ -1,6 +1,7 @@
 import { FiTv } from "react-icons/fi";
 import Button from "../Common/Button";
 import type { RestaurantDetail } from "../../types/restaurant.types";
+import EmptyMessage from "./EmptyMessage";
 
 export default function RestaurantDetailBroadcastTab({
   detail,
@@ -40,8 +41,8 @@ export default function RestaurantDetailBroadcastTab({
             </li>
           ))
         ) : (
-          <li className="py-6 text-gray-400 text-center">
-            예정된 중계가 없습니다.
+          <li>
+            <EmptyMessage message="중계정보가 없습니다." />
           </li>
         )}
       </ul>

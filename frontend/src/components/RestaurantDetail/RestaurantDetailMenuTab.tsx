@@ -1,5 +1,6 @@
 import { FaUtensils } from "react-icons/fa";
 import type { RestaurantDetail } from "../../types/restaurant.types";
+import EmptyMessage from "./EmptyMessage";
 
 export default function RestaurantDetailMenuTab({
   detail,
@@ -31,7 +32,9 @@ export default function RestaurantDetailMenuTab({
           </li>
         ))
       ) : (
-        <li className="py-3 text-gray-400 text-center">메뉴 정보 없음</li>
+        <li>
+          <EmptyMessage message="메뉴정보가 없습니다." />
+        </li>
       )}
     </ul>
   );
