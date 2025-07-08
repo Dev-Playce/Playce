@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import searchService from "../service/searchService";
 import { success } from "../utils/response";
-import { logApiError } from "../utils/errorHandler";
+import { logApiError } from "../utils/errorUtils";
+import { log } from "../utils/logUtils";
 
 const searchController = {
   // 1. 현재 위치 기반 검색
   getNearbyStores: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("\n📍 [현재 위치 기반 검색] 요청");
+      log("\n📍 [현재 위치 기반 검색] 요청");
 
       const { lat, lng, radius } = req.query;
 
@@ -17,7 +18,7 @@ const searchController = {
         Number(radius)
       );
 
-      console.log("✅ [현재 위치 기반 검색] 성공");
+      log("✅ [현재 위치 기반 검색] 성공");
 
       return success(res, "현재 위치 기반 검색 성공", result);
     } catch (error) {
@@ -29,7 +30,7 @@ const searchController = {
   // 2. 통합 검색
   searchStores: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("\n🔍 [통합 검색] 요청");
+      log("\n🔍 [통합 검색] 요청");
 
       const {
         search,
@@ -51,7 +52,7 @@ const searchController = {
         // sort: String(sort || '') as 'date' | 'name',
       });
 
-      console.log("✅ [통합 검색] 성공");
+      log("✅ [통합 검색] 성공");
 
       return success(res, "통합 검색 성공", result);
     } catch (error) {
