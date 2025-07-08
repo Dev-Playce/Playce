@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import useFavoriteStore from "../../stores/favoriteStore";
 import RestaurantCardList from "../RestaurantCardList/RestaurantCardList";
 import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail";
-import type { RestaurantDetail } from "../../types/restaurant.types";
-import { getStoreDetail } from "../../api/restaurant.api";
 
 interface FavoriteListProps {
   onClose: () => void;
@@ -12,28 +10,15 @@ interface FavoriteListProps {
 
 const FavoriteList = ({ onClose }: FavoriteListProps) => {
   const { favorites, fetchFavorites, removeFavorite } = useFavoriteStore();
-  // storeId와 detail을 함께 관리
-  const [selectedDetail, setSelectedDetail] = useState<{
-    storeId: number;
-    detail: RestaurantDetail;
-  } | null>(null);
+  const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchFavorites();
   }, [fetchFavorites]);
 
-  // 상세보기 버튼 클릭 시 storeId와 detail을 함께 저장
-  const handleDetail = async (store_id: number) => {
-    try {
-      const res = await getStoreDetail(store_id);
-      if (res.success && res.data) {
-        setSelectedDetail({ storeId: store_id, detail: res.data });
-      } else {
-        alert("상세 정보를 찾을 수 없습니다.");
-      }
-    } catch {
-      alert("상세 정보를 불러오지 못했습니다.");
-    }
+  // 상세보기 버튼 클릭 시 storeId만 저장
+  const handleDetail = (store_id: number) => {
+    setSelectedStoreId(store_id);
   };
 
   return (
@@ -57,11 +42,10 @@ const FavoriteList = ({ onClose }: FavoriteListProps) => {
         onDetail={handleDetail}
       />
       {/* 상세보기 모달/사이드바 */}
-      {selectedDetail && (
+      {selectedStoreId !== null && (
         <RestaurantDetailComponent
-          detail={selectedDetail.detail}
-          storeId={selectedDetail.storeId}
-          onClose={() => setSelectedDetail(null)}
+          storeId={selectedStoreId}
+          onClose={() => setSelectedStoreId(null)}
         />
       )}
     </section>

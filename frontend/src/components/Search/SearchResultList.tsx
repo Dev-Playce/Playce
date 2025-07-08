@@ -1,6 +1,8 @@
+import { useState } from "react";
 import SearchResultItem from "./SearchResultItem";
 import { useSearchStore } from "../../stores/searchStore";
 import { sortSearchResults } from "../../utils/sortUtils";
+import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail";
 
 const SearchResultList = () => {
   const isSearching = useSearchStore((state) => state.isSearching);
@@ -8,6 +10,9 @@ const SearchResultList = () => {
   const results = useSearchStore((state) => state.results);
   const sort = useSearchStore((state) => state.sort);
   const setSort = useSearchStore((state) => state.setSort);
+
+  // 상세보기용 state 추가
+  const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
 
   const sortedResults = sortSearchResults(results, sort);
 
@@ -68,10 +73,24 @@ const SearchResultList = () => {
               imgUrl: item.img_url || "/noimg.png",
             };
 
-            return <SearchResultItem key={item.id} data={displayItem} />;
+            return (
+              <SearchResultItem
+                key={item.id}
+                data={displayItem}
+                onClick={() => setSelectedStoreId(item.id)}
+              />
+            );
           })
         )}
       </div>
+
+      {/* 상세보기 모달/사이드바 */}
+      {selectedStoreId !== null && (
+        <RestaurantDetailComponent
+          storeId={selectedStoreId}
+          onClose={() => setSelectedStoreId(null)}
+        />
+      )}
     </div>
   );
 };
