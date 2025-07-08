@@ -1,4 +1,4 @@
-import { FiChevronLeft, FiTrash2, FiEdit2 } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
 
 interface RestaurantCardListProps {
   stores: {
@@ -9,10 +9,8 @@ interface RestaurantCardListProps {
     type: string;
   }[];
   onRemove?: (store_id: number) => void;
-  onEdit?: (store_id: number) => void;
   onDetail?: (store_id: number) => void;
   showDelete?: boolean;
-  showEdit?: boolean;
   showDetail?: boolean;
   compact?: boolean;
 }
@@ -20,10 +18,8 @@ interface RestaurantCardListProps {
 export default function RestaurantCardList({
   stores,
   onRemove,
-  onEdit,
   onDetail,
   showDelete = false,
-  showEdit = false,
   showDetail = true,
   compact = false,
 }: RestaurantCardListProps) {
@@ -36,9 +32,15 @@ export default function RestaurantCardList({
           <li
             key={store.store_id}
             className={
-              compact
-                ? "flex items-center gap-3 py-3 border-b border-gray-100 last:border-0"
-                : "flex items-center gap-4 p-3"
+              (compact
+                ? "flex items-center gap-3 py-3 px-3 border-b border-gray-100 last:border-0"
+                : "flex items-center gap-4 px-6 py-3") +
+              " cursor-pointer hover:bg-primary4 transition-colors"
+            }
+            onClick={
+              showDetail && onDetail
+                ? () => onDetail(store.store_id)
+                : undefined
             }
           >
             <img
@@ -87,56 +89,27 @@ export default function RestaurantCardList({
                 {store.address}
               </div>
             </div>
-            {/* 상세보기 버튼 */}
-            {showDetail && (
-              <button
-                onClick={() => onDetail && onDetail(store.store_id)}
-                className={
-                  compact
-                    ? "w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-primary1 transition ml-1"
-                    : "p-2 rounded-full bg-gray-50 hover:bg-emerald-100 transition-colors shadow"
-                }
-                aria-label="상세보기"
-              >
-                <FiChevronLeft
-                  className={
-                    compact
-                      ? "text-primary5 text-xl"
-                      : "text-emerald-500 text-xl"
-                  }
-                />
-              </button>
-            )}
-            {/* 수정 버튼 */}
-            {showEdit && (
-              <button
-                onClick={() => onEdit && onEdit(store.store_id)}
-                className={
-                  compact
-                    ? "w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-blue-50 transition ml-1"
-                    : "ml-2 p-2 rounded-full bg-gray-50 hover:bg-blue-100 transition-colors shadow"
-                }
-                aria-label="수정"
-              >
-                <FiEdit2 className="text-blue-400 text-xl" />
-              </button>
-            )}
-            {/* 삭제 버튼 */}
+            {/* 삭제 버튼만 별도 노출 */}
             {showDelete && (
               <button
-                onClick={() => onRemove && onRemove(store.store_id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onRemove) {
+                    onRemove(store.store_id);
+                  }
+                }}
                 className={
                   compact
-                    ? "w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-red-50 transition ml-1"
-                    : "ml-2 p-2 rounded-full bg-gray-50 hover:bg-red-100 transition-colors shadow"
+                    ? "w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-gray-100 transition ml-1"
+                    : "ml-2 p-2 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors shadow"
                 }
                 aria-label="삭제"
               >
                 <FiTrash2
                   className={
                     compact
-                      ? "text-gray-400 group-hover:text-red-500 text-base"
-                      : "text-red-400 text-xl"
+                      ? "text-gray-400 hover:text-red-500 text-base transition-colors"
+                      : "text-gray-400 hover:text-red-500 text-xl transition-colors"
                   }
                 />
               </button>
