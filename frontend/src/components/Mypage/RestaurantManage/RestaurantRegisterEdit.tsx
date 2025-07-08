@@ -2,7 +2,6 @@ import { useState } from "react";
 import validateStoreForm from "./modals/validateStoreForm";
 import ErrorMessage from "./modals/ErrorMessage";
 import MenuInputList from "./modals/MenuInputList";
-import ImageUrlInputList from "./modals/ImageUrlInputList";
 import {
   editStore,
   registerStore,
@@ -12,6 +11,7 @@ import {
 import useMypageStore from "../../../stores/mypageStore";
 import FindAddressButton from "../../Common/FindAddressButton";
 import { dummyRestaurantDetails } from "../../../data/dummyRestaurantDetail";
+import ImageUpload from "../../Common/ImageUpload";
 
 interface StoreFormModalProps {
   mode: "create" | "edit";
@@ -36,9 +36,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
     storeDetail?.description || ""
   );
   const [menus, setMenus] = useState<string[]>([""]); // Todo
-  const [imgUrls, setImgUrls] = useState<string[]>(
-    storeDetail?.img_list || [""]
-  );
+  const [imgUrls, setImgUrls] = useState<string[]>(storeDetail?.img_urls || []);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [agree, setAgree] = useState(false);
 
@@ -206,8 +204,12 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
             placeholder="식당을 소개해 주세요 (선택)"
           />
         </div>
-        {/* 이미지 URL(동적 필드 컴포넌트) */}
-        <ImageUrlInputList imgUrls={imgUrls} setImgUrls={setImgUrls} />
+        {/* 사진 */}
+        <div>
+          <label className="block mb-1 font-semibold text-gray-700">사진</label>
+          <ImageUpload imageUrls={imgUrls} setImageUrls={setImgUrls} />
+          {/* <ImageUrlInputList imgUrls={imgUrls} setImgUrls={setImgUrls} /> */}
+        </div>
 
         {/* 약관동의 체크박스: 등록(create) 모드에서만 노출 */}
         {mode === "create" && (

@@ -26,6 +26,10 @@ export interface EditStoreProps {
   description: string;
 }
 
+export const myStores = () => {
+  return requestHandler("get", "/stores/mypage");
+};
+
 export const registerStore = (data: RegisterStoreProps) => {
   return requestHandler("post", "/stores", data);
 };

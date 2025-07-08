@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { dummyRestaurantDetails } from "../../../data/dummyRestaurantDetail";
+import { dummyRestaurantDetails } from "../../../data/dummyRestaurantDetail.ts";
 import { FiChevronLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
 import DetailStores from "../../RestaurantDetail/RestaurantDetail.tsx";
-import type { MyStore } from "../../../types/restaurant.types";
+import type { MyStore } from "../../../types/restaurant.types.ts";
 import useMypageStore from "../../../stores/mypageStore.ts";
-import { dummyMyStores } from "../../../data/dummy-my-stores.ts";
-import { deleteStore } from "../../../api/restaurant.api.ts";
+import { deleteStore, myStores } from "../../../api/restaurant.api.ts";
 
-const RestaurantList = () => {
+const StoreList = () => {
   const [stores, setStores] = useState<MyStore[]>([]);
   const [selectedDetailStoreId, setSelectedDetailStoreId] = useState<
     number | null
@@ -16,8 +15,13 @@ const RestaurantList = () => {
 
   // Todo: 내 식당 목록 불러오기
   useEffect(() => {
-    const myStores = dummyMyStores.stores;
-    setStores(myStores);
+    const fetchMyStores = async () => {
+      const res = await myStores();
+      setStores(res.data);
+      return res;
+    };
+
+    fetchMyStores();
   }, []);
 
   // 삭제
@@ -107,4 +111,4 @@ const RestaurantList = () => {
   );
 };
 
-export default RestaurantList;
+export default StoreList;
