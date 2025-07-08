@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FiStar,
   FiMapPin,
@@ -14,26 +14,43 @@ import Button from "../Common/Button";
 import classNames from "classnames";
 import useFavoriteStore from "../../stores/favoriteStore";
 import useAuthStore from "../../stores/authStore";
+import { getStoreDetail } from "../../api/restaurant.api";
 
 const TABS = ["홈", "메뉴", "중계"] as const;
 type Tab = (typeof TABS)[number];
 
 interface RestaurantDetailComponentProps {
-  detail: RestaurantDetail;
   storeId: number;
   onClose?: () => void;
 }
 
 export default function RestaurantDetailComponent({
-  detail,
   storeId,
   onClose,
 }: RestaurantDetailComponentProps) {
   const [currentTab, setCurrentTab] = useState<Tab>("홈");
+  const [detail, setDetail] = useState<RestaurantDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
   const isFavorite = favorites.some((fav) => fav.store_id === storeId);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    getStoreDetail(storeId)
+      .then((res) => {
+        if (res.success && res.data) {
+          setDetail(res.data);
+        } else {
+          setError("상세 정보를 찾을 수 없습니다.");
+        }
+      })
+      .catch(() => setError("상세 정보를 불러오지 못했습니다."))
+      .finally(() => setLoading(false));
+  }, [storeId]);
 
   const handleToggleFavorite = async () => {
     if (!isLoggedIn) {
@@ -46,6 +63,26 @@ export default function RestaurantDetailComponent({
       await addFavorite(storeId);
     }
   };
+
+  if (loading) {
+    return (
+      <aside className="fixed left-0 top-0 h-full w-[430px] z-[100] bg-white shadow-2xl border-r border-gray-100 flex flex-col font-pretendard">
+        <div className="flex-1 flex items-center justify-center">
+          로딩 중...
+        </div>
+      </aside>
+    );
+  }
+
+  if (error || !detail) {
+    return (
+      <aside className="fixed left-0 top-0 h-full w-[430px] z-[100] bg-white shadow-2xl border-r border-gray-100 flex flex-col font-pretendard">
+        <div className="flex-1 flex items-center justify-center text-red-500">
+          {error || "오류"}
+        </div>
+      </aside>
+    );
+  }
 
   return (
     <aside className="fixed left-0 top-0 h-full w-[430px] z-[100] bg-white shadow-2xl border-r border-gray-100 flex flex-col font-pretendard">
@@ -122,6 +159,14 @@ export default function RestaurantDetailComponent({
         {/* 홈 탭 */}
         {currentTab === "홈" && (
           <div className="flex flex-col gap-4">
+            {/* 내 가게일 때만 표시되는 뱃지 */}
+            {detail.is_owner && (
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2 py-1 bg-primary3 text-primary5 rounded text-xs font-bold">
+                  내 가게
+                </span>
+              </div>
+            )}
             <h2 className="text-2xl font-bold mb-2">{detail.store_name}</h2>
             <p className="mb-2 text-gray-700">{detail.description}</p>
             <div className="flex items-center gap-2">
