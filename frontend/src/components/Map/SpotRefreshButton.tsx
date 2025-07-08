@@ -18,6 +18,7 @@ const SpotRefreshButton = () => {
           lng: position.lng,
           radius: SEARCHNEARBY_RADIUS,
         });
+        console.log(res.data);
         setRestaurants(res.data);
         setRefreshBtn(false);
       }}

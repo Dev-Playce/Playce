@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { dummyRestaurantDetails } from "../../../data/dummyRestaurantDetail.ts";
 import { FiChevronLeft, FiEdit2, FiTrash2 } from "react-icons/fi";
-import DetailStores from "../../RestaurantDetail/RestaurantDetail.tsx";
 import type { MyStore } from "../../../types/restaurant.types.ts";
 import useMypageStore from "../../../stores/mypageStore.ts";
 import { deleteStore, myStores } from "../../../api/restaurant.api.ts";
+import RestaurantDetailComponent from "../../RestaurantDetail/RestaurantDetail.tsx";
 
 const StoreList = () => {
   const [stores, setStores] = useState<MyStore[]>([]);
@@ -75,8 +74,6 @@ const StoreList = () => {
                 {/* 수정 버튼 */}
                 <button
                   onClick={() => {
-                    // setFormOpen(true);
-                    // setEditTarget(store);
                     setRestaurantEdit(store.store_id);
                     setRestaurantSubpage("restaurant-list-edit");
                   }}
@@ -100,9 +97,7 @@ const StoreList = () => {
       )}
       {/* 상세보기 */}
       {selectedDetailStoreId && (
-        <DetailStores
-          // Todo: 수정해야 함
-          detail={dummyRestaurantDetails[0]}
+        <RestaurantDetailComponent
           storeId={selectedDetailStoreId}
           onClose={() => setSelectedDetailStoreId(null)}
         />
