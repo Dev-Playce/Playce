@@ -1,7 +1,14 @@
 import { Router } from "express";
 import storeController from "../controller/storeController";
-import { authenticate, optionalAuthenticate } from "../middlewares/authMiddleware";
-import { createStoreValidator, updateStoreValidator } from "../middlewares/storeValidator";
+import {
+  authenticate,
+  optionalAuthenticate,
+} from "../middlewares/authMiddleware";
+import {
+  createStoreValidator,
+  updateStoreValidator,
+} from "../middlewares/storeValidator";
+import { uploadToS3 } from "../utils/s3";
 
 const router = Router();
 
@@ -16,14 +23,14 @@ const router = Router();
  * @swagger
  * /stores:
  *   post:
- *     summary: 식당 등록
+ *     summary: 식당 등록 (이미지 포함)
  *     tags: [Store]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -34,6 +41,7 @@ const router = Router();
  *               - opening_hours
  *               - menus
  *               - type
+ *               - images
  *             properties:
  *               store_name:
  *                 type: string
@@ -60,16 +68,29 @@ const router = Router();
  *                 type: string
  *                 nullable: true
  *                 example: 축구 경기 생중계가 있는 강남 최고의 스포츠펍
- *               img_urls:
+ *               images:
  *                 type: array
  *                 items:
  *                   type: string
- *                 example:
- *                   - 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EC%95%88%EA%B2%BD%EA%B3%BC-%EC%96%91%EC%B4%88%EA%B0%80%EC%9E%88%EB%8A%94-%ED%85%8C%EC%9D%B4%EB%B8%94-NXzahh27tDQ'
- *                   - 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EB%B0%98%EC%AF%A4-%EC%B1%84%EC%9B%8C%EC%A7%84-%EC%99%80%EC%9D%B8-%EC%9E%94-%EC%98%86%EC%97%90-%EB%B0%98%EC%AF%A4-%EB%B9%88-%ED%88%AC%EB%AA%85-%ED%8C%8C%EC%9D%B8%ED%8A%B8-%EC%9E%94-OxKFC5u0980'
+ *                   format: binary
  *     responses:
  *       201:
  *         description: 식당이 등록되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: 식당이 등록되었습니다. (이미지 3개 업로드됨)
+ *                 data:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
  *       400:
  *         description: req.body 유효성 검사 실패 또는 유효하지 않은 사업자등록번호/지역
  *       401:
@@ -79,7 +100,12 @@ const router = Router();
  *       409:
  *         description: 이미 등록된 사업자등록번호
  */
-router.post("/", authenticate, createStoreValidator, storeController.registerStore); // 1. 식당 등록 (🔒 토큰 검사)
+router.post(
+  "/",
+  authenticate,
+  uploadToS3.array("images", 5),
+  storeController.registerStore
+); // 식당 등록 (토큰 검사)
 
 /**
  * @swagger
@@ -144,7 +170,7 @@ router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식�
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -156,7 +182,7 @@ router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식�
  *                 example: 서울 중구 세종대로18길 6 1-2층
  *               phone:
  *                 type: string
- *                 example: 000-111-1234
+ *                 example: 010-1111-1234
  *               opening_hours:
  *                 type: string
  *                 example: 매일 12:00 ~ 24:00
@@ -166,16 +192,15 @@ router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식�
  *               type:
  *                 type: string
  *                 example: 치킨
- *               img_urls:
+  *               images:
  *                 type: array
  *                 items:
  *                   type: string
- *                 example:
- *                   - 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EC%95%88%EA%B2%BD%EA%B3%BC-%EC%96%91%EC%B4%88%EA%B0%80%EC%9E%88%EB%8A%94-%ED%85%8C%EC%9D%B4%EB%B8%94-NXzahh27tDQ'
- *                   - 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EB%B0%98%EC%AF%A4-%EC%B1%84%EC%9B%8C%EC%A7%84-%EC%99%80%EC%9D%B8-%EC%9E%94-%EC%98%86%EC%97%90-%EB%B0%98%EC%AF%A4-%EB%B9%88-%ED%88%AC%EB%AA%85-%ED%8C%8C%EC%9D%B8%ED%8A%B8-%EC%9E%94-OxKFC5u0980'
+ *                   format: binary
+ *                 description: 새로 추가할 이미지 파일들
  *               description:
  *                 type: string
- *                 example: 
+ *                 example: 설명
  *     responses:
  *       200:
  *         description: 식당이 수정되었습니다.
@@ -188,7 +213,13 @@ router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식�
  *       404:
  *         description: 식당/사용자를 찾을 수 없음
  */
-router.patch("/:storeId", authenticate, updateStoreValidator, storeController.updateStore); // 2. 식당 수정 (🔒)
+router.patch(
+  "/:storeId",
+  authenticate,
+  uploadToS3.array("images", 5),
+  updateStoreValidator,
+  storeController.updateStore
+); // 2. 식당 수정 (🔒)
 
 /**
  * @swagger

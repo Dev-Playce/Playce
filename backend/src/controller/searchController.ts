@@ -38,7 +38,7 @@ const searchController = {
         team,
         big_region,
         small_region,
-        sort,
+        // sort,
       } = req.query;
 
       const result = await searchService.searchStores({
@@ -48,7 +48,7 @@ const searchController = {
         team: String(team || ''),
         big_region: String(big_region || ''),
         small_region: String(small_region || ''),
-        sort: String(sort || '') as 'date' | 'name',
+        // sort: String(sort || '') as 'date' | 'name',
       });
 
       console.log("✅ [통합 검색] 성공");
