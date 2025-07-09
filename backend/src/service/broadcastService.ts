@@ -126,7 +126,7 @@ const getBroadcastsByStore = async (storeId: number) => {
   });
 
   const responseData = broadcasts.map(b => ({
-    match_data: b.matchDate,
+    match_date: b.matchDate,
     match_time: b.matchTime,
     sport: b.sport.name,
     league: b.league.name,

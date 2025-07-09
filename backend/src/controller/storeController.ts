@@ -48,10 +48,12 @@ const storeController = {
 
       let imgUrls: string[] = [];
       if (typeof req.body.img_urls === "string") {
-        imgUrls = [req.body.img_urls];
+        // 쉼표로 구분된 문자열을 배열로 분리
+        imgUrls = req.body.img_urls.split(",").map((s: string) => s.trim());
       } else if (Array.isArray(req.body.img_urls)) {
         imgUrls = req.body.img_urls;
       }
+
 
       const newImageUrls = files?.map((file) => file.location) || [];
       const allImgUrls = [...imgUrls, ...newImageUrls];
@@ -65,7 +67,7 @@ const storeController = {
         allImgUrls.length > 0
           ? ` (총 ${allImgUrls.length}개 이미지가 등록됨)`
           : "";
-          
+
       log("✅ [식당 수정] 성공");
       return success(res, `식당이 수정되었습니다.${imgMessage}`);
     } catch (error) {
