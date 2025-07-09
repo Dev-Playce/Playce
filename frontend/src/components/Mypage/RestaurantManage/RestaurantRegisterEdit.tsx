@@ -48,7 +48,6 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
       setDescription(data.description);
       setMenus(data.menus);
       setImgUrls(data.img_urls);
-      console.log(data.img_urls);
     };
 
     if (mode === "edit" && restaurantEditId) {
@@ -91,7 +90,6 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         alert(`식당 등록이 완료되었습니다.`);
         setRestaurantSubpage("restaurant-home");
       } catch (e) {
-        console.log(imgUrls);
         alert(`${e}\n식당을 등록할 수 없습니다.`);
       }
     } else if (mode === "edit") {

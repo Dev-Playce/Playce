@@ -8,7 +8,7 @@ interface InputTextProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const InputText = React.forwardRef<HTMLInputElement, InputTextProps>(
   ({ className, type = "text", ...props }, ref) => {
     return (
-      <div className="p-[1px]">
+      <div className="p-[1px] w-full">
         <input
           ref={ref}
           type={type}

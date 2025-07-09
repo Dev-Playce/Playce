@@ -10,13 +10,8 @@ import useMypageStore from "../../stores/mypageStore";
 // import { useAuth } from "../../hooks/useAuth";
 
 const AuthHeader: React.FC = () => {
-  const {
-    isLoggedIn,
-    isLoginModalOpen,
-    storeLogout,
-    setIsLoginModalOpen,
-    setIsSignupModalOpen,
-  } = useAuthStore();
+  const { isLoggedIn, storeLogout, setIsLoginModalOpen, setIsSignupModalOpen } =
+    useAuthStore();
 
   // const { userLogout } = useAuth();
   const { setIsMypageOpen } = useMypageStore();
@@ -59,7 +54,6 @@ const AuthHeader: React.FC = () => {
               className="bg-white text-primary5 hover:shadow-lg rounded-lg"
               onClick={() => {
                 setIsLoginModalOpen(true);
-                console.log(isLoginModalOpen);
               }}
             >
               로그인

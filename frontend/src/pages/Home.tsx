@@ -32,7 +32,6 @@ const Home: React.FC = () => {
       lng: position.lng,
       radius: SEARCHNEARBY_RADIUS,
     });
-    // console.log("lat: ", position.lat, "lng: ", position.lng);
   }, [setRestaurants]);
 
   return (
