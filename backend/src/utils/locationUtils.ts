@@ -55,7 +55,7 @@ export const getLocationDataFromAddress = async (
   const findBigRegion = await bigRegionRepo.findOne({
     where: { name: Like(`${normalizeRegionName(bigRegionName)}%`) },
   });
-  if(!findBigRegion) throw createError('유효하지 않은 지역-대분류입니다.', 400);
+  if (!findBigRegion) throw createError('유효하지 않은 지역-대분류입니다.', 400);
 
   const findSmallRegion = await smallRegionRepo.findOne({
     where: {

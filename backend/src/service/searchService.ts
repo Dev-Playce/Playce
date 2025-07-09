@@ -113,6 +113,7 @@ const searchService = {
       query.andWhere("league.name = :league", { league });
     }
 
+
     if (team) {
       log(`- 필터: 팀 '${team}'`);
       query.andWhere(

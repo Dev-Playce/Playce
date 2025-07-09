@@ -27,9 +27,9 @@ export class Store {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => User, (user) => user.stores, { 
+  @ManyToOne(() => User, (user) => user.stores, {
     nullable: false,
-    onDelete: 'CASCADE' 
+    onDelete: 'CASCADE'
   })
   @JoinColumn({
     name: "user_id",
@@ -64,10 +64,10 @@ export class Store {
   })
   smallRegion!: SmallRegion;
 
-  @Column({ name: "lat", type: "float"})
+  @Column({ name: "lat", type: "float" })
   lat!: number;
 
-  @Column({ name: "lng", type: "float"})
+  @Column({ name: "lng", type: "float" })
   lng!: number;
 
   @Column({ name: "phone" })
