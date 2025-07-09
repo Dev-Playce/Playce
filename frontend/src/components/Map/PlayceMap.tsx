@@ -40,6 +40,7 @@ const PlayceMap: React.FC = () => {
         className="w-full h-full"
         ref={mapRef}
         center={position}
+        isPanto={true}
         onClick={closeModal}
         onDragEnd={() => {
           setRefreshBtn(true);
@@ -51,6 +52,7 @@ const PlayceMap: React.FC = () => {
           setPosition(pos);
         }}
       >
+        {/* <MapController position={position} /> */}
         {restaurants.map((restaurant) => (
           <PlayceMapMarker key={restaurant.store_id} restaurant={restaurant} />
         ))}

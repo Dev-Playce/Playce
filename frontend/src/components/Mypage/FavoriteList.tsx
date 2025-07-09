@@ -3,6 +3,7 @@ import { FaTimes } from "react-icons/fa";
 import useFavoriteStore from "../../stores/favoriteStore";
 import RestaurantCardList from "../RestaurantCardList/RestaurantCardList";
 import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail";
+import Button from "../Common/Button";
 
 interface FavoriteListProps {
   onClose: () => void;
@@ -24,14 +25,17 @@ const FavoriteList = ({ onClose }: FavoriteListProps) => {
   return (
     <section className="px-2">
       <div className="flex items-center justify-between text-lg font-semibold my-5">
-        <div className="flex items-center gap-3">즐겨찾기</div>
-        <button
+        <div className="flex items-center gap-3 text-xl text-mainText">
+          즐겨찾기
+        </div>
+        <Button
           onClick={onClose}
-          className="hover:text-primary5"
-          aria-label="마이페이지 닫기"
+          scheme="close"
+          size="icon"
+          className="text-mainText"
         >
           <FaTimes />
-        </button>
+        </Button>
       </div>
       <RestaurantCardList
         stores={favorites}

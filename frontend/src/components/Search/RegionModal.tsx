@@ -18,7 +18,7 @@ const RegionModal = ({ onClose, onApply }: RegionModalProps) => {
   return (
     <ModalBase onClose={onClose} title="지역" className="p-5">
       <RegionPanel />
-      <div className="border-t border-gray-200 p-4 flex gap-3">
+      <div className="border-t border-gray-200 pt-5 flex gap-3">
         <Button onClick={resetRegions} scheme="secondary">
           초기화
         </Button>

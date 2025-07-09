@@ -109,8 +109,9 @@ export const editStore = async (data: EditStoreProps, storeId: number) => {
   newImageUrls.forEach((image) => {
     formData.append("images", image);
   });
+  // formData.append("img_urls", JSON.stringify(existingImageUrls)); // 서버에서 기존 이미지 유지 처리
   existingImageUrls.forEach((url) => {
-    formData.append("imageUrls", url); // 서버에서 기존 이미지 유지 처리
+    formData.append("img_urls", url); // 서버에서 기존 이미지 유지 처리
   });
 
   const res = await axios.patch(`${BASE_URL}/stores/${storeId}`, formData, {

@@ -14,7 +14,7 @@ const SportModal = ({ onClose, onApply }: SportModalProps) => {
   return (
     <ModalBase onClose={onClose} title="경기" className="p-5">
       <SportPanel />
-      <div className="border-t border-gray-200 p-4 flex gap-3">
+      <div className="border-t border-gray-200 pt-5 flex gap-3">
         <Button onClick={resetSport} scheme="secondary">
           초기화
         </Button>

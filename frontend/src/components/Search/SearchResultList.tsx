@@ -45,7 +45,7 @@ const SearchResultList = () => {
         </div>
       </div>
 
-      <div className="px-3">
+      <div className="">
         {isSearching ? (
           <p className="text-center text-gray-400 py-20">검색 중입니다.</p>
         ) : sortedResults.length === 0 ? (
@@ -77,7 +77,9 @@ const SearchResultList = () => {
               <SearchResultItem
                 key={item.id}
                 data={displayItem}
-                onClick={() => setSelectedStoreId(item.id)}
+                onClick={() => {
+                  setSelectedStoreId(item.id);
+                }}
               />
             );
           })

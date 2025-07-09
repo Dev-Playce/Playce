@@ -31,16 +31,17 @@ const RegionPanel = () => {
   return (
     <div className="flex flex-col max-h-[500px]">
       <div className="flex divide-x overflow-hidden border-b h-[300px]">
-        <div className="w-1/2 overflow-y-auto">
+        <div className="w-1/2 overflow-y-auto scrollbar-hide">
           {bigRegions.map((region) => (
             <div
               key={region.id}
               onClick={() => setSelectedBigRegionName(region.name)}
-              className={`px-4 p-3 cursor-pointer hover:bg-gray-100 ${
-                region.name === selectedBigRegionName
-                  ? "font-bold text-primary5"
-                  : ""
-              }`}
+              className={`p-3 cursor-pointer hover:bg-gray-100
+                ${
+                  region.name === selectedBigRegionName
+                    ? "font-bold text-primary5"
+                    : ""
+                }`}
             >
               {region.name}
             </div>
@@ -66,7 +67,7 @@ const RegionPanel = () => {
               return (
                 <label
                   key={sub.id}
-                  className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer"
                 >
                   <span>{sub.name}</span>
                   <input

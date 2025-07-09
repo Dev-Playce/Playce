@@ -9,7 +9,8 @@ import ModalBase from "../Common/ModalBase";
 
 const LoginModal = () => {
   const { userLogin } = useAuth();
-  const { isLoginModalOpen, setIsLoginModalOpen } = useAuthStore();
+  const { isLoginModalOpen, setIsLoginModalOpen, setIsPasswordResetModalOpen } =
+    useAuthStore();
 
   const {
     register,
@@ -36,7 +37,7 @@ const LoginModal = () => {
       type="auth"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-3 mt-5">
+        <div className="flex flex-col gap-3">
           <fieldset>
             <InputText
               placeholder="이메일"
@@ -56,6 +57,20 @@ const LoginModal = () => {
           <Button type="submit" className="mt-5" scheme="primary">
             로그인
           </Button>
+          {/* 중앙 정렬된 비밀번호 찾기 링크 */}
+          <div className="flex justify-center mt-2">
+            <button
+              type="button"
+              className="text-sm text-gray-400 hover:text-primary5 transition-colors underline underline-offset-2"
+              onClick={() => {
+                setIsLoginModalOpen(false);
+                setIsPasswordResetModalOpen(true);
+              }}
+              tabIndex={0}
+            >
+              비밀번호를 잊으셨나요?
+            </button>
+          </div>
         </div>
       </form>
     </ModalBase>
