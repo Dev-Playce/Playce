@@ -25,10 +25,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc",
     "start": "node dist/app.js",
+    "start:test": "cross-env NODE_ENV=test node dist/app.js",
     "dev": "nodemon --watch src --exec \"ts-node src/app.ts\" --ext ts",
+    "dev:test": "cross-env NODE_ENV=test nodemon --watch src --exec \"ts-node src/app.ts\" --ext ts",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/data-source.ts",
     "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d src/data-source.ts",
-    "seed": "ts-node seeds/index.ts"
+    "seed": "ts-node seeds/index.ts",
+    "seed:test": "cross-env NODE_ENV=test ts-node seeds/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -44,6 +47,8 @@
     "@types/node": "^24.0.3",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
+    "cross-env": "^7.0.3",
+    "dotenv-cli": "^8.0.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
