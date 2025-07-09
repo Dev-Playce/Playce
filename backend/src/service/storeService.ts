@@ -320,6 +320,8 @@ const storeService = {
       description: store.description,
       broadcasts: broadcastData,
       is_owner: isOwner,
+      lat: store.lat,
+      lng: store.lng,
     };
     log("- 응답 데이터 : ", responseData);
 
