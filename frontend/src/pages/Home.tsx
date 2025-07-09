@@ -11,6 +11,7 @@ import useMypageStore from "../stores/mypageStore";
 import SearchPage from "./SearchPage";
 import { useMap } from "../hooks/useMap";
 import { SEARCHNEARBY_RADIUS } from "../constant/map-constant";
+import PasswordResetRequestModal from "../components/Auth/PasswordResetRequestModal";
 
 const Home: React.FC = () => {
   const { position, isRefreshBtnOn, setRestaurants } = useMapStore();
@@ -43,6 +44,7 @@ const Home: React.FC = () => {
         <AuthHeader />
         <LoginModal />
         <SignupModal />
+        <PasswordResetRequestModal />
       </div>
       {isMypageOpen && <MypageModal onClose={() => setIsMypageOpen(false)} />}
     </div>

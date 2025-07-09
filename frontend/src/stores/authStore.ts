@@ -10,6 +10,8 @@ interface AuthState {
   setIsSignupModalOpen: (modal: boolean) => void;
   storeLogin: (token: string) => void;
   storeLogout: () => void;
+  isPasswordResetModalOpen: boolean;
+  setIsPasswordResetModalOpen: (modal: boolean) => void;
 }
 
 export const getToken = () => {
@@ -31,6 +33,9 @@ const useAuthStore = create<AuthState>((set) => ({
   isAuthModalOpen: false,
   isLoggedIn: getToken() ? true : false,
   authModal: null,
+  isPasswordResetModalOpen: false,
+  setIsPasswordResetModalOpen: (modal) =>
+    set({ isPasswordResetModalOpen: modal }),
   setIsLoginModalOpen: (modal) => {
     set({ isLoginModalOpen: modal });
   },
