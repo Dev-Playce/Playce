@@ -34,7 +34,7 @@ export default function RestaurantCardList({
             className={
               (compact
                 ? "flex items-center gap-3 p-3 border-b border-gray-100 last:border-0"
-                : "flex items-center gap-4 px-6 py-3") +
+                : "flex items-center gap-4 p-3") +
               " cursor-pointer hover:bg-primary4 transition-colors"
             }
             onClick={
