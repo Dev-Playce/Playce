@@ -9,8 +9,8 @@ const swaggerDefinition = {
     },
     servers: [
         {
-            url: `http://localhost:${process.env.PORT || 3000}`,
-            description: "local server",
+            url: "http://3.35.146.155:3000",
+            description: "EC2 배포 서버",
         }
     ],
     // 토큰 인증 
@@ -27,7 +27,7 @@ const swaggerDefinition = {
 
 const options = {
     swaggerDefinition,
-    apis: ['src/routes/*.ts'], // JSDoc 주석을 읽어올 경로
+    apis: ['./src/routes/*.ts'], // JSDoc 주석을 읽어올 경로
 };
 
 const swaggerSpec = swaggerJSDoc(options);

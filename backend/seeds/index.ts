@@ -61,7 +61,7 @@ const runSeeders = async () => {
   }
 };
 
-if (require.main === module){
+if (require.main === module) {
   (async () => {
     try {
       await AppDataSource.initialize(); // 데이터베이스 연결 초기화

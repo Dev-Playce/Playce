@@ -2,6 +2,7 @@ import "dotenv/config";
 import "reflect-metadata";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+import logger from "./utils/logger";
 
 // TypeORM 설정
 import { AppDataSource } from "./data-source";
@@ -27,7 +28,7 @@ const port = Number(process.env.PORT) || 3000;
 
 // ✅ CORS 허용
 app.use(cors({
-  origin: ['http://localhost:5173','http://localhost:3000', 'http://3.35.146.155:3000'], // 배포 시 도메인 설정 가능
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://3.35.146.155:3000'], // 배포 시 도메인 설정 가능
   credentials: true,
 }));
 
@@ -65,6 +66,7 @@ AppDataSource.initialize()
   .then(() => {
     console.log("📦 DB 연결 성공(TypeORM)");
     app.listen(port, '0.0.0.0', () => {
+      logger.info("✅ 서버 실행됨 (CloudWatch 연동 확인)");
       console.log(`🚀 서버 실행 중 : http://3.35.146.155:${port}`);
       console.log(`💡 Swagger 문서 :  http://3.35.146.155:${port}/api-docs`);
     });

@@ -4,8 +4,8 @@ import { User } from "../entities/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { createError } from "../utils/errorUtils";
-import { log } from "../utils/logUtils";
 import { sendMail } from "../utils/email";
+import { log } from "../utils/logUtils";
 require("dotenv").config();
 
 const userRepository = AppDataSource.getRepository(User);
@@ -149,12 +149,8 @@ const userService = {
       select: ["email", "name", "nickname", "phone"],
     });
 
-    if (!user) {
-      throw createError("사용자를 찾을 수 없습니다.", 404);
-    }
-
-    log("[UserService] 사용자 정보 조회 성공");
-    log("응답 데이터:", user);
+    console.log("[UserService] 사용자 정보 조회 성공");
+    console.log("응답 데이터:", user);
     return user;
   },
 
