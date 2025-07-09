@@ -19,6 +19,7 @@ const FavoriteList = ({ onClose }: FavoriteListProps) => {
 
   // 상세보기 버튼 클릭 시 storeId만 저장
   const handleDetail = (store_id: number) => {
+    console.log(favorites);
     setSelectedStoreId(store_id);
   };
 
