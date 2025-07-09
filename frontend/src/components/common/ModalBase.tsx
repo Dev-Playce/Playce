@@ -54,9 +54,10 @@ const ModalBase = ({
 
         <div
           className={classNames(
-            "overflow-y-auto flex-grow",
-            { "p-0": type === "mypage" },
-            { "px-4 py-3": type !== "mypage" }
+            "overflow-y-auto flex-grow ",
+            { "mt-0": type === "mypage" },
+            { "mt-5": type !== "mypage" }
+            // { "px-4 py-3": type !== "mypage" }
           )}
         >
           {children}
