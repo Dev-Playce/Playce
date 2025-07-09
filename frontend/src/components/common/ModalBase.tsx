@@ -28,9 +28,10 @@ const ModalBase = ({
     >
       <div
         className={classNames(
-          "bg-white rounded-xl shadow-lg max-h-[90vh] overflow-hidden flex flex-col w-[600px]",
+          "bg-white rounded-xl shadow-lg max-h-[90vh] overflow-hidden flex flex-col",
           { "w-[400px]": type === "auth" },
           { "w-[850px]": type === "mypage" },
+          { "w-[600px]": type !== "auth" && type !== "mypage" },
           className
         )}
         onClick={(e) => e.stopPropagation()}
@@ -53,9 +54,10 @@ const ModalBase = ({
 
         <div
           className={classNames(
-            "overflow-y-auto flex-grow",
-            { "p-0": type === "mypage" },
-            { "px-4 py-3": type !== "mypage" }
+            "overflow-y-auto flex-grow ",
+            { "mt-0": type === "mypage" },
+            { "mt-5": type !== "mypage" }
+            // { "px-4 py-3": type !== "mypage" }
           )}
         >
           {children}

@@ -5,12 +5,8 @@ import { useLeagues } from "../../hooks/useLeagues";
 import { getUpdatedLeagueSelection } from "../../utils/sportUtils";
 
 const SportPanel = () => {
-  const {
-    sport,
-    selectedLeagues,
-    setSport,
-    setSelectedLeagues,
-  } = useSportStore();
+  const { sport, selectedLeagues, setSport, setSelectedLeagues } =
+    useSportStore();
 
   const { data: sports = [] } = useSports();
   const selectedSportId = sports.find((s) => s.name === sport)?.id;
@@ -27,15 +23,13 @@ const SportPanel = () => {
 
   return (
     <div className="flex flex-col max-h-[500px]">
-      <div
-        className="flex divide-x overflow-hidden border-b h-[300px]"
-      >
+      <div className="flex divide-x overflow-hidden border-b h-[300px]">
         <div className="w-1/2 overflow-y-auto">
           {sports.map((s) => (
             <div
               key={s.id}
               onClick={() => setSport(s.name)}
-              className={`px-4 p-3 cursor-pointer hover:bg-gray-100 ${
+              className={`p-3 cursor-pointer hover:bg-gray-100 ${
                 s.name === sport ? "font-bold text-primary5" : ""
               }`}
             >
@@ -59,7 +53,7 @@ const SportPanel = () => {
               return (
                 <label
                   key={l.id}
-                  className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer"
                 >
                   <span>{l.name}</span>
                   <input

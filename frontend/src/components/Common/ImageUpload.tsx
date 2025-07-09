@@ -14,12 +14,12 @@ export default function ImageUpload({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleDragEnter = () => setActive(true);
-  const handleDragLeave = (event: React.DragEvent<HTMLLabelElement>) => {
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
     if (!event.currentTarget.contains(event.relatedTarget as Node)) {
       setActive(false);
     }
   };
-  const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
 
@@ -37,7 +37,7 @@ export default function ImageUpload({
     };
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setActive(false);
     const file = event.dataTransfer.files[0];
@@ -86,6 +86,7 @@ export default function ImageUpload({
           />
           <button
             className="absolute top-1 right-1 w-7 h-7 bg-white rounded-full flex items-center justify-center text-black hover:bg-gray-100 hidden group-hover:flex"
+            type="button"
             onClick={() => closeImage(index)}
           >
             <IoClose className="text-xl" />
@@ -93,7 +94,7 @@ export default function ImageUpload({
         </div>
       ))}
 
-      <label
+      <div
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -102,8 +103,10 @@ export default function ImageUpload({
           ${
             isActive ? "border-black bg-gray-200" : "border-gray-400 bg-white"
           } hover:border-black`}
+        onClick={() => document.getElementById("image-upload-input")?.click()}
       >
         <input
+          id="image-upload-input"
           type="file"
           className="hidden"
           accept="image/*"
@@ -111,7 +114,7 @@ export default function ImageUpload({
         />
         <MdUploadFile className="text-[40px] text-gray-500" />
         <span className="text-[14px] text-gray-600">클릭 또는 드롭</span>
-      </label>
+      </div>
 
       {showModal && selectedImage && (
         <div

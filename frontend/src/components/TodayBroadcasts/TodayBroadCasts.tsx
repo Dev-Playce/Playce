@@ -62,7 +62,7 @@ export default function TodayBroadcastSidebar() {
   );
 
   return (
-    <section className="w-full bg-white px-4 pt-4 pb-3 rounded-xl shadow">
+    <section className="w-full bg-white px-4 pb-3">
       <h3 className="text-lg font-bold mb-3 flex items-center">
         <FiTv className="text-primary1 text-xl mr-2" />
         오늘의 중계일정

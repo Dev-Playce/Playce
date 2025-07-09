@@ -37,7 +37,7 @@ const LoginModal = () => {
       type="auth"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-3 mt-5">
+        <div className="flex flex-col gap-3">
           <fieldset>
             <InputText
               placeholder="이메일"

@@ -25,9 +25,9 @@ export default function FavoriteSidebar() {
   };
 
   return (
-    <section className="w-full bg-white px-4 pt-4 pb-3 rounded-xl shadow">
+    <section className="w-full bg-white mt-6">
       <button
-        className="flex items-center w-full h-8 border-b border-gray-100 bg-white group mb-3"
+        className="flex items-center w-full h-8 border-b border-gray-100 bg-white group px-3 pb-3"
         onClick={() => setExpanded((prev) => !prev)}
         aria-label="즐겨찾기 펼치기"
       >
