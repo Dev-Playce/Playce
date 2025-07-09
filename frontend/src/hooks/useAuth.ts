@@ -3,6 +3,10 @@ import {
   signup,
   type LoginProps,
   type SignupProps,
+  passwordResetRequest,
+  passwordReset,
+  type PasswordResetRequestProps,
+  type PasswordResetProps,
 } from "../api/auth.api";
 import useAuthStore from "../stores/authStore";
 
@@ -40,9 +44,31 @@ export const useAuth = () => {
     }
   };
 
+  // 비밀번호 초기화 요청
+  const userPasswordResetRequest = async (data: PasswordResetRequestProps) => {
+    try {
+      await passwordResetRequest(data);
+      alert("비밀번호 재설정 메일이 전송되었습니다.");
+    } catch (error) {
+      alert(`Error : ${error} \n 비밀번호 초기화 요청에 실패했습니다.`);
+    }
+  };
+
+  // 비밀번호 재설정
+  const userPasswordReset = async (data: PasswordResetProps) => {
+    try {
+      await passwordReset(data);
+      alert("비밀번호가 성공적으로 변경되었습니다.");
+    } catch (error) {
+      alert(`Error : ${error}\n 비밀번호 변경에 실패했습니다.`);
+    }
+  };
+
   return {
     userLogin,
     userLogout,
     userSignup,
+    userPasswordResetRequest,
+    userPasswordReset,
   };
 };
