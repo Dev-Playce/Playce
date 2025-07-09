@@ -10,6 +10,9 @@ import RestaurantDetailHomeTab from "./RestaurantDetailHomeTab";
 import RestaurantDetailMenuTab from "./RestaurantDetailMenuTab";
 import RestaurantDetailBroadcastTab from "./RestaurantDetailBroadcastTab";
 import RestaurantDetailPhotoTab from "./RestaurantDetailPhotoTab";
+import useMapStore from "../../stores/mapStore";
+import { searchNearby } from "../../api/map.api";
+import { SEARCHNEARBY_RADIUS } from "../../constant/map-constant";
 
 type Tab = "홈" | "메뉴" | "사진" | "중계";
 
@@ -26,6 +29,7 @@ export default function RestaurantDetailComponent({
   const [detail, setDetail] = useState<RestaurantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { setPosition, setRestaurants, setRefreshBtn } = useMapStore();
 
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
@@ -35,9 +39,17 @@ export default function RestaurantDetailComponent({
     setLoading(true);
     setError(null);
     getStoreDetail(storeId)
-      .then((res) => {
+      .then(async (res) => {
         if (res.success && res.data) {
           setDetail(res.data);
+          setPosition({ lat: res.data.lat, lng: res.data.lng });
+          const nearStores = await searchNearby({
+            lat: res.data.lat,
+            lng: res.data.lng,
+            radius: SEARCHNEARBY_RADIUS,
+          });
+          setRestaurants(nearStores.data);
+          setRefreshBtn(false);
         } else {
           setError("상세 정보를 찾을 수 없습니다.");
         }

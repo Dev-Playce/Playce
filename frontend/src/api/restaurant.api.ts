@@ -106,10 +106,6 @@ export const editStore = async (data: EditStoreProps, storeId: number) => {
     base64ToFile(base64, `image_${idx}.png`)
   );
 
-  console.log(newImageUrls);
-  console.log(existingImageUrls);
-  console.log(JSON.stringify(existingImageUrls));
-
   newImageUrls.forEach((image) => {
     formData.append("images", image);
   });
