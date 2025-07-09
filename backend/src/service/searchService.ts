@@ -1,11 +1,12 @@
 import { AppDataSource } from "../data-source";
 import { Store } from "../entities/Store";
-import { createError } from "../utils/createError";
+import { createError } from "../utils/errorUtils";
+import { log } from "../utils/logUtils";
 
 const searchService = {
   // ✅ 현재 위치 기반 검색
   getNearbyStores: async (lat: number, lng: number, radius: number = 5) => {
-    console.log(`\n📍 [현재 위치 검색] lat: ${lat}, lng: ${lng}, radius: ${radius}km`);
+    log(`\n📍 [현재 위치 검색] lat: ${lat}, lng: ${lng}, radius: ${radius}km`);
 
     const storeRepo = AppDataSource.getRepository(Store);
 
@@ -35,7 +36,7 @@ const searchService = {
       `, { lat, lng, radius })
       .getMany();
 
-    console.log(`- 검색 결과: ${stores.length}개`);
+    log(`- 검색 결과: ${stores.length}개`);
 
     const result = stores.map((store) => ({
       store_id: store.id,
@@ -56,7 +57,7 @@ const searchService = {
       })),
     }));
 
-    console.log("✅ 현재 위치 검색 완료");
+    log("✅ 현재 위치 검색 완료");
     return result;
   },
 
@@ -70,7 +71,7 @@ const searchService = {
     small_region?: string;
     // sort?: "date" | "name";
   }) => {
-    console.log("\n🔎 [통합 검색] 요청 필터:", filters);
+    log("\n🔎 [통합 검색] 요청 필터:", filters);
 
     const {
       search,
@@ -95,7 +96,7 @@ const searchService = {
 
     // 🔍 필터 처리
     if (search) {
-      console.log(`- 필터: 검색어 '${search}'`);
+      log(`- 필터: 검색어 '${search}'`);
       query.andWhere(
         "store.storeName LIKE :search OR store.address LIKE :search",
         { search: `%${search}%` }
@@ -103,18 +104,18 @@ const searchService = {
     }
 
     if (sport) {
-      console.log(`- 필터: 스포츠 '${sport}'`);
+      log(`- 필터: 스포츠 '${sport}'`);
       query.andWhere("sport.name = :sport", { sport });
     }
 
     if (league && league !== "전체" && league !== "all") {
-      console.log(`- 필터: 리그 '${league}'`);
+      log(`- 필터: 리그 '${league}'`);
       query.andWhere("league.name = :league", { league });
     }
 
 
     if (team) {
-      console.log(`- 필터: 팀 '${team}'`);
+      log(`- 필터: 팀 '${team}'`);
       query.andWhere(
         "broadcast.teamOne = :team OR broadcast.teamTwo = :team",
         { team }
@@ -122,28 +123,28 @@ const searchService = {
     }
 
     if (big_region) {
-      console.log(`- 필터: 대지역 '${big_region}'`);
+      log(`- 필터: 대지역 '${big_region}'`);
       query.andWhere("bigRegion.name = :bigRegion", { bigRegion: big_region });
     }
 
     if (small_region && small_region !== "전체" && small_region !== "all") {
       query.andWhere("smallRegion.name = :smallRegion", { smallRegion: small_region });
     } else {
-      console.log("- 필터: 소지역 전체 (필터 생략)");
+      log("- 필터: 소지역 전체 (필터 생략)");
     }
 
     // // 🔃 정렬
     // if (sort === "date") {
-    //   console.log("- 정렬: 날짜순");
+    //   log("- 정렬: 날짜순");
     //   query.orderBy("broadcast.matchDate", "ASC");
     // } else if (sort === "name") {
-    //   console.log("- 정렬: 이름순");
+    //   log("- 정렬: 이름순");
     //   query.orderBy("store.storeName", "ASC");
     // }
 
     const stores = await query.getMany();
 
-    console.log(`- 검색 결과: ${stores.length}개`);
+    log(`- 검색 결과: ${stores.length}개`);
 
     const result = stores.map((store) => {
       // 최신 중계 일정 1개 추출
@@ -173,12 +174,11 @@ const searchService = {
             team_two: latestBroadcast.teamTwo,
             etc: latestBroadcast.etc,
           }
-          : null,
+          : null, // 중계 일정이 없을 경우 null
       };
     });
 
-
-    console.log("✅ 통합 검색 완료");
+    log("✅ 통합 검색 완료");
     return result;
   },
 };

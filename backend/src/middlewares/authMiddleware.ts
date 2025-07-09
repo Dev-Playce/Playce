@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import userService from "../service/userService";
 import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
-import { createError } from "../utils/createError";
+import { createError } from "../utils/errorUtils";
 import { fail } from "../utils/response";
 
 const userRepository = AppDataSource.getRepository(User);

@@ -2,7 +2,8 @@ import { Like, Point, Repository } from "typeorm";
 import { BigRegion } from "../entities/BigRegion";
 import { SmallRegion } from "../entities/SmallRegion";
 import { getCoordinatesByAddress } from "./kakaoAPI";
-import { createError } from "./createError";
+import { createError } from "./errorUtils";
+import { log } from "./logUtils";
 
 /**
  * 지역 이름 정규화
@@ -48,7 +49,7 @@ export const getLocationDataFromAddress = async (
 ) => {
   // 카카오 API 호출 -> 좌표, 지역명 가져오기
   const { bigRegionName, smallRegionName, lat, lng } = await getCoordinatesByAddress(address);
-  console.log(`- 좌표 : 위도(${lat}), 경도(${lng})`);
+  log(`- 좌표 : 위도(${lat}), 경도(${lng})`);
 
   // DB에서 지역 대/소분류 id 찾기
   const findBigRegion = await bigRegionRepo.findOne({
@@ -63,14 +64,14 @@ export const getLocationDataFromAddress = async (
     }
   });
   if (!findSmallRegion) throw createError('유효하지 않은 지역-소분류입니다.', 400);
-  console.log(`- 지역 id : 대분류(id: ${findBigRegion.id}, name: ${bigRegionName}), 소분류(id: ${findSmallRegion.id}, name: ${smallRegionName})`);
+  log(`- 지역 id : 대분류(id: ${findBigRegion.id}, name: ${bigRegionName}), 소분류(id: ${findSmallRegion.id}, name: ${smallRegionName})`);
 
   // // Point 객체 생성
   // const location = {
   //   type: 'Point',
   //   coordinates: [lng, lat]
   // };
-  // console.log('- Point 객체 : ', location);
+  // log('- Point 객체 : ', location);
 
   return { lat, lng, bigRegion: findBigRegion, smallRegion: findSmallRegion };
 };

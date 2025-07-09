@@ -5,8 +5,9 @@ import { SmallRegion } from "../entities/SmallRegion";
 import { Store } from "../entities/Store";
 import { StoreImage } from "../entities/StoreImage";
 import { getLocationDataFromAddress } from "../utils/locationUtils";
-import { createError } from "../utils/createError";
+import { createError } from "../utils/errorUtils";
 import { deleteS3Object } from "../utils/s3";
+import { log } from "../utils/logUtils";
 
 const storeService = {
   // 1. 식당 등록
@@ -40,7 +41,7 @@ const storeService = {
         throw createError("유효하지 않은 사업자등록번호입니다.", 400);
       if (findBusinessNumber.store)
         throw createError("이미 등록된 사업자등록번호입니다.", 409);
-      console.log(
+      log(
         `- 사업자등록번호(id: ${findBusinessNumber.id}, number: ${findBusinessNumber.businessNumber})`
       );
 
@@ -55,7 +56,7 @@ const storeService = {
           bigRegionRepo,
           smallRegionRepo
         );
-      console.log(
+      log(
         `- 지역 : 대분류(${bigRegion.id}, ${bigRegion.name}), 소분류(${smallRegion.id}, ${smallRegion.name}), 위도(${lat}), 경도(${lng})`
       );
 
@@ -78,7 +79,7 @@ const storeService = {
       });
 
       const saveStore = await storeRepo.save(newStore);
-      console.log("- stores : 데이터 저장 완료");
+      log("- stores : 데이터 저장 완료");
 
       // store_images에 데이터 저장
       if (imgUrls && Array.isArray(imgUrls) && imgUrls.length > 0) {
@@ -92,7 +93,7 @@ const storeService = {
         );
 
         await storeImageRepo.save(newStoreImages);
-        console.log(
+        log(
           `- store_image : ${newStoreImages.length}개의 이미지 저장 완료`
         );
       }
@@ -123,11 +124,11 @@ const storeService = {
       // 식당 유효성 검사
       if (!storeToUpdate)
         throw createError("해당 식당을 찾을 수 없습니다.", 404);
-      console.log("- 식당 유효성 검사 완료 : DB에 있는지");
+      log("- 식당 유효성 검사 완료 : DB에 있는지");
 
       if (storeToUpdate.user.id !== userId)
         throw createError("해당 식당에 대한 수정 권한이 없습니다.", 403);
-      console.log("- 식당 유효성 검사 완료 : 소유권 확인");
+      log("- 식당 유효성 검사 완료 : 소유권 확인");
 
       const allowedFields = [
         "store_name",
@@ -138,6 +139,7 @@ const storeService = {
         "type",
         "description",
         "img_urls",
+        "images",
       ];
       const receiveFields = Object.keys(updateData);
       const invalidFields = receiveFields.filter(
@@ -151,22 +153,22 @@ const storeService = {
           )})`,
           400
         );
-      console.log("- 식당 유효성 검사 완료 : 수정할 수 없는 필드 포함 여부");
+      log("- 식당 유효성 검사 완료 : 수정할 수 없는 필드 포함 여부");
 
       // DB 업데이트
-      if (updateData.store_name !== undefined)
+      if (updateData.store_name)
         storeToUpdate.storeName = updateData.store_name;
-      if (updateData.phone !== undefined)
+      if (updateData.phone)
         storeToUpdate.phone = updateData.phone;
-      if (updateData.opening_hours !== undefined)
+      if (updateData.opening_hours)
         storeToUpdate.openingHours = updateData.opening_hours;
-      if (updateData.menus !== undefined)
+      if (updateData.menus)
         storeToUpdate.menus = updateData.menus;
-      if (updateData.type !== undefined) storeToUpdate.type = updateData.type;
-      if (updateData.description !== undefined)
+      if (updateData.type) storeToUpdate.type = updateData.type;
+      if (updateData.description)
         storeToUpdate.description = updateData.description;
 
-      if (updateData.address !== undefined) {
+      if (updateData.address) {
         // 주소 -> location, bigRegion, smallRegion 같이 수정
         const bigRegionRepo = AppDataSource.getRepository(BigRegion);
         const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
@@ -187,7 +189,7 @@ const storeService = {
         storeToUpdate.smallRegion = smallRegion;
       }
 
-      if (updateData.img_urls !== undefined) {
+      if (updateData.img_urls) {
         // 이미지 -> 전체 삭제 후 재등록
         const storeImageRepo = AppDataSource.getRepository(StoreImage);
 
@@ -210,7 +212,7 @@ const storeService = {
       }
 
       await storeRepo.save(storeToUpdate);
-      console.log("- 수정 완료");
+      log("- 수정 완료");
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -232,11 +234,11 @@ const storeService = {
 
     // 식당 유효성 검사
     if (!storeToDelete) throw createError("해당 식당을 찾을 수 없습니다.", 404);
-    console.log("- 식당 유효성 검사 통과");
+    log("- 식당 유효성 검사 통과");
 
     if (storeToDelete.user.id !== userId)
       throw createError("해당 식당에 대한 삭제 권한이 없습니다.", 403);
-    console.log("- 식당 소유권 확인");
+    log("- 식당 소유권 확인");
 
     // 1. 기존 이미지들 S3에서 삭제
     const images = await storeImageRepo.find({
@@ -268,7 +270,7 @@ const storeService = {
     });
 
     if (!store) throw createError("해당 식당을 찾을 수 없습니다.", 404);
-    console.log("- store 유효성 검사");
+    log("- store 유효성 검사");
 
     const imgUrlsData = store.images.map((img) => img.imgUrl);
     const broadcastData = store.broadcasts.map((bc) => ({
@@ -294,7 +296,7 @@ const storeService = {
       broadcasts: broadcastData,
       is_owner: isOwner,
     };
-    console.log("- 응답 데이터 : ", responseData);
+    log("- 응답 데이터 : ", responseData);
 
     return responseData;
   },
@@ -319,7 +321,7 @@ const storeService = {
         address: store.address,
       };
     });
-    console.log("- 응답 데이터 : ", responseData);
+    log("- 응답 데이터 : ", responseData);
 
     return responseData;
   },

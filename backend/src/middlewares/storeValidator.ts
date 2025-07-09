@@ -51,12 +51,40 @@ export const createStoreValidator = [
     .isString()
     .withMessage("영업 시간은 문자열이어야 합니다."),
 
+  // body("menus")
+  //   .optional({ checkFalsy: true })
+  //   .isArray().withMessage("메뉴는 배열이어야 합니다."),
+  // body("menus.*.name")
+  //   .notEmpty().withMessage("메뉴 이름을 입력해주세요.").bail()
+  //   .isString().withMessage("메뉴 이름은 문자열이어야 합니다."),
+  // body("menus.*.price")
+  //   .notEmpty().withMessage("메뉴 가격을 입력해주세요.").bail()
+  //   .isString().withMessage("메뉴 가격은 문자열이어야 합니다."),
   body("menus")
-    .notEmpty()
-    .withMessage("메뉴를 입력해주세요.")
-    .bail()
-    .isString()
-    .withMessage("메뉴는 문자열이어야 합니다."),
+    .optional({ checkFalsy: true })
+    .isString().withMessage("메뉴는 JSON 문자열이어야 합니다.")
+    .custom((value, { req }) => {
+      try {
+        const parsedMenus = JSON.parse(value); // JSON 문자열을 파싱
+        if (!Array.isArray(parsedMenus)) {
+          throw new Error("메뉴는 유효한 JSON 배열이어야 합니다.");
+        }
+        // 파싱된 배열 내 각 객체의 유효성 검사
+        for (const item of parsedMenus) {
+          if (typeof item.name !== 'string' || item.name.trim() === '') {
+            throw new Error("각 메뉴 항목은 비어있지 않은 'name' (문자열)을 포함해야 합니다.");
+          }
+          if (typeof item.price !== 'string' || item.price.trim() === '') {
+            throw new Error("각 메뉴 항목은 비어있지 않은 'price' (문자열)를 포함해야 합니다.");
+          }
+        }
+        // 유효성 검사를 통과하면 파싱된 객체를 req.body.menus에 다시 할당하여 컨트롤러에서 바로 사용 가능하게 함
+        req.body.menus = parsedMenus;
+        return true;
+      } catch (e: any) {
+        throw new Error(`메뉴 형식이 유효하지 않습니다: ${e.message}`);
+      }
+    }),
 
   body("type")
     .notEmpty()
@@ -66,17 +94,17 @@ export const createStoreValidator = [
     .withMessage("업종은 문자열이어야 합니다."),
 
   body("description")
-    .optional()
+    .optional({ checkFalsy: true })
     .isString()
     .withMessage("설명은 문자열이어야 합니다."),
 
   body("img_urls")
-    .optional()
+    .optional({ checkFalsy: true })
     .isArray()
     .withMessage("이미지 URL 리스트는 배열이어야 합니다."),
 
   body("img_urls.*")
-    .optional()
+    .optional({ checkFalsy: true })
     .isURL()
     .withMessage("각 이미지 URL은 유효한 형식이어야 합니다."),
 
@@ -87,17 +115,17 @@ export const createStoreValidator = [
 export const updateStoreValidator = [
   // 모든 필드는 선택적으로(optional) 받습니다.
   body("store_name")
-    .optional()
+    .optional({ checkFalsy: true })
     .isString()
     .withMessage("식당 이름은 문자열이어야 합니다."),
 
   body("address")
-    .optional()
+    .optional({ checkFalsy: true })
     .isString()
     .withMessage("주소는 문자열이어야 합니다."),
 
   body("phone")
-    .optional()
+    .optional({ checkFalsy: true })
     .isString()
     .withMessage("전화번호는 문자열이어야 합니다.")
     .bail()
@@ -110,24 +138,57 @@ export const updateStoreValidator = [
     ),
 
   body("opening_hours")
-    .optional()
+    .optional({ checkFalsy: true })
     .isString()
     .withMessage("영업 시간은 문자열이어야 합니다."),
 
+  // body("menus")
+  //   .optional({ checkFalsy: true })
+  //   .isArray().withMessage("메뉴는 배열이어야 합니다."),
+  // body("menus.*.name")
+  //   .notEmpty().withMessage("메뉴 이름을 입력해주세요.").bail()
+  //   .isString().withMessage("메뉴 이름은 문자열이어야 합니다."),
+  // body("menus.*.price")
+  //   .notEmpty().withMessage("메뉴 가격을 입력해주세요.").bail()
+  //   .isString().withMessage("메뉴 가격은 문자열이어야 합니다."),
   body("menus")
-    .optional()
-    .isString()
-    .withMessage("메뉴는 문자열이어야 합니다."),
+    .optional({ checkFalsy: true })
+    .isString().withMessage("메뉴는 JSON 문자열이어야 합니다.")
+    .custom((value, { req }) => {
+      try {
+        const parsedMenus = JSON.parse(value); // JSON 문자열을 파싱
+        if (!Array.isArray(parsedMenus)) {
+          throw new Error("메뉴는 유효한 JSON 배열이어야 합니다.");
+        }
+        // 파싱된 배열 내 각 객체의 유효성 검사
+        for (const item of parsedMenus) {
+          if (typeof item.name !== 'string' || item.name.trim() === '') {
+            throw new Error("각 메뉴 항목은 비어있지 않은 'name' (문자열)을 포함해야 합니다.");
+          }
+          if (typeof item.price !== 'string' || item.price.trim() === '') {
+            throw new Error("각 메뉴 항목은 비어있지 않은 'price' (문자열)를 포함해야 합니다.");
+          }
+        }
+        // 유효성 검사를 통과하면 파싱된 객체를 req.body.menus에 다시 할당하여 컨트롤러에서 바로 사용 가능하게 함
+        req.body.menus = parsedMenus;
+        return true;
+      } catch (e: any) {
+        throw new Error(`메뉴 형식이 유효하지 않습니다: ${e.message}`);
+      }
+    }),
 
-  body("type").optional().isString().withMessage("업종은 문자열이어야 합니다."),
+  body("type")
+    .optional({ checkFalsy: true })
+    .isString()
+    .withMessage("업종은 문자열이어야 합니다."),
 
   body("description")
-    .optional()
+    .optional({ checkFalsy: true })
     .isString()
     .withMessage("설명은 문자열이어야 합니다."),
 
   body("img_urls")
-    .optional()
+    .optional({ checkFalsy: true })
     .custom((value) => {
       if (typeof value === "string") return true; // 문자열 하나면 허용
       if (Array.isArray(value))
@@ -137,7 +198,7 @@ export const updateStoreValidator = [
     .withMessage("img_urls는 문자열 혹은 문자열 배열이어야 합니다."),
 
   body("img_urls.*")
-    .optional()
+    .optional({ checkFalsy: true })
     .isURL()
     .withMessage("각 이미지 URL은 유효한 형식이어야 합니다."),
 

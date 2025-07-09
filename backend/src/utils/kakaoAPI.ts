@@ -32,7 +32,7 @@ export const getCoordinatesByAddress = async (address: string): Promise<{
       lng: parseFloat(x)
     };
   } catch (error) {
-    console.log(`❌ 카카오 : 주소 -> 좌표 변환 실패 : ${address}`);
+    console.error(`❌ 카카오 : 주소 -> 좌표 변환 실패 : ${address}`);
     throw error;
   }
 };
