@@ -2,8 +2,9 @@ import { AppDataSource } from "../data-source";
 import { Favorite } from "../entities/Favorite";
 import { Store } from "../entities/Store";
 import { User } from "../entities/User";
-import { createError } from "../utils/createError";
+import { createError } from "../utils/errorUtils";
 import { formatDateToKST } from "../utils/dateFormatter";
+import { log } from "../utils/logUtils";
 
 const favoriteRepository = AppDataSource.getRepository(Favorite);
 const storeRepository = AppDataSource.getRepository(Store);
@@ -12,7 +13,7 @@ const userRepository = AppDataSource.getRepository(User);
 const favoriteService = {
   // 1. 즐겨찾기 추가
   addFavorite: async (userId: number, storeId: number) => {
-    console.log(
+    log(
       "[Service]즐겨찾기 추가 - userId:",
       userId,
       "storeId:",
@@ -21,7 +22,7 @@ const favoriteService = {
 
     const store = await storeRepository.findOneBy({ id: storeId });
     if (!store) throw createError("해당 식당을 찾을 수 없습니다.", 404);
-    console.log("식당 확인 완료:", store.storeName);
+    log("식당 확인 완료:", store.storeName);
 
     const existing = await favoriteRepository.findOne({
       where: {
@@ -36,7 +37,7 @@ const favoriteService = {
     const newFavorite = favoriteRepository.create({ user: { id: userId }, store });
     const saved = await favoriteRepository.save(newFavorite);
 
-    console.log("즐겨찾기 저장 완료 - ID:", saved.id);
+    log("즐겨찾기 저장 완료 - ID:", saved.id);
     return {
       favorite_id: saved.id,
       created_at: formatDateToKST(new Date(saved.createdAt)),
@@ -45,7 +46,7 @@ const favoriteService = {
 
   // 2. 즐겨찾기 삭제
   removeFavorite: async (userId: number, storeId: number) => {
-    console.log(
+    log(
       "[Service]즐겨찾기 삭제 - userId:",
       userId,
       "storeId:",
@@ -65,12 +66,12 @@ const favoriteService = {
     }
 
     await favoriteRepository.remove(favorite);
-    console.log("즐겨찾기 삭제 완료");
+    log("즐겨찾기 삭제 완료");
   },
 
   // 3. 즐겨찾기 목록 조회
   getFavorites: async (userId: number) => {
-    console.log("[Service]즐겨찾기 목록 조회 - userId:", userId);
+    log("[Service]즐겨찾기 목록 조회 - userId:", userId);
 
     const favorites = await favoriteRepository.find({
       where: { user: { id: userId } },
@@ -78,13 +79,13 @@ const favoriteService = {
       order: { createdAt: "ASC" },
     });
 
-    console.log("즐겨찾기 개수:", favorites.length);
+    log("즐겨찾기 개수:", favorites.length);
 
     return favorites.map((fav) => {
       const images = fav.store.images || [];
       const mainImage = images.find((img) => img.isMain);
 
-      console.log("즐겨찾기 매핑 중 -", fav.store.storeName);
+      log("즐겨찾기 매핑 중 -", fav.store.storeName);
 
       return {
         store_id: fav.store.id,
