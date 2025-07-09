@@ -93,9 +93,7 @@ const storeService = {
         );
 
         await storeImageRepo.save(newStoreImages);
-        log(
-          `- store_image : ${newStoreImages.length}개의 이미지 저장 완료`
-        );
+        log(`- store_image : ${newStoreImages.length}개의 이미지 저장 완료`);
       }
 
       await queryRunner.commitTransaction();
@@ -158,12 +156,10 @@ const storeService = {
       // DB 업데이트
       if (updateData.store_name)
         storeToUpdate.storeName = updateData.store_name;
-      if (updateData.phone)
-        storeToUpdate.phone = updateData.phone;
+      if (updateData.phone) storeToUpdate.phone = updateData.phone;
       if (updateData.opening_hours)
         storeToUpdate.openingHours = updateData.opening_hours;
-      if (updateData.menus)
-        storeToUpdate.menus = updateData.menus;
+      if (updateData.menus) storeToUpdate.menus = updateData.menus;
       if (updateData.type) storeToUpdate.type = updateData.type;
       if (updateData.description)
         storeToUpdate.description = updateData.description;
@@ -190,25 +186,52 @@ const storeService = {
       }
 
       if (updateData.img_urls) {
-        // 이미지 -> 전체 삭제 후 재등록
         const storeImageRepo = AppDataSource.getRepository(StoreImage);
 
         const oldImages = await storeImageRepo.find({
           where: { store: { id: storeId } },
         });
 
-        await Promise.all(oldImages.map((img) => deleteS3Object(img.imgUrl)));
-        await storeImageRepo.delete({ store: { id: storeId } }); // 기존 이미지 삭제
+        const oldUrls: string[] = oldImages.map((img) => img.imgUrl);
+        const newUrls: string[] = updateData.img_urls;
 
-        const newImages = updateData.img_urls.map(
-          (url: string, index: number) =>
-            storeImageRepo.create({
-              store: storeToUpdate,
-              imgUrl: url,
-              isMain: index === 0,
-            })
+        const urlsToDelete = oldUrls.filter((url) => !newUrls.includes(url));
+        const urlsToAdd = newUrls.filter((url) => !oldUrls.includes(url));
+
+        // 삭제할 이미지 → S3 및 DB에서 삭제
+        await Promise.all(urlsToDelete.map((url) => deleteS3Object(url)));
+        if (urlsToDelete.length > 0) {
+          await storeImageRepo
+            .createQueryBuilder()
+            .delete()
+            .where("store_id = :storeId", { storeId })
+            .andWhere("img_url IN (:...urls)", { urls: urlsToDelete })
+            .execute();
+        }
+
+        // 추가할 이미지 DB에 저장
+        const newImages = urlsToAdd.map((url: string) =>
+          storeImageRepo.create({
+            store: storeToUpdate,
+            imgUrl: url,
+            isMain: false,
+          })
         );
         await storeImageRepo.save(newImages);
+
+        // 대표 이미지 재설정: img_urls 첫 번째 URL 기준
+        await storeImageRepo.update(
+          { store: { id: storeId } },
+          { isMain: false }
+        );
+        const firstImgUrl = newUrls[0];
+        const mainImg = await storeImageRepo.findOne({
+          where: { store: { id: storeId }, imgUrl: firstImgUrl },
+        });
+        if (mainImg) {
+          mainImg.isMain = true;
+          await storeImageRepo.save(mainImg);
+        }
       }
 
       await storeRepo.save(storeToUpdate);

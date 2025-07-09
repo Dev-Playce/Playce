@@ -41,29 +41,31 @@ const storeController = {
   updateStore: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       log("\n🍴 [식당 수정] 요청");
+
       const userId: number = req.user!.userId;
       const storeId: number = parseInt(req.params.storeId);
-      // const updateData = req.body;
       const files = req.files as S3File[];
-      let imgUrls = req.body.img_urls;
-      if (typeof imgUrls === "string") {
-        req.body.img_urls = [imgUrls];
-      } else if (!Array.isArray(imgUrls)) {
-        req.body.img_urls = [];
+
+      let imgUrls: string[] = [];
+      if (typeof req.body.img_urls === "string") {
+        imgUrls = [req.body.img_urls];
+      } else if (Array.isArray(req.body.img_urls)) {
+        imgUrls = req.body.img_urls;
       }
-      if (!Array.isArray(imgUrls)) imgUrls = [];
 
       const newImageUrls = files?.map((file) => file.location) || [];
-
+      const allImgUrls = [...imgUrls, ...newImageUrls];
       const updateData = {
         ...req.body,
-        img_urls: [...imgUrls, ...newImageUrls], // 💡 최종적으로 남길 이미지들만
+        img_urls: allImgUrls,
       };
-
       await storeService.updateStore(userId, storeId, updateData);
 
       const imgMessage =
-        imgUrls.length > 0 ? ` (이미지 ${imgUrls.length}개 업로드됨)` : "";
+        allImgUrls.length > 0
+          ? ` (총 ${allImgUrls.length}개 이미지가 등록됨)`
+          : "";
+          
       log("✅ [식당 수정] 성공");
       return success(res, `식당이 수정되었습니다.${imgMessage}`);
     } catch (error) {
