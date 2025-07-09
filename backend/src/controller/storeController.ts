@@ -21,7 +21,7 @@ const storeController = {
         img_urls: imgUrls, // ✅ S3 URL 포함
       };
 
-      await storeService.createStore(userId, createData);
+      const newStoreId = await storeService.createStore(userId, createData);
 
       const imgMessage =
         imgUrls.length > 0 ? ` (이미지 ${imgUrls.length}개 업로드됨)` : "";
@@ -29,7 +29,7 @@ const storeController = {
       return success(
         res,
         `식당이 등록되었습니다.${imgMessage}`,
-        undefined,
+        { id: newStoreId},
         201
       );
     } catch (error) {

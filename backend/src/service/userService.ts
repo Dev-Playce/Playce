@@ -48,6 +48,8 @@ const userService = {
 
     await userRepository.save(newUser);
     log("[UserService] 회원가입 완료 - email:", email);
+
+    return newUser.id;
   },
   // 2. 로그인
   login: async (req: Request) => {
