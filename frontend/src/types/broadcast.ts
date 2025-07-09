@@ -7,3 +7,14 @@ export type broadcast = {
   team_two: string;
   etc: string;
 };
+
+export type StoreWithBroadcasts = {
+  store_id: number;
+  store_name: string;
+  type: string;
+  main_img: string | null;
+  address: string;
+  lat: number;
+  lng: number;
+  broadcasts: broadcast[];
+};

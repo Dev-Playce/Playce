@@ -1,65 +1,44 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { FiTv } from "react-icons/fi";
-
-// 더미 데이터
-const broadcasts = [
-  {
-    match_date: "2025-06-26",
-    match_time: "18:30",
-    sport: "야구",
-    league: "KBO",
-    team_one: {
-      name: "삼성",
-      logo: "https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/8/8d/Samsung_Lions_Emblem.svg",
-    },
-    team_two: {
-      name: "롯데",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/9/9f/Lotte_Giants_Emblem.svg",
-      home: true,
-    },
-    etc: "",
-  },
-  {
-    match_date: "2025-06-26",
-    match_time: "18:30",
-    sport: "야구",
-    league: "KBO",
-    team_one: {
-      name: "NC",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/1/1e/NC_Dinos_Emblem.svg",
-    },
-    team_two: {
-      name: "KT",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/6/6e/KT_Wiz_Emblem.svg",
-      home: true,
-    },
-    etc: "",
-  },
-  {
-    match_date: "2025-06-26",
-    match_time: "21:00",
-    sport: "축구",
-    league: "EPL",
-    team_one: {
-      name: "리버풀",
-      logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
-    },
-    team_two: {
-      name: "맨유",
-      logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
-    },
-    etc: "빅매치",
-  },
-];
-
-const SPORTS = ["야구", "해외야구", "축구", "해외축구", "농구", "배구"];
+import useMapStore from "../../stores/mapStore";
+import type { broadcast } from "../../types/broadcast";
 
 export default function TodayBroadcastSidebar() {
-  const [selectedSport, setSelectedSport] = useState("야구");
-  const today = "2025-06-26";
-  const filtered = broadcasts.filter(
-    (b) => b.match_date === today && b.sport === selectedSport
-  );
+  const restaurants = useMapStore((state) => state.restaurants); // StoreWithBroadcasts[]
+  const [selectedSport, setSelectedSport] = useState<string>("축구");
+  const today = new Date().toISOString().slice(0, 10);
+
+  // 오늘의 중계일정만 추출
+  type TodayBroadcast = broadcast & {
+    store_name: string;
+    store_id: number;
+    main_img: string | null;
+    address: string;
+    type: string;
+  };
+
+  const todayBroadcasts = useMemo(() => {
+    const result: TodayBroadcast[] = [];
+    restaurants.forEach((store) => {
+      (store.broadcasts || []).forEach((b) => {
+        if (b.match_date === today) {
+          result.push({
+            ...b,
+            store_name: store.store_name,
+            store_id: store.store_id,
+            main_img: store.main_img,
+            address: store.address,
+            type: store.type,
+          });
+        }
+      });
+    });
+    return result;
+  }, [restaurants, today]);
+
+  // 종목 목록 만들기 (오늘 경기 있는 종목만)
+  const SPORTS = Array.from(new Set(todayBroadcasts.map((b) => b.sport)));
+  const filtered = todayBroadcasts.filter((b) => b.sport === selectedSport);
 
   return (
     <section className="w-full bg-white px-4 pt-4 pb-3 rounded-xl shadow">
@@ -69,20 +48,24 @@ export default function TodayBroadcastSidebar() {
       </h3>
       {/* 종목 탭 */}
       <nav className="flex gap-2 mb-3 border-b border-gray-100 pb-1">
-        {SPORTS.map((sport) => (
-          <button
-            key={sport}
-            onClick={() => setSelectedSport(sport)}
-            className={`px-2 pb-1 text-sm font-semibold border-b-2 ${
-              selectedSport === sport
-                ? "border-primary5 text-primary5"
-                : "border-transparent text-gray-400 hover:text-gray-700"
-            } transition`}
-            style={{ background: "none" }}
-          >
-            {sport}
-          </button>
-        ))}
+        {SPORTS.length === 0 ? (
+          <span className="text-gray-400 text-sm">중계 종목 없음</span>
+        ) : (
+          SPORTS.map((sport) => (
+            <button
+              key={sport}
+              onClick={() => setSelectedSport(sport)}
+              className={`px-2 pb-1 text-sm font-semibold border-b-2 ${
+                selectedSport === sport
+                  ? "border-primary5 text-primary5"
+                  : "border-transparent text-gray-400 hover:text-gray-700"
+              } transition`}
+              style={{ background: "none" }}
+            >
+              {sport}
+            </button>
+          ))
+        )}
       </nav>
       {/* 경기 리스트 */}
       <ul>
@@ -96,32 +79,19 @@ export default function TodayBroadcastSidebar() {
               key={idx}
               className="flex items-center gap-3 py-3 border-b border-gray-100 last:border-0"
             >
-              {/* 팀1 */}
-              <img
-                src={game.team_one.logo}
-                alt={game.team_one.name}
-                className="w-7 h-7 rounded-full bg-gray-100 object-cover"
-              />
-              <span className="font-semibold text-gray-800">
-                {game.team_one.name}
+              {/* 가게명(원하면 main_img 등도 활용 가능) */}
+              <span className="font-bold text-primary5 mr-2">
+                {game.store_name}
               </span>
-              {/* VS */}
+              {/* 팀1 */}
+              <span className="font-semibold text-gray-800">
+                {game.team_one}
+              </span>
               <span className="mx-1 text-xs text-gray-400">vs</span>
               {/* 팀2 */}
-              <img
-                src={game.team_two.logo}
-                alt={game.team_two.name}
-                className="w-7 h-7 rounded-full bg-gray-100 object-cover"
-              />
               <span className="font-semibold text-gray-800">
-                {game.team_two.name}
+                {game.team_two}
               </span>
-              {/* 홈 표시 */}
-              {game.team_two.home && (
-                <span className="ml-1 text-xs bg-gray-200 text-gray-700 rounded px-1.5 py-0.5">
-                  홈
-                </span>
-              )}
               {/* 경기 시간, 리그 */}
               <span className="ml-auto text-xs text-gray-500">
                 {game.match_time}
