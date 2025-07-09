@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { createError } from "../utils/errorUtils";
 import { log } from "../utils/logUtils";
+import { sendMail } from "../utils/email";
 require("dotenv").config();
 
 const userRepository = AppDataSource.getRepository(User);
@@ -77,12 +78,69 @@ const userService = {
     return token;
   },
   // 3. 비밀번호 초기화 요청
-  requestResetPassword: async () => {
-    log("👤 유저 : 3. 비밀번호 초기화 요청");
+  requestResetPassword: async (email: string) => {
+    log("🔄 [UserService] 비밀번호 초기화 요청 시작");
+
+    const user = await userRepository.findOneBy({ email });
+    if (!user) {
+      throw createError("해당 사용자를 찾을 수 없습니다.", 404);
+    }
+    log("✅ 사용자 확인 완료 - 이메일:", email);
+
+    const jwtSecret = process.env.PRIVATE_KEY;
+    if (!jwtSecret) {
+      throw new Error("JWT 시크릿 키가 설정되지 않았습니다.");
+    }
+
+    const token = jwt.sign({ email: user.email }, jwtSecret, {
+      expiresIn: "30m",
+    });
+    log("🔐 비밀번호 초기화 토큰 생성 완료");
+
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const resetUrl = `${clientUrl}/reset-password/${token}`;
+    const html = `
+      <p>비밀번호를 재설정하려면 아래 링크를 클릭하세요:</p>
+      <a href="${resetUrl}">${resetUrl}</a>
+      <p>이 링크는 30분 후 만료됩니다.</p>
+    `;
+
+    await sendMail({
+      to: email,
+      subject: "비밀번호 재설정 요청",
+      html,
+    });
+
+    log("📩 비밀번호 재설정 이메일 전송 완료 - 수신자:", email);
   },
+
   // 4. 비밀번호 초기화
-  resetPassword: async () => {
-    log("👤 유저 : 4. 비밀번호 초기화");
+  resetPassword: async (resetToken: string, newPassword: string) => {
+    log("🔁 [UserService] 비밀번호 초기화 요청");
+
+    const jwtSecret = process.env.PRIVATE_KEY;
+    if (!jwtSecret) {
+      throw new Error("JWT 시크릿 키가 설정되지 않았습니다.");
+    }
+
+    try {
+      const decoded = jwt.verify(resetToken, jwtSecret) as { email: string };
+      const email = decoded.email;
+      log("✅ 토큰 검증 성공 - 이메일:", email);
+
+      const user = await userRepository.findOneBy({ email });
+      if (!user) {
+        throw createError("해당 사용자를 찾을 수 없습니다.", 404);
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await userRepository.update({ email }, { password: hashedPassword });
+
+      log("🔐 비밀번호 초기화 완료");
+    } catch (err) {
+      log("❌ 비밀번호 초기화 실패:", err);
+      throw createError("유효하지 않거나 만료된 토큰입니다.", 400);
+    }
   },
   // 5. 내 정보 조회
   getMyInfo: async (userId: number) => {

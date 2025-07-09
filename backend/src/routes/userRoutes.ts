@@ -4,6 +4,8 @@ import {
   JoinValidator,
   LoginValidator,
   NicknameValidator,
+  ResetPasswordRequestValidator,
+  ResetPasswordValidator,
 } from "../middlewares/userValidator";
 import { authenticate } from "../middlewares/authMiddleware";
 
@@ -126,7 +128,8 @@ router.post("/login", LoginValidator, userController.login); // 2. 로그인
  * @swagger
  * /users/reset:
  *  post:
- *    summary: 비밀번호 초기화 요청
+ *    summary: 비밀번호 초기화 요청 (이메일 전송)
+ *    description: 사용자가 비밀번호를 재설정할 수 있도록 입력된 이메일로 링크를 전송합니다.
  *    tags: [User]
  *    requestBody:
  *      required: true
@@ -156,16 +159,31 @@ router.post("/login", LoginValidator, userController.login); // 2. 로그인
  *                  type: string
  *                  example: "메일이 전송되었습니다."
  *      400:
- *        description: 이메일 누락 또는 유효하지 않은 형식
+ *        description: 이메일 누락 또는 잘못된 형식
+ *      404:
+ *        description: 가입되지 않은 이메일 주소
  */
-router.post("/reset", userController.requestResetPassword); // 3. 비밀번호 초기화 요청
+router.post(
+  "/reset",
+  ResetPasswordRequestValidator,
+  userController.requestResetPassword
+); // 3. 비밀번호 초기화 요청
 
 /**
  * @swagger
- * /users/reset:
+ * /users/reset/{token}:
  *  patch:
  *    summary: 비밀번호 초기화
  *    tags: [User]
+ *    description: 이메일로 받은 토큰을 경로에 포함하여 비밀번호를 재설정합니다.
+ *    parameters:
+ *      - in: path
+ *        name: token
+ *        required: true
+ *        schema:
+ *          type: string
+ *        description: 이메일 링크에 포함된 JWT 토큰
+ *        example: eyJhbGciOiJIUzI1NiIsInR5cCI6...
  *    requestBody:
  *      required: true
  *      content:
@@ -173,12 +191,13 @@ router.post("/reset", userController.requestResetPassword); // 3. 비밀번호 �
  *          schema:
  *            type: object
  *            required:
- *              - password
+ *              - newPassword
  *            properties:
- *              password:
+ *              newPassword:
  *                type: string
  *                format: password
- *                example: your_new_password
+ *                description: 새 비밀번호
+ *                example: newPassword123!
  *    responses:
  *      200:
  *        description: 비밀번호 초기화 성공
@@ -194,11 +213,15 @@ router.post("/reset", userController.requestResetPassword); // 3. 비밀번호 �
  *                  type: string
  *                  example: "비밀번호가 변경되었습니다."
  *      400:
- *        description: 비밀번호 누락 또는 유효하지 않은 형식
+ *        description: 필수값 누락 또는 유효하지 않은 요청 형식
  *      401:
- *        description: 유효하지 않은 토큰
+ *        description: 유효하지 않거나 만료된 토큰
  */
-router.patch("/reset", userController.resetPassword); // 4. 비밀번호 초기화
+router.patch(
+  "/reset/:token",
+  ResetPasswordValidator,
+  userController.resetPassword
+); // 4. 비밀번호 초기화
 
 /**
  * @swagger
