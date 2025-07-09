@@ -4,7 +4,9 @@ import { User } from "../entities/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { createError } from "../utils/errorUtils";
+import { sendMail } from "../utils/email";
 import { log } from "../utils/logUtils";
+
 require("dotenv").config();
 
 const userRepository = AppDataSource.getRepository(User);
@@ -77,12 +79,67 @@ const userService = {
     return token;
   },
   // 3. 비밀번호 초기화 요청
-  requestResetPassword: async () => {
-    log("👤 유저 : 3. 비밀번호 초기화 요청");
+  requestResetPassword: async (email: string) => {
+    console.log("👤 유저 : 3. 비밀번호 초기화 요청");
+
+    const user = await userRepository.findOneBy({ email });
+    if (!user) {
+      throw createError("해당 사용자를 찾을 수 없습니다.", 404);
+    }
+    console.log("✅ 사용자 존재 확인 - 이메일:", email);
+
+    const jwtSecret = process.env.PRIVATE_KEY;
+    if (!jwtSecret) {
+      throw new Error("JWT 시크릿 키가 설정되지 않았습니다.");
+    }
+
+    const token = jwt.sign({ email: user.email }, jwtSecret, {
+      expiresIn: "30m",
+    });
+    console.log("🔐 비밀번호 초기화 토큰 생성 완료");
+
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const resetUrl = `${clientUrl}/reset-password/${token}`;
+    const html = `<p>비밀번호를 재설정하려면 아래 링크를 클릭하세요:</p><a href="${resetUrl}">${resetUrl}</a>`;
+
+    await sendMail({
+      to: email,
+      subject: "비밀번호 재설정",
+      html,
+    });
+
+    console.log("📩 비밀번호 재설정 이메일 전송 완료 - 수신자:", email);
   },
   // 4. 비밀번호 초기화
-  resetPassword: async () => {
-    log("👤 유저 : 4. 비밀번호 초기화");
+  resetPassword: async (resetToken: string, newPassword: string) => {
+    console.log("👤 유저 : 4. 비밀번호 초기화");
+
+    const jwtSecret = process.env.PRIVATE_KEY;
+    if (!jwtSecret) {
+      throw new Error("JWT 시크릿 키가 설정되지 않았습니다.");
+    }
+
+    try {
+      // 🔐 토큰 검증
+      const decoded = jwt.verify(resetToken, jwtSecret) as { email: string };
+      const email = decoded.email;
+      console.log("✅ 토큰 검증 성공 - 이메일:", email);
+
+      // 👤 사용자 존재 확인
+      const user = await userRepository.findOneBy({ email });
+      if (!user) {
+        throw createError("해당 사용자를 찾을 수 없습니다.", 404);
+      }
+
+      // 🔑 비밀번호 해싱 후 업데이트
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await userRepository.update({ email }, { password: hashedPassword });
+
+      console.log("🔐 비밀번호 초기화 완료");
+    } catch (err) {
+      console.error("❌ 비밀번호 초기화 실패:", err);
+      throw createError("유효하지 않거나 만료된 토큰입니다.", 400);
+    }
   },
   // 5. 내 정보 조회
   getMyInfo: async (userId: number) => {
@@ -91,12 +148,8 @@ const userService = {
       select: ["email", "name", "nickname", "phone"],
     });
 
-    if (!user) {
-      throw createError("사용자를 찾을 수 없습니다.", 404);
-    }
-
-    log("[UserService] 사용자 정보 조회 성공");
-    log("응답 데이터:", user);
+    console.log("[UserService] 사용자 정보 조회 성공");
+    console.log("응답 데이터:", user);
     return user;
   },
 

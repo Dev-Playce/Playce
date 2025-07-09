@@ -40,3 +40,23 @@ export const NicknameValidator = [
     .withMessage("변경할 닉네임을 입력해주세요."),
   validate,
 ];
+
+export const ResetPasswordRequestValidator = [
+  body("email")
+    .notEmpty()
+    .withMessage("이메일을 입력해주세요.")
+    .bail()
+    .isEmail()
+    .withMessage("이메일 형식이 올바르지 않습니다."),
+  validate,
+];
+
+export const ResetPasswordValidator = [
+  body("newPassword")
+    .notEmpty()
+    .withMessage("새 비밀번호를 입력해주세요.")
+    .bail()
+    .isLength({ min: 6 })
+    .withMessage("비밀번호는 최소 6자 이상이어야 합니다."),
+  validate,
+];
