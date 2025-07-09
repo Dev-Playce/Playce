@@ -25,7 +25,7 @@ export interface RestaurantDetail {
   address: string;
   phone: string;
   opening_hours: string;
-  menus: string | string[];
+  menus: MenuItem[];
   type: string;
   img_urls: string[];
   description: string;
@@ -39,3 +39,8 @@ export interface MyStore {
   main_img: string;
   address: string;
 }
+
+export type MenuItem = {
+  name: string;
+  price: string;
+};

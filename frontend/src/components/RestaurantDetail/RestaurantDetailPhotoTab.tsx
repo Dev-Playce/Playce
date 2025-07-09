@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { RestaurantDetail } from "../../types/restaurant.types";
 import { FiX } from "react-icons/fi";
+import EmptyMessage from "./EmptyMessage";
 
 export default function RestaurantDetailPhotoTab({
   detail,
@@ -11,11 +12,7 @@ export default function RestaurantDetailPhotoTab({
   const [modalImg, setModalImg] = useState<string | null>(null);
 
   if (images.length === 0) {
-    return (
-      <div className="text-gray-400 text-center py-12">
-        등록된 사진이 없습니다.
-      </div>
-    );
+    return <EmptyMessage message="사진정보가 없습니다." />;
   }
 
   return (
