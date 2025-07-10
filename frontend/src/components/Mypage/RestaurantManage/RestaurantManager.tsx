@@ -2,15 +2,34 @@ import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import useMypageStore from "../../../stores/mypageStore";
 import {
   menuItems,
-  type MenuKey,
+  type ExtendedSubpage,
 } from "../../../types/restaurant-manage.types";
 import type { MypageProps } from "../MypageModal";
 import useBroadcastStore from "../../../stores/broadcastStore";
 import Button from "../../Common/Button";
+import BroadcastRegister from "./Broadcasts/BroadcastRegister";
+import BroadcastEdit from "./Broadcasts/BroadcastEdit";
 
 const RestaurantManager = ({ onClose }: MypageProps) => {
   const { restaurantSubpage, setRestaurantSubpage } = useMypageStore();
   const { resetYMD } = useBroadcastStore();
+
+  const getModalTitle = (key: ExtendedSubpage) => {
+    if (key === "broadcast-register") return "중계 일정 등록";
+    if (key === "broadcast-edit") return "중계 일정 수정";
+
+    const item = menuItems.find((i) => i.key === key);
+    return item?.label ?? "";
+  };
+
+  const getComponents = (key: ExtendedSubpage) => {
+    if (key === "broadcast-register")
+      return <BroadcastRegister onClose={onClose} />;
+    if (key === "broadcast-edit") return <BroadcastEdit onClose={onClose} />;
+
+    const item = menuItems.find((i) => i.key === key);
+    return item?.component();
+  };
 
   return (
     <div className="px-2">
@@ -50,16 +69,6 @@ const RestaurantManager = ({ onClose }: MypageProps) => {
       <div>{getComponents(restaurantSubpage)}</div>
     </div>
   );
-};
-
-const getModalTitle = (key: MenuKey) => {
-  const item = menuItems.find((i) => i.key === key);
-  return item?.label ?? "";
-};
-
-const getComponents = (key: MenuKey) => {
-  const item = menuItems.find((i) => i.key === key);
-  return item?.component();
 };
 
 export default RestaurantManager;

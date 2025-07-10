@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import type { MenuKey } from "../types/restaurant-manage.types";
+import type { ExtendedSubpage } from "../types/restaurant-manage.types";
 
 interface MypageState {
   isMypageOpen: boolean;
-  restaurantSubpage: MenuKey;
+  restaurantSubpage: ExtendedSubpage;
   restaurantEditId: number | null;
   setIsMypageOpen: (mypage: boolean) => void;
-  setRestaurantSubpage: (subpage: MenuKey) => void;
+  setRestaurantSubpage: (subpage: ExtendedSubpage) => void;
   setRestaurantEdit: (restaurant: number) => void;
 }
 
