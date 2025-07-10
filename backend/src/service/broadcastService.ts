@@ -126,13 +126,14 @@ const getBroadcastsByStore = async (storeId: number) => {
   });
 
   const responseData = broadcasts.map(b => ({
+    broadcast_id: b.id,
     match_date: b.matchDate,
     match_time: b.matchTime,
     sport: b.sport.name,
     league: b.league.name,
     team_one: b.teamOne,
     team_two: b.teamTwo,
-    ect: b.etc
+    etc: b.etc
   }));
   log(`✅ 조회 완료 - ${broadcasts.length}건`);
   return responseData

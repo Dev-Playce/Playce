@@ -310,6 +310,8 @@ const storeService = {
     const responseData = {
       store_name: store.storeName,
       address: store.address,
+      lat: store.lat,
+      lng: store.lng,
       phone: store.phone,
       opening_hours: store.openingHours,
       menus: store.menus,
