@@ -3,15 +3,17 @@ import { FiTv, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import Button from "../Common/Button";
 import type { RestaurantDetail, Broadcast } from "../../types/restaurant.types";
 import EmptyMessage from "./EmptyMessage";
+import useMypageStore from "../../stores/mypageStore";
+import useBroadcastStore from "../../stores/broadcastStore";
 
 // 날짜를 "7월 9일" 형식으로 변환
-function getKoreanDateString(dateStr: string) {
+function getKoreanDateString(dateStr: string): string {
   const date = new Date(dateStr);
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
 
 // 날짜별 그룹핑
-function groupByDate(broadcasts: Broadcast[]) {
+function groupByDate(broadcasts: Broadcast[]): Record<string, Broadcast[]> {
   return broadcasts.reduce((acc, b) => {
     (acc[b.match_date] = acc[b.match_date] || []).push(b);
     return acc;
@@ -19,24 +21,29 @@ function groupByDate(broadcasts: Broadcast[]) {
 }
 
 // 날짜 비교 함수 (YYYY-MM-DD 문자열 비교)
-function compareDate(a: string, b: string) {
+function compareDate(a: string, b: string): number {
   return a.localeCompare(b);
+}
+
+interface RestaurantDetailBroadcastTabProps {
+  detail: RestaurantDetail;
 }
 
 export default function RestaurantDetailBroadcastTab({
   detail,
-  onManage,
-}: {
-  detail: RestaurantDetail;
-  onManage?: () => void;
-}) {
-  const [showPast, setShowPast] = useState(false);
-  const today = new Date().toISOString().slice(0, 10);
+}: RestaurantDetailBroadcastTabProps) {
+  const [showPast, setShowPast] = useState<boolean>(false);
+  const today: string = new Date().toISOString().slice(0, 10);
+
+  // zustand store hooks
+  const setIsMypageOpen = useMypageStore((s) => s.setIsMypageOpen);
+  const setRestaurantSubpage = useMypageStore((s) => s.setRestaurantSubpage);
+  const setStore = useBroadcastStore((s) => s.setStore);
 
   // 중계일정 분리
   const futureAndToday: Broadcast[] = [];
   const past: Broadcast[] = [];
-  detail.broadcasts.forEach((b) => {
+  detail.broadcasts.forEach((b: Broadcast) => {
     if (compareDate(b.match_date, today) >= 0) {
       futureAndToday.push(b);
     } else {
@@ -45,16 +52,29 @@ export default function RestaurantDetailBroadcastTab({
   });
 
   // 날짜별 그룹핑 및 정렬
-  const groupedFuture = groupByDate(futureAndToday);
-  const groupedPast = groupByDate(past);
+  const groupedFuture: Record<string, Broadcast[]> =
+    groupByDate(futureAndToday);
+  const groupedPast: Record<string, Broadcast[]> = groupByDate(past);
 
   // 날짜 오름차순(오늘~미래), 내림차순(과거)
-  const sortedFutureDates = Object.keys(groupedFuture).sort((a, b) =>
+  const sortedFutureDates: string[] = Object.keys(groupedFuture).sort((a, b) =>
     compareDate(a, b)
   );
-  const sortedPastDates = Object.keys(groupedPast).sort((a, b) =>
+  const sortedPastDates: string[] = Object.keys(groupedPast).sort((a, b) =>
     compareDate(b, a)
   );
+
+  // 중계 관리 버튼 클릭 시
+  const handleManageClick = (): void => {
+    // 1. 마이페이지 모달 오픈
+    setIsMypageOpen(true);
+    // 2. 중계 일정 관리 subpage로 이동
+    setRestaurantSubpage("schedule-view-broadcasts");
+    // 3. 현재 상세보기 식당을 중계 관리 식당으로 지정
+    setStore(detail.store_name, detail.id);
+    // detail.id가 아니라 detail.store_id라면 아래처럼 바꿔주세요.
+    // setStore(detail.store_name, detail.store_id);
+  };
 
   return (
     <div>
@@ -65,7 +85,7 @@ export default function RestaurantDetailBroadcastTab({
             <EmptyMessage message="예정된 중계정보가 없습니다." />
           </li>
         ) : (
-          sortedFutureDates.map((date, groupIdx) => (
+          sortedFutureDates.map((date: string, groupIdx: number) => (
             <Fragment key={date}>
               <h4
                 className={`mb-2 ${
@@ -78,7 +98,7 @@ export default function RestaurantDetailBroadcastTab({
                   {date}
                 </span>
               </h4>
-              {groupedFuture[date].map((b, idx) => (
+              {groupedFuture[date].map((b: Broadcast, idx: number) => (
                 <li
                   key={idx}
                   className="rounded-xl p-4 mb-3 flex flex-col gap-2 border border-primary2 bg-white"
@@ -137,7 +157,7 @@ export default function RestaurantDetailBroadcastTab({
                 지난 중계정보가 없습니다.
               </li>
             ) : (
-              sortedPastDates.map((date, groupIdx) => (
+              sortedPastDates.map((date: string, groupIdx: number) => (
                 <Fragment key={date}>
                   <h4
                     className={`mb-2 ${
@@ -150,7 +170,7 @@ export default function RestaurantDetailBroadcastTab({
                       {date}
                     </span>
                   </h4>
-                  {groupedPast[date].map((b, idx) => (
+                  {groupedPast[date].map((b: Broadcast, idx: number) => (
                     <li
                       key={idx}
                       className="rounded-xl p-4 mb-3 flex flex-col gap-2 border border-gray-200 bg-gray-50"
@@ -187,7 +207,7 @@ export default function RestaurantDetailBroadcastTab({
 
       {detail.is_owner && (
         <div className="mt-6 flex justify-end">
-          <Button scheme="primary" onClick={onManage}>
+          <Button scheme="primary" onClick={handleManageClick}>
             중계 관리
           </Button>
         </div>
