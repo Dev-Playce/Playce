@@ -7,16 +7,16 @@ interface SearchState {
   setSearchText: (value: string) => void;
 
   // 지역
-  bigRegion: string;
-  smallRegion: string;
-  setBigRegion: (value: string) => void;
-  setSmallRegion: (value: string) => void;
+  bigRegions: string[];
+  smallRegions: string[];
+  setBigRegions: (value: string[]) => void;
+  setSmallRegions: (value: string[]) => void;
 
   // 종목/리그
-  sport: string;
-  league: string;
-  setSport: (value: string) => void;
-  setLeague: (value: string) => void;
+  sports: string[];
+  leagues: string[];
+  setSports: (value: string[]) => void;
+  setLeagues: (value: string[]) => void;
 
   // 정렬 기준
   sort: "distance" | "datetime";
@@ -44,10 +44,10 @@ interface SearchState {
 
 export const useSearchStore = create<SearchState>((set) => ({
   searchText: "",
-  bigRegion: "",
-  smallRegion: "",
-  sport: "",
-  league: "",
+  bigRegions: [],
+  smallRegions: [],
+  sports: [],
+  leagues: [],
   sort: "distance",
   triggerSearch: false,
   isSearching: false,
@@ -55,10 +55,10 @@ export const useSearchStore = create<SearchState>((set) => ({
   results: [],
 
   setSearchText: (value) => set({ searchText: value }),
-  setBigRegion: (value) => set({ bigRegion: value }),
-  setSmallRegion: (value) => set({ smallRegion: value }),
-  setSport: (value) => set({ sport: value }),
-  setLeague: (value) => set({ league: value }),
+  setBigRegions: (value) => set({ bigRegions: value }),
+  setSmallRegions: (value) => set({ smallRegions: value }),
+  setSports: (value) => set({ sports: value }),
+  setLeagues: (value) => set({ leagues: value }),
   setSort: (value) => set({ sort: value }),
   setTriggerSearch: (value) => set({ triggerSearch: value }),
   setIsSearching: (value) => set({ isSearching: value }),
@@ -68,10 +68,10 @@ export const useSearchStore = create<SearchState>((set) => ({
   reset: () =>
     set({
       searchText: "",
-      bigRegion: "",
-      smallRegion: "",
-      sport: "",
-      league: "",
+      bigRegions: [],
+      smallRegions: [],
+      sports: [],
+      leagues: [],
       sort: "distance",
       triggerSearch: false,
       isSearching: false,

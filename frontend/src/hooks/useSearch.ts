@@ -7,10 +7,10 @@ import type { SearchResultItem } from "../types/search";
 export const useSearch = () => {
   const {
     searchText,
-    sport,
-    league,
-    bigRegion,
-    smallRegion,
+    sports,
+    leagues,
+    bigRegions,
+    smallRegions,
     sort,
     setResults,
     setIsSearching,
@@ -25,19 +25,19 @@ export const useSearch = () => {
     try {
       console.log("검색 조건:", {
         searchText,
-        sport,
-        league,
-        big_region: bigRegion,
-        small_region: smallRegion,
+        sports,
+        leagues,
+        big_region: bigRegions,
+        small_region: smallRegions,
         sort,
       });
 
       const res = await fetchSearchResults({
         search: searchText,
-        sport,
-        league,
-        big_region: bigRegion,
-        small_region: smallRegion,
+        sports,
+        leagues,
+        big_regions: bigRegions,
+        small_regions: smallRegions,
         sort,
       });
 
