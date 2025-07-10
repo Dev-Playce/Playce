@@ -3,8 +3,6 @@ import { FiTv, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import Button from "../Common/Button";
 import type { RestaurantDetail, Broadcast } from "../../types/restaurant.types";
 import EmptyMessage from "./EmptyMessage";
-import useMypageStore from "../../stores/mypageStore";
-import useBroadcastStore from "../../stores/broadcastStore";
 
 // 날짜를 "7월 9일" 형식으로 변환
 function getKoreanDateString(dateStr: string): string {
@@ -35,11 +33,6 @@ export default function RestaurantDetailBroadcastTab({
   const [showPast, setShowPast] = useState<boolean>(false);
   const today: string = new Date().toISOString().slice(0, 10);
 
-  // zustand store hooks
-  const setIsMypageOpen = useMypageStore((s) => s.setIsMypageOpen);
-  const setRestaurantSubpage = useMypageStore((s) => s.setRestaurantSubpage);
-  const setStore = useBroadcastStore((s) => s.setStore);
-
   // 중계일정 분리
   const futureAndToday: Broadcast[] = [];
   const past: Broadcast[] = [];
@@ -63,18 +56,6 @@ export default function RestaurantDetailBroadcastTab({
   const sortedPastDates: string[] = Object.keys(groupedPast).sort((a, b) =>
     compareDate(b, a)
   );
-
-  // 중계 관리 버튼 클릭 시
-  const handleManageClick = (): void => {
-    // 1. 마이페이지 모달 오픈
-    setIsMypageOpen(true);
-    // 2. 중계 일정 관리 subpage로 이동
-    setRestaurantSubpage("schedule-view-broadcasts");
-    // 3. 현재 상세보기 식당을 중계 관리 식당으로 지정
-    setStore(detail.store_name, detail.id);
-    // detail.id가 아니라 detail.store_id라면 아래처럼 바꿔주세요.
-    // setStore(detail.store_name, detail.store_id);
-  };
 
   return (
     <div>
@@ -207,9 +188,7 @@ export default function RestaurantDetailBroadcastTab({
 
       {detail.is_owner && (
         <div className="mt-6 flex justify-end">
-          <Button scheme="primary" onClick={handleManageClick}>
-            중계 관리
-          </Button>
+          <Button scheme="primary">중계 관리</Button>
         </div>
       )}
     </div>
