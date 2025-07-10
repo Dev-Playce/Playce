@@ -8,10 +8,10 @@ const SearchButton = () => {
   const {
     searchText,
     setTriggerSearch,
-    setBigRegion,
-    setSmallRegion,
-    setSport,
-    setLeague,
+    setBigRegions,
+    setSmallRegions,
+    setSports,
+    setLeagues,
     setIsSearching,
   } = useSearchStore();
   const { selectedRegions } = useRegionStore();
@@ -30,20 +30,21 @@ const SearchButton = () => {
     }
 
     if (selectedRegions.length > 0) {
-      const first = selectedRegions[0];
-      setBigRegion(first.bigRegion);
-      setSmallRegion(first.smallRegion);
+      const bigs = [...new Set(selectedRegions.map((r) => r.bigRegion))];
+      const smalls = selectedRegions.map((r) => r.smallRegion);
+      setBigRegions(bigs);
+      setSmallRegions(smalls);
     } else {
-      setBigRegion("");
-      setSmallRegion("");
+      setBigRegions([]);
+      setSmallRegions([]);
     }
 
-    setSport(sport);
-    if (selectedLeagues.length > 0) {
-      setLeague(selectedLeagues[0].league);
-    } else {
-      setLeague("");
-    }
+    const uniqueSports = [...new Set(selectedLeagues.map((l) => l.sport))];
+    setSports(uniqueSports);
+
+    const leagues = selectedLeagues.map((l) => l.league);
+    setLeagues(leagues);
+
     setIsSearching(true);
     setTriggerSearch(true);
   };

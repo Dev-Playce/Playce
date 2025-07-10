@@ -3,11 +3,11 @@ import type { SearchResultItem } from "../types/search";
 
 export interface SearchParams {
   search?: string;
-  sport?: string;
-  league?: string;
+  sports?: string[];
+  leagues?: string[];
   team?: string;
-  big_region?: string;
-  small_region?: string;
+  big_regions?: string[];
+  small_regions?: string[];
   sort?: string;
 }
 
