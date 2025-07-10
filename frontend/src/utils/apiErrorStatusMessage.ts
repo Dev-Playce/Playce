@@ -14,8 +14,6 @@ export const apiErrorStatusMessage = (
     const status = axiosError.response.status;
     const message = errorList.find((item) => item.code === status)?.message;
 
-    console.log(status, message);
-
     if (message) {
       return message;
     } else {
