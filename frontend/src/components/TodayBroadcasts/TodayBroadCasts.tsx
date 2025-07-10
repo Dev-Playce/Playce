@@ -4,17 +4,11 @@ import useMapStore from "../../stores/mapStore";
 import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail";
 import type { Broadcast } from "../../types/restaurant.types";
 
-function getKoreanDateString(dateStr: string) {
-  const date = new Date(dateStr);
-  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
-}
-
 export default function TodayBroadcastSidebar() {
   const restaurants = useMapStore((state) => state.restaurants);
   const [selectedSport, setSelectedSport] = useState<string>("축구");
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
   const today = new Date().toISOString().slice(0, 10);
-  const todayLabel = getKoreanDateString(today);
 
   type TodayBroadcast = Broadcast & {
     store_name: string;
@@ -54,7 +48,7 @@ export default function TodayBroadcastSidebar() {
         <h3 className="text-lg font-bold">오늘의 중계일정</h3>
       </div>
       <div className="text-sm text-gray-500 mb-4 font-medium tracking-tight">
-        {todayLabel} 지도에서 탐색한 가게의 중계일정만 보여드려요.
+        지도에서 탐색한 가게의 중계일정만 보여드려요.
       </div>
       {/* 종목 탭 */}
       <nav className="flex gap-2 mb-4 border-b border-gray-100 pb-1">
