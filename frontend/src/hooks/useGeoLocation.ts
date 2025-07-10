@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import useMapStore from "../stores/mapStore";
 import { useMap } from "./useMap";
-import { SEARCHNEARBY_RADIUS } from "../constant/map-constant";
+import { CITY_STATION, SEARCHNEARBY_RADIUS } from "../constant/map-constant";
 
 export const useGeoLocation = (options = {}) => {
   const { setPosition } = useMapStore();
@@ -26,6 +26,14 @@ export const useGeoLocation = (options = {}) => {
 
   const handleError = (err: GeolocationPositionError) => {
     setError(err.message);
+
+    setPosition(CITY_STATION);
+
+    fetchRestaurants({
+      lat: CITY_STATION.lat,
+      lng: CITY_STATION.lng,
+      radius: SEARCHNEARBY_RADIUS,
+    });
   };
 
   useEffect(() => {
@@ -33,6 +41,7 @@ export const useGeoLocation = (options = {}) => {
 
     if (!geolocation) {
       setError("위치 기능을 지원하지 않습니다");
+
       return;
     }
 
