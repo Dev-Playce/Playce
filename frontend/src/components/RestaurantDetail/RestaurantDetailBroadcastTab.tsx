@@ -186,8 +186,9 @@ export default function RestaurantDetailBroadcastTab({
         )}
       </div>
 
+      {/* 중계 관리 버튼 (하단에만 표시) */}
       {detail.is_owner && (
-        <div className="mt-6 flex justify-end">
+        <div className="mt-10 flex justify-end">
           <Button scheme="primary">중계 관리</Button>
         </div>
       )}
