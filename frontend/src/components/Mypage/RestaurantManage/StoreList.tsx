@@ -4,6 +4,9 @@ import type { MyStore } from "../../../types/restaurant.types.ts";
 import useMypageStore from "../../../stores/mypageStore.ts";
 import { deleteStore, myStores } from "../../../api/restaurant.api.ts";
 import RestaurantDetailComponent from "../../RestaurantDetail/RestaurantDetail.tsx";
+import { useAuth } from "../../../hooks/useAuth.ts";
+import { apiErrorStatusMessage } from "../../../utils/apiErrorStatusMessage.ts";
+import type { AxiosError } from "axios";
 
 const StoreList = () => {
   const [stores, setStores] = useState<MyStore[]>([]);
@@ -11,13 +14,26 @@ const StoreList = () => {
     number | null
   >(null);
   const { setRestaurantSubpage, setRestaurantEdit } = useMypageStore();
+  const { userLogout } = useAuth();
 
-  // Todo: 내 식당 목록 불러오기
   useEffect(() => {
     const fetchMyStores = async () => {
-      const res = await myStores();
-      setStores(res.data);
-      return res;
+      try {
+        const res = await myStores();
+        setStores(res.data);
+        return res;
+      } catch (error) {
+        const errorList = [
+          { code: 401, message: "로그인이 만료되었습니다" },
+          { code: 404, message: "사용자를 찾을 수 없습니다" },
+        ];
+        const message = apiErrorStatusMessage(error, errorList);
+        const axiosError = error as AxiosError;
+        if (axiosError.status === 401) {
+          userLogout();
+        }
+        alert(message);
+      }
     };
 
     fetchMyStores();
@@ -26,8 +42,26 @@ const StoreList = () => {
   // 삭제
   const handleRemove = (id: number) => {
     if (window.confirm("정말 이 식당을 삭제하시겠습니까?")) {
-      deleteStore(id);
-      setStores((stores) => stores!.filter((store) => store.store_id !== id));
+      try {
+        deleteStore(id);
+        setStores((stores) => stores!.filter((store) => store.store_id !== id));
+      } catch (error) {
+        const errorList = [
+          {
+            code: 400,
+            message: "사업자등록번호 또는 지역이 유효하지 않습니다",
+          },
+          { code: 401, message: "로그인이 만료되었습니다" },
+          { code: 403, message: "식당 삭제 권한이 없습니다" },
+          { code: 404, message: "식당 또는 사용자를 찾을 수 없습니다" },
+        ];
+        const message = apiErrorStatusMessage(error, errorList);
+        const axiosError = error as AxiosError;
+        if (axiosError.status === 401) {
+          userLogout();
+        }
+        alert(message);
+      }
     }
   };
 

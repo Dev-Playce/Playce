@@ -14,6 +14,9 @@ import FindAddressButton from "../../Common/FindAddressButton";
 import type { RestaurantDetail } from "../../../types/restaurant.types";
 import ImageUrlInputList from "./modals/ImageUrlInputList";
 import type { menu } from "../../../types/menu";
+import { apiErrorStatusMessage } from "../../../utils/apiErrorStatusMessage";
+import type { AxiosError } from "axios";
+import { useAuth } from "../../../hooks/useAuth";
 
 interface StoreFormModalProps {
   mode: "create" | "edit";
@@ -21,6 +24,7 @@ interface StoreFormModalProps {
 
 const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
   const { restaurantEditId, setRestaurantSubpage } = useMypageStore();
+  const { userLogout } = useAuth();
 
   const [storeDetail, setStoreDetail] = useState<RestaurantDetail | null>(null);
   const [storeName, setStoreName] = useState("");
@@ -89,8 +93,22 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         await registerStore(data);
         alert(`식당 등록이 완료되었습니다.`);
         setRestaurantSubpage("restaurant-home");
-      } catch (e) {
-        alert(`${e}\n식당을 등록할 수 없습니다.`);
+      } catch (error) {
+        const errorList = [
+          {
+            code: 400,
+            message: "사업자등록번호 또는 지역이 유효하지 않습니다",
+          },
+          { code: 401, message: "로그인이 만료되었습니다" },
+          { code: 404, message: "사용자를 찾을 수 없습니다" },
+          { code: 409, message: "이미 등록된 사업자등록번호입니다" },
+        ];
+        const message = apiErrorStatusMessage(error, errorList);
+        const axiosError = error as AxiosError;
+        if (axiosError.status === 401) {
+          userLogout();
+        }
+        alert(message);
       }
     } else if (mode === "edit") {
       const data: EditStoreProps = {
@@ -107,8 +125,22 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         await editStore(data, restaurantEditId!);
         alert(`식당 수정이 완료되었습니다.`);
         setRestaurantSubpage("restaurant-home");
-      } catch (e) {
-        alert(`${e}\n식당을 수정할 수 없습니다.`);
+      } catch (error) {
+        const errorList = [
+          {
+            code: 400,
+            message: "잘못된 정보가 입력되었습니다",
+          },
+          { code: 401, message: "로그인이 만료되었습니다" },
+          { code: 403, message: "식당에 대한 수정 권한이 없습니다" },
+          { code: 404, message: "식당 또는 사용자가 존재하지 않습니다" },
+        ];
+        const message = apiErrorStatusMessage(error, errorList);
+        const axiosError = error as AxiosError;
+        if (axiosError.status === 401) {
+          userLogout();
+        }
+        alert(message);
       }
     }
 
