@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type {SelectedSports} from "../types/staticdata";
+import type { SelectedSports } from "../types/staticdata";
 
 interface SportState {
   sport: string;
@@ -14,7 +14,8 @@ export const useSportStore = create<SportState>((set, get) => ({
   sport: "",
   selectedLeagues: [],
 
-  setSport: (sport) => set({ sport, selectedLeagues: [] }),
+  setSport: (sport) =>
+    set((prev) => ({ sport, selectedLeagues: prev.selectedLeagues })),
 
   setSelectedLeagues: (leagues) => set({ selectedLeagues: leagues }),
 
