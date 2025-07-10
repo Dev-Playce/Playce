@@ -27,18 +27,20 @@ const Home: React.FC = () => {
   useGeoLocation(geolocationOptions);
 
   useEffect(() => {
-    fetchRestaurants({
-      lat: position.lat,
-      lng: position.lng,
-      radius: SEARCHNEARBY_RADIUS,
-    });
+    if (position) {
+      fetchRestaurants({
+        lat: position.lat,
+        lng: position.lng,
+        radius: SEARCHNEARBY_RADIUS,
+      });
+    }
   }, [setRestaurants]);
 
   return (
     <div className="flex">
       <SearchPage />
       <div className="relative w-full h-screen">
-        <Map />
+        {position && <Map />}
         {/* 이 위치에서 재탐색 버튼 */}
         {isRefreshBtnOn && <SpotRefreshButton />}
         <AuthHeader />

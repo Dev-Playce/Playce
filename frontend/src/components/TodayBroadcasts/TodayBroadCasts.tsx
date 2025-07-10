@@ -45,10 +45,10 @@ export default function TodayBroadcastSidebar() {
       {/* 헤더 */}
       <div className="flex items-center gap-2 mb-1">
         <FiTv className="text-primary1 text-xl" />
-        <h3 className="text-lg font-bold">오늘의 중계일정</h3>
+        <span className="text-lg font-bold">오늘의 중계일정</span>
       </div>
       <div className="text-sm text-gray-500 mb-4 font-medium tracking-tight">
-        지도에서 탐색한 가게의 중계일정만 보여드려요.
+        지도에서 탐색한 가게의 중계일정만 보여드려요
       </div>
       {/* 종목 탭 */}
       <nav className="flex gap-2 mb-4 border-b border-gray-100 pb-1">
