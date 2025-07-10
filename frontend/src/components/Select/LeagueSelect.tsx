@@ -1,27 +1,36 @@
-import { sportsMap } from "../../data/sports";
-
 interface LeagueSelectProps {
-  sport: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: number | "";
+  options: { id: number; name: string }[];
+  onChange: (id: number, name: string) => void;
+  disabled?: boolean;
 }
 
-const LeagueSelect = ({ sport, value, onChange }: LeagueSelectProps) => {
-  const leagues = sport ? Object.keys(sportsMap[sport]) : [];
-
+const LeagueSelect = ({
+  value,
+  options,
+  onChange,
+  disabled,
+}: LeagueSelectProps) => {
   return (
     <div>
-      <label className="font-semibold mb-2 block">리그</label>
+      <label className="mb-2 block text-mainText">리그</label>
       <select
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={!sport}
-        className="w-full p-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:border-primary1 focus:border-2 outline-none"
+        onChange={(e) => {
+          const selectedId = Number(e.target.value);
+          const selectedName =
+            options.find((l) => l.id === selectedId)?.name || "";
+          onChange(selectedId, selectedName);
+        }}
+        disabled={disabled}
+        className="w-full p-2 border rounded-md hover:border-primary5 focus:border-primary5 focus:ring-1 focus:ring-primary1 focus:outline-none"
       >
-        <option value="">리그 선택</option>
-        {leagues.map((l) => (
-          <option key={l} value={l}>
-            {l}
+        <option value="" className="text-mainText">
+          리그 선택
+        </option>
+        {options.map((l) => (
+          <option key={l.id} value={l.id}>
+            {l.name}
           </option>
         ))}
       </select>

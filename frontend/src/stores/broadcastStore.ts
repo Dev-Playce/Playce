@@ -1,6 +1,5 @@
 import { create } from "zustand";
-import type { broadcast } from "../types/broadcast";
-import { dummyBroadcasts } from "../data/dummyBroadcasts";
+import type { Broadcast } from "../types/broadcast";
 
 const today = new Date();
 
@@ -16,25 +15,26 @@ interface BoradcastState {
   year: number;
   month: number;
   date: number;
-  restaurant: string;
-  restaurantId: number;
-  broadcastLists: broadcast[];
+  store: string;
+  storeId: number;
+  broadcastLists: Broadcast[];
   viewOption: TViewOption;
   resetYMD: () => void;
   setYear: (year: number) => void;
   setMonth: (month: number) => void;
   setDate: (date: number) => void;
-  setRestaurant: (r: string, rId: number) => void;
+  setStore: (r: string, rId: number) => void;
   setViewOption: (view: TViewOption) => void;
+  setBroadcastLists: (broadcasts: Broadcast[]) => void;
 }
 
 const useBroadcastStore = create<BoradcastState>((set) => ({
   year: dateInfo.yearNum,
   month: dateInfo.monthNum + 1,
   date: dateInfo.dateNum,
-  restaurant: "",
-  restaurantId: 0,
-  broadcastLists: dummyBroadcasts,
+  store: "",
+  storeId: 0,
+  broadcastLists: [],
   viewOption: "tab",
   resetYMD: () => {
     set({
@@ -52,12 +52,13 @@ const useBroadcastStore = create<BoradcastState>((set) => ({
   setDate: (date) => {
     set({ date: date });
   },
-  setRestaurant: (r: string, rId: number) => {
-    set({ restaurant: r, restaurantId: rId });
+  setStore: (s: string, sId: number) => {
+    set({ store: s, storeId: sId });
   },
   setViewOption: (view) => {
     set({ viewOption: view });
   },
+  setBroadcastLists: (broadcasts) => set({ broadcastLists: broadcasts }),
 }));
 
 export default useBroadcastStore;

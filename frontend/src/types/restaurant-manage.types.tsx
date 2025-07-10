@@ -39,3 +39,4 @@ export const menuItems = [
 ] as const;
 
 export type MenuKey = (typeof menuItems)[number]["key"];
+export type ExtendedSubpage = MenuKey | "broadcast-register" | "broadcast-edit";
