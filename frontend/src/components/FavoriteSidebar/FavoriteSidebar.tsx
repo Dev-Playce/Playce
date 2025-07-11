@@ -25,7 +25,7 @@ export default function FavoriteSidebar() {
   };
 
   return (
-    <section className="w-full bg-white px-2 pt-6 pb-5 rounded-2xl border border-gray-100">
+    <section className="w-full bg-white px-1.5 pt-6 pb-2 rounded-2xl border border-gray-100">
       <button
         className="flex items-center w-full h-8 border-b border-gray-100 bg-white group px-3 pb-3"
         onClick={() => setExpanded((prev) => !prev)}

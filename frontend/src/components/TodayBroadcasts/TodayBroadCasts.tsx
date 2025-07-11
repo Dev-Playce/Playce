@@ -47,7 +47,7 @@ export default function TodayBroadcastSidebar() {
   const filtered = todayBroadcasts.filter((b) => b.sport === selectedSport);
 
   return (
-    <section className="w-full bg-white px-5 pt-6 pb-10 rounded-2xl border border-gray-100">
+    <section className="w-full bg-white px-5 pt-1 pb-10 rounded-2xl border border-gray-100">
       {/* 헤더 */}
       <div className="flex items-center gap-2 mb-1">
         <FiTv className="text-primary1 text-xl" />
