@@ -10,8 +10,12 @@ const SpotRefreshButton = () => {
     <Button
       icon={<IoReloadOutline />}
       size="medium"
-      scheme="secondary"
-      className="absolute top-[80px] left-1/2 -translate-x-1/2 z-10 rounded-lg"
+      className={`
+    absolute top-[80px] left-1/2 -translate-x-1/2 z-10 rounded-lg
+    bg-primary5 border border-primary5 text-white
+    hover:bg-white hover:text-primary5 hover:border-primary5
+    transition-colors
+  `}
       onClick={async () => {
         const res = await searchNearby({
           lat: position.lat,
