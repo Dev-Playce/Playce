@@ -10,6 +10,12 @@ function getKoreanDateString(dateStr: string): string {
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
 
+// 시간에서 초 제거 ("HH:mm:ss" -> "HH:mm")
+function formatTime(timeStr: string | undefined | null): string {
+  if (!timeStr) return "";
+  return timeStr.split(":").slice(0, 2).join(":");
+}
+
 // 날짜별 그룹핑
 function groupByDate(broadcasts: Broadcast[]): Record<string, Broadcast[]> {
   return broadcasts.reduce((acc, b) => {
@@ -92,7 +98,7 @@ export default function RestaurantDetailBroadcastTab({
                       {b.sport}
                     </span>
                     <span className="ml-auto text-xs text-gray-400">
-                      {b.match_time}
+                      {formatTime(b.match_time)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-base font-bold text-gray-800">
@@ -164,7 +170,7 @@ export default function RestaurantDetailBroadcastTab({
                           {b.sport}
                         </span>
                         <span className="ml-auto text-xs text-gray-400">
-                          {b.match_time}
+                          {formatTime(b.match_time)}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-base font-bold text-gray-500">

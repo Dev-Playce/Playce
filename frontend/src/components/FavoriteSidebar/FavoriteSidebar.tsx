@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiStar } from "react-icons/fi";
+import { FaStar } from "react-icons/fa";
 import useFavoriteStore from "../../stores/favoriteStore";
 import useAuthStore from "../../stores/authStore";
 import RestaurantCardList from "../RestaurantCardList/RestaurantCardList";
@@ -25,13 +25,13 @@ export default function FavoriteSidebar() {
   };
 
   return (
-    <section className="w-full bg-white mt-6">
+    <section className="w-full bg-white px-1.5 pt-6 pb-2 rounded-2xl border border-gray-100">
       <button
         className="flex items-center w-full h-8 border-b border-gray-100 bg-white group px-3 pb-3"
         onClick={() => setExpanded((prev) => !prev)}
         aria-label="즐겨찾기 펼치기"
       >
-        <FiStar className="text-primary1 text-xl mr-2" />
+        <FaStar className="text-yellow-400 text-xl mr-2" />
         <span className="text-lg font-bold flex-1 text-left">즐겨찾기</span>
         <span className="text-xs text-gray-400 mr-2">
           {expanded ? "접기" : "더보기"}
