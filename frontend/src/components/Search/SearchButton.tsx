@@ -50,7 +50,7 @@ const SearchButton = () => {
   };
 
   return (
-    <Button onClick={handleSearch} scheme="primary" fullWidth size="semi">
+    <Button onClick={handleSearch} scheme="apply" fullWidth size="semi">
       <SearchOutlined className="text-sm mr-2" />
       검색
     </Button>
