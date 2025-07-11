@@ -1,6 +1,6 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
+import { BASE_URL } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
 import { loginAndGetToken } from '../../utils/auth.js';
 import { createBroadcast } from '../../utils/factories.js';
@@ -13,7 +13,6 @@ export const deleteBroadcastSuccessTest = (token, broadcastId) => {
   const url = `${BASE_URL}/broadcasts/${broadcastId}`;
   const params = {
     headers: {
-      ...DEFAULT_HEADERS,
       'Authorization': `Bearer ${token}`,
     },
   };

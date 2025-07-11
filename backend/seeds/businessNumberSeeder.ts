@@ -51,7 +51,7 @@ const generateBusinessNumbers = (count: number) => {
 
 const businessNumbers = [
   ...initialBusinessNumbers,
-  ...generateBusinessNumbers(50),
+  ...generateBusinessNumbers(500),
 ];
 
 export const seedBusinessNumbers = async () => {

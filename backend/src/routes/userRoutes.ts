@@ -93,11 +93,11 @@ router.post("/join", JoinValidator, userController.join); // 1. 회원가입
  *              email:
  *                type: string
  *                format: email
- *                example: user@mail.com
+ *                example: hong@mail.com
  *              password:
  *                type: string
  *                format: password
- *                example: your_password
+ *                example: 111111
  *    responses:
  *      200:
  *        description: 로그인 성공
