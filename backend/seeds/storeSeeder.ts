@@ -8,8 +8,8 @@ const stores = [
     address: "서울 중구 세종대로18길 6 1-2층",
     bigRegionId: 1,
     smallRegionId: 24,
-    lng: 126.977440016914,   // 경도
-    lat: 37.5637251812787,    // 위도
+    lng: 126.977440016914,
+    lat: 37.5637251812787,
     phone: "000-111-1234",
     openingHours: "매일 12:00 ~ 24:00",
     menus: [
@@ -23,10 +23,10 @@ const stores = [
   {
     userId: 2,
     storeName: "무교동 북어국집",
-    businessNumber: { id: 2 },
+    businessNumberId: 2,
     address: "서울 중구 무교로 19",
-    bigRegion: { id: 1 },
-    smallRegion: { id: 24 },
+    bigRegionId: 1,
+    smallRegionId: 24,
     lat: 37.566295,
     lng: 126.977945,
     phone: "02-777-1234",
@@ -42,10 +42,10 @@ const stores = [
   {
     userId: 4,
     storeName: "서울시청점 김밥천국",
-    businessNumber: { id: 3 },
+    businessNumberId: 3,
     address: "서울 중구 세종대로 18길 6",
-    bigRegion: { id: 1 },
-    smallRegion: { id: 24 },
+    bigRegionId: 1,
+    smallRegionId: 24,
     lat: 37.566295,
     lng: 126.977945,
     phone: "02-123-4567",
@@ -60,12 +60,12 @@ const stores = [
     description: "간단하고 저렴하게 식사하기 좋은 김밥천국",
   },
   {
-    user: { id: 3 },
+    userId: 3,
     storeName: "하늘포차",
-    businessNumber: { id: 4 },
+    businessNumberId: 4,
     address: "광주 동구 중앙로160번길 23-4 9층",
-    bigRegion: { id: 5 },
-    smallRegion: { id: 63 },
+    bigRegionId: 5,
+    smallRegionId: 63,
     lat: 35.1470280581948,
     lng: 126.915713969115,
     phone: "02-123-4567",
@@ -80,12 +80,12 @@ const stores = [
     description: "마늘 닭매운탕과 주먹밥의 찰떡궁합",
   },
   {
-    user: { id: 5 },
+    userId: 5,
     storeName: "당감쪽갈비",
-    businessNumber: { id: 5 },
+    businessNumberId: 5,
     address: "부산 부산진구 당감로16번길 40 1층",
-    bigRegion: { id: 2 },
-    smallRegion: { id: 32 },
+    bigRegionId: 2,
+    smallRegionId: 32,
     lat: 35.1636081906753,
     lng: 129.04180197768,
     phone: "010-1393-7921",
@@ -99,12 +99,12 @@ const stores = [
     description: "매콤쪽갈비와 치즈퐁듀의 환상 궁합",
   },
   {
-    user: { id: 3 },
+    userId: 3,
     storeName: "배럴하우스",
-    businessNumber: { id: 6 },
+    businessNumberId: 6,
     address: "강원 춘천시 우묵길70번길 7 1층",
-    bigRegion: { id: 10 },
-    smallRegion: { id: 152 },
+    bigRegionId: 10,
+    smallRegionId: 152,
     lat: 37.866935362425,
     lng: 127.723552867696,
     phone: "010-1391-8243",
@@ -118,12 +118,12 @@ const stores = [
     description: "넓은 공간에서 즐기는 다양한 안주와 맛",
   },
   {
-    user: { id: 6 },
+    userId: 6,
     storeName: "효자수산",
-    businessNumber: { id: 7 },
+    businessNumberId: 7,
     address: "전북 전주시 완산구 전주객사2길 10",
-    bigRegion: { id: 13 },
-    smallRegion: { id: 195 },
+    bigRegionId: 13,
+    smallRegionId: 195,
     lat: 35.8173730606522,
     lng: 127.141438512667,
     phone: "010-1391-8243",
@@ -137,12 +137,12 @@ const stores = [
     description: "맛있는 모듬회로 입맛 돋우기",
   },
   {
-    user: { id: 7 },
+    userId: 7,
     storeName: "동백",
-    businessNumber: { id: 8 },
+    businessNumberId: 8,
     address: "경남 김해시 가야로 514 1층",
-    bigRegion: { id: 16 },
-    smallRegion: { id: 245 },
+    bigRegionId: 16,
+    smallRegionId: 245,
     lat: 35.2363487416578,
     lng: 128.888978986413,
     phone: "010-1467-0368",
@@ -156,12 +156,12 @@ const stores = [
     description: "간짜장이 맛있는집",
   },
   {
-    user: { id: 2 },
+    userId: 2,
     storeName: "강릉조개마을",
-    businessNumber: { id: 10 },
+    businessNumberId: 10,
     address: "강원 강릉시 하슬라로192번길 1 조개마을",
-    bigRegion: { id: 10 },
-    smallRegion: { id: 140 },
+    bigRegionId: 10,
+    smallRegionId: 140,
     lat: 37.7670425472483,
     lng: 128.875781878031,
     phone: "010-1338-4700",
@@ -174,12 +174,12 @@ const stores = [
     description: "신선한 조개구이와 품질 좋은 무한리필",
   },
   {
-    user: { id: 7 },
+    userId: 7,
     storeName: "운정소곱창",
-    businessNumber: { id: 11 },
+    businessNumberId: 11,
     address: "경기 파주시 산내로104번길 5-23 1층",
-    bigRegion: { id: 9 },
-    smallRegion: { id: 135 },
+    bigRegionId: 9,
+    smallRegionId: 135,
     lat: 37.7271291011688,
     lng: 126.736663650376,
     phone: "010-1317-9272",
@@ -193,12 +193,12 @@ const stores = [
     description: "맛있는 곱창과 푸짐한 가격의 조화",
   },
   {
-    user: { id: 9 },
+    userId: 9,
     storeName: "호랑이주택",
-    businessNumber: { id: 12 },
+    businessNumberId: 12,
     address: "인천 남동구 인하로521번길 12 1층",
-    bigRegion: { id: 4 },
-    smallRegion: { id: 53 },
+    bigRegionId: 4,
+    smallRegionId: 53,
     lat: 37.4437007329489,
     lng: 126.704868221819,
     phone: "031-710-2821",
@@ -212,12 +212,12 @@ const stores = [
     description: "친절한 직원과 함께하는 즐거움",
   },
   {
-    user: { id: 1 },
+    userId: 1,
     storeName: "레코드피자 상암점",
-    businessNumber: { id: 13 },
+    businessNumberId: 13,
     address: "서울 마포구 월드컵북로44길 76-3 1, 2층",
-    bigRegion: { id: 1 },
-    smallRegion: { id: 13 },
+    bigRegionId: 1,
+    smallRegionId: 13,
     lat: 37.5778254765589,
     lng: 126.893715304022,
     phone: "031-1393-6544",
@@ -231,12 +231,12 @@ const stores = [
     description: "피자 맛집",
   },
   {
-    user: { id: 4 },
+    userId: 4,
     storeName: "낭만참치 논산 본점",
-    businessNumber: { id: 14 },
+    businessNumberId: 14,
     address: "충남 논산시 시민로132번길 52-22",
-    bigRegion: { id: 12 },
-    smallRegion: { id: 172 },
+    bigRegionId: 12,
+    smallRegionId: 172,
     lat: 36.1796686419472,
     lng: 127.107107211365,
     phone: "031-1382-0375",
@@ -250,12 +250,12 @@ const stores = [
     description: "쾌적한 식사를 위해 별관 확장 오픈",
   },
   {
-    user: { id: 10 },
+    userId: 10,
     storeName: "미깡밭한우집",
-    businessNumber: { id: 15 },
+    businessNumberId: 15,
     address: "제주 서귀포시 호근동 630-2",
-    bigRegion: { id: 17 },
-    smallRegion: { id: 260 },
+    bigRegionId: 17,
+    smallRegionId: 260,
     lat: 33.256856299391,
     lng: 126.533900911598,
     phone: "031-1497-0285",
@@ -269,12 +269,12 @@ const stores = [
     description: "제주FC 단골 한우 맛집!",
   },
   {
-    user: { id: 5 },
+    userId: 5,
     storeName: "만계화 범어점",
-    businessNumber: { id: 16 },
+    businessNumberId: 16,
     address: "대구 수성구 범어천로 81 1층",
-    bigRegion: { id: 3 },
-    smallRegion: { id: 49 },
+    bigRegionId: 3,
+    smallRegionId: 49,
     lat: 35.854215110097,
     lng: 128.623027206195,
     phone: "031-1497-0285",
@@ -291,83 +291,99 @@ const stores = [
 
 const storeImages = [
   {
-    store: { id: 1 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/%EA%B5%90%EC%B4%8C1.webp",
+    storeId: 1,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/%EA%B5%90%EC%B4%8C1.webp",
     isMain: true,
   },
   {
-    store: { id: 1 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/%EA%B5%90%EC%B4%8C2.webp",
+    storeId: 1,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/%EA%B5%90%EC%B4%8C2.webp",
     isMain: false,
   },
   {
-    store: { id: 2 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/%EB%B6%81%EC%96%B41.webp",
+    storeId: 2,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/%EB%B6%81%EC%96%B41.webp",
     isMain: true,
   },
   {
-    store: { id: 3 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/3.jpg",
+    storeId: 3,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/3.jpg",
     isMain: true,
   },
   {
-    store: { id: 4 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/4.jpg",
+    storeId: 4,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/4.jpg",
     isMain: true,
   },
   {
-    store: { id: 5 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/5.jpg",
+    storeId: 5,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/5.jpg",
     isMain: true,
   },
   {
-    store: { id: 6 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/6.jpg",
+    storeId: 6,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/6.jpg",
     isMain: true,
   },
   {
-    store: { id: 7 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/7.jpg",
+    storeId: 7,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/7.jpg",
     isMain: true,
   },
   {
-    store: { id: 8 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/8.jpg",
+    storeId: 8,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/8.jpg",
     isMain: true,
   },
   {
-    store: { id: 9 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/9.jpg",
+    storeId: 9,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/9.jpg",
     isMain: true,
   },
   {
-    store: { id: 10 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/10.jpg",
+    storeId: 10,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/10.jpg",
     isMain: true,
   },
   {
-    store: { id: 11 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/11.jpg",
+    storeId: 11,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/11.jpg",
     isMain: true,
   },
   {
-    store: { id: 12 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/12.jpg",
+    storeId: 12,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/12.jpg",
     isMain: true,
   },
   {
-    store: { id: 13 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/13.jpg",
+    storeId: 13,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/13.jpg",
     isMain: true,
   },
   {
-    store: { id: 14 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/14.jpg",
+    storeId: 14,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/14.jpg",
     isMain: true,
   },
   {
-    store: { id: 15 },
-    imgUrl: "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/15.jpg",
+    storeId: 15,
+    imgUrl:
+      "https://playce-bucket.s3.ap-northeast-2.amazonaws.com/images/15.jpg",
     isMain: true,
   },
 ];
@@ -414,7 +430,7 @@ export const seedStores = async () => {
         VALUES
           (?, ?, ?)
       `,
-        [img.store, img.imgUrl, img.isMain ? 1 : 0]
+        [img.storeId, img.imgUrl, img.isMain ? 1 : 0]
       );
     }
 
