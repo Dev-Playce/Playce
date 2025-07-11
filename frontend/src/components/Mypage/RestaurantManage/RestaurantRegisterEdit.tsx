@@ -16,7 +16,7 @@ import ImageUrlInputList from "./modals/ImageUrlInputList";
 import type { menu } from "../../../types/menu";
 import { apiErrorStatusMessage } from "../../../utils/apiErrorStatusMessage";
 import type { AxiosError } from "axios";
-import { useAuth } from "../../../hooks/useAuth";
+import useAuthStore from "../../../stores/authStore";
 
 interface StoreFormModalProps {
   mode: "create" | "edit";
@@ -24,7 +24,7 @@ interface StoreFormModalProps {
 
 const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
   const { restaurantEditId, setRestaurantSubpage } = useMypageStore();
-  const { userLogout } = useAuth();
+  const { storeLogout } = useAuthStore();
 
   const [storeDetail, setStoreDetail] = useState<RestaurantDetail | null>(null);
   const [storeName, setStoreName] = useState("");
@@ -106,7 +106,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
         if (axiosError.status === 401) {
-          userLogout();
+          storeLogout();
         }
         alert(message);
       }
@@ -138,7 +138,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
         if (axiosError.status === 401) {
-          userLogout();
+          storeLogout();
         }
         alert(message);
       }
