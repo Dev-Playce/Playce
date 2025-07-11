@@ -4,6 +4,12 @@ import useMapStore from "../../stores/mapStore";
 import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail";
 import type { Broadcast } from "../../types/restaurant.types";
 
+// 시간 포맷팅 함수 추가
+function formatTime(timeStr: string | undefined | null): string {
+  if (!timeStr) return "";
+  return timeStr.split(":").slice(0, 2).join(":");
+}
+
 export default function TodayBroadcastSidebar() {
   const restaurants = useMapStore((state) => state.restaurants);
   const [selectedSport, setSelectedSport] = useState<string>("축구");
@@ -119,7 +125,7 @@ export default function TodayBroadcastSidebar() {
                         {game.team_two}
                       </span>
                       <span className="ml-auto text-xs text-gray-500">
-                        {game.match_time}
+                        {formatTime(game.match_time)}
                       </span>
                     </div>
                     {game.etc && (
