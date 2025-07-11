@@ -29,7 +29,8 @@ const StoreList = () => {
         ];
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
-        if (axiosError.status === 401) {
+        const status = axiosError.response?.status;
+        if (status === 401) {
           storeLogout();
         }
         alert(message);
@@ -57,7 +58,8 @@ const StoreList = () => {
         ];
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
-        if (axiosError.status === 401) {
+        const status = axiosError.response?.status;
+        if (status === 401) {
           storeLogout();
         }
         alert(message);

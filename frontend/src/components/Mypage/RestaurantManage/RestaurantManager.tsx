@@ -40,11 +40,11 @@ const RestaurantManager = ({ onClose }: MypageProps) => {
               className="hover:cursor-pointer hover:text-primary5"
               onClick={() => {
                 if (restaurantSubpage === "schedule-view-broadcasts") {
-                  setRestaurantSubpage("schedule-view-restaurants");
+                  setRestaurantSubpage("restaurant-home");
                   resetYMD();
                 } else if (restaurantSubpage === "restaurant-list-edit") {
                   if (window.confirm("식당 수정을 취소하시겠습니까?")) {
-                    setRestaurantSubpage("restaurant-list");
+                    setRestaurantSubpage("restaurant-home");
                   }
                 } else {
                   setRestaurantSubpage("restaurant-home");

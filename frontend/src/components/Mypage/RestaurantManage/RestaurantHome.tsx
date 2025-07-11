@@ -8,6 +8,7 @@ import { FiEdit2, FiTrash2, FiTv } from "react-icons/fi";
 import RestaurantDetailComponent from "../../RestaurantDetail/RestaurantDetail";
 import type { MyStore } from "../../../types/restaurant.types";
 import Button from "../../Common/Button";
+import useBroadcastStore from "../../../stores/broadcastStore";
 
 const RestaurantHome = () => {
   const [stores, setStores] = useState<MyStore[]>([]);
@@ -15,6 +16,7 @@ const RestaurantHome = () => {
     number | null
   >(null);
   const { setRestaurantSubpage, setRestaurantEdit } = useMypageStore();
+  const { setStore } = useBroadcastStore();
   const { storeLogout } = useAuthStore();
 
   useEffect(() => {
@@ -30,7 +32,8 @@ const RestaurantHome = () => {
         ];
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
-        if (axiosError.status === 401) {
+        const status = axiosError.response?.status;
+        if (status === 401) {
           storeLogout();
         }
         alert(message);
@@ -58,7 +61,8 @@ const RestaurantHome = () => {
         ];
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
-        if (axiosError.status === 401) {
+        const status = axiosError.response?.status;
+        if (status === 401) {
           storeLogout();
         }
         alert(message);
@@ -104,7 +108,8 @@ const RestaurantHome = () => {
                 onClick={(e) => {
                   e.stopPropagation();
                   // setRestaurantEdit(store.store_id);
-                  // setRestaurantSubpage("restaurant-list-edit");
+                  setStore(store.store_name, store.store_id);
+                  setRestaurantSubpage("schedule-view-broadcasts");
                 }}
                 scheme="storeCircle"
                 icon={<FiTv className="text-primary5 text-xl" />}

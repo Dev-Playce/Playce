@@ -23,7 +23,7 @@ export const menuItems = [
   },
   {
     key: "restaurant-list-edit",
-    label: "내 식당 목록",
+    label: "식당 수정",
     component: () => <RestaurantEdit />,
   },
   {
