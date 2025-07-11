@@ -1,5 +1,5 @@
 import React from "react";
-import { FaCompass } from "react-icons/fa";
+import { IoLocateOutline } from "react-icons/io5";
 
 interface GoToCurrentLocationButtonProps {
   mapRef: React.RefObject<kakao.maps.Map | null>;
@@ -30,23 +30,14 @@ function GoToCurrentLocationButton({ mapRef }: GoToCurrentLocationButtonProps) {
     <button
       type="button"
       className="
-        absolute bottom-24 right-24 z-20
-        w-14 h-14 flex items-center justify-center
-        rounded-full bg-white border-2 border-primary5 shadow-lg
-        hover:rotate-45 hover:bg-primary4/30 transition-all
-        group
+        fixed bottom-24 right-20 z-20
+        p-3 rounded-full bg-white shadow-md border border-gray-200
+        hover:bg-primary4 hover:border-primary5 transition-colors
       "
       onClick={handleClick}
       aria-label="현위치로 이동"
-      style={{
-        boxShadow: "0 4px 16px 0 rgba(0,0,0,0.08)",
-      }}
     >
-      <span
-        className="absolute w-10 h-10 rounded-full border-2 border-primary4 opacity-60"
-        style={{ pointerEvents: "none" }}
-      />
-      <FaCompass className="text-primary5 text-3xl relative z-10 group-hover:text-primary6 transition-colors" />
+      <IoLocateOutline className="text-primary5 text-2xl" />
     </button>
   );
 }
