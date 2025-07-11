@@ -90,6 +90,7 @@ const PlayceMap: React.FC = () => {
           setPosition(pos);
         }}
       >
+        {/* <MapController position={position} /> */}
         {restaurants.map((restaurant) => (
           <PlayceMapMarker key={restaurant.store_id} restaurant={restaurant} />
         ))}
