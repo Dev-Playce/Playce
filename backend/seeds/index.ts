@@ -26,10 +26,10 @@ const resetDB = async () => {
     await queryRunner.query(`TRUNCATE TABLE users`);
 
     await queryRunner.query(`TRUNCATE TABLE business_numbers`);
-    // await queryRunner.query(`TRUNCATE TABLE small_regions`);
-    // await queryRunner.query(`TRUNCATE TABLE big_regions`);
-    // await queryRunner.query(`TRUNCATE TABLE sports`);
-    // await queryRunner.query(`TRUNCATE TABLE leagues`);
+    await queryRunner.query(`TRUNCATE TABLE small_regions`);
+    await queryRunner.query(`TRUNCATE TABLE big_regions`);
+    await queryRunner.query(`TRUNCATE TABLE sports`);
+    await queryRunner.query(`TRUNCATE TABLE leagues`);
 
     await queryRunner.query(`SET FOREIGN_KEY_CHECKS = 1;`);
 
@@ -47,8 +47,8 @@ const resetDB = async () => {
 const runSeeders = async () => {
   try {
     await seedBusinessNumbers();
-    // await seedRegions();
-    // await seedSportLeagues();
+    await seedRegions();
+    await seedSportLeagues();
 
     await seedUsers();
     await seedStores();
