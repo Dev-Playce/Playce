@@ -11,12 +11,14 @@ import BroadcastRegister from "./Broadcasts/BroadcastRegister";
 import BroadcastEdit from "./Broadcasts/BroadcastEdit";
 
 const RestaurantManager = ({ onClose }: MypageProps) => {
-  const { restaurantSubpage, setRestaurantSubpage } = useMypageStore();
+  const { restaurantSubpage, restaurantEditName, setRestaurantSubpage } =
+    useMypageStore();
   const { resetYMD } = useBroadcastStore();
 
   const getModalTitle = (key: ExtendedSubpage) => {
     if (key === "broadcast-register") return "중계 일정 등록";
     if (key === "broadcast-edit") return "중계 일정 수정";
+    if (key === "restaurant-edit") return `식당 수정 - ${restaurantEditName}`;
 
     const item = menuItems.find((i) => i.key === key);
     return item?.label ?? "";
@@ -40,11 +42,11 @@ const RestaurantManager = ({ onClose }: MypageProps) => {
               className="hover:cursor-pointer hover:text-primary5"
               onClick={() => {
                 if (restaurantSubpage === "schedule-view-broadcasts") {
-                  setRestaurantSubpage("schedule-view-restaurants");
+                  setRestaurantSubpage("restaurant-home");
                   resetYMD();
-                } else if (restaurantSubpage === "restaurant-list-edit") {
+                } else if (restaurantSubpage === "restaurant-edit") {
                   if (window.confirm("식당 수정을 취소하시겠습니까?")) {
-                    setRestaurantSubpage("restaurant-list");
+                    setRestaurantSubpage("restaurant-home");
                   }
                 } else {
                   setRestaurantSubpage("restaurant-home");

@@ -4,9 +4,9 @@ import type { MyStore } from "../../../types/restaurant.types.ts";
 import useMypageStore from "../../../stores/mypageStore.ts";
 import { deleteStore, myStores } from "../../../api/restaurant.api.ts";
 import RestaurantDetailComponent from "../../RestaurantDetail/RestaurantDetail.tsx";
-import { useAuth } from "../../../hooks/useAuth.ts";
 import { apiErrorStatusMessage } from "../../../utils/apiErrorStatusMessage.ts";
 import type { AxiosError } from "axios";
+import useAuthStore from "../../../stores/authStore.ts";
 
 const StoreList = () => {
   const [stores, setStores] = useState<MyStore[]>([]);
@@ -14,7 +14,7 @@ const StoreList = () => {
     number | null
   >(null);
   const { setRestaurantSubpage, setRestaurantEdit } = useMypageStore();
-  const { userLogout } = useAuth();
+  const { storeLogout } = useAuthStore();
 
   useEffect(() => {
     const fetchMyStores = async () => {
@@ -29,8 +29,9 @@ const StoreList = () => {
         ];
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
-        if (axiosError.status === 401) {
-          userLogout();
+        const status = axiosError.response?.status;
+        if (status === 401) {
+          storeLogout();
         }
         alert(message);
       }
@@ -57,8 +58,9 @@ const StoreList = () => {
         ];
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
-        if (axiosError.status === 401) {
-          userLogout();
+        const status = axiosError.response?.status;
+        if (status === 401) {
+          storeLogout();
         }
         alert(message);
       }
@@ -68,66 +70,66 @@ const StoreList = () => {
   return (
     <section>
       {stores.length === 0 ? (
-        <div className="text-gray-400 text-center text-lg tracking-wide">
+        <div className="text-gray-400 text-center py-20 text-lg tracking-wide">
           등록된 식당이 없습니다.
         </div>
       ) : (
-        <>
-          <ul>
-            {stores.map((store) => (
-              <li
-                key={store.store_name}
-                className="flex items-center gap-4 p-3 border-b border-gray-100 last:border-b-0"
-              >
-                <img
-                  src={store.main_img || "/noimg.png"}
-                  alt={store.store_name}
-                  className="w-16 h-16 rounded-lg object-cover border border-gray-200 bg-gray-100"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="block text-lg font-semibold text-gray-900 truncate">
-                      {store.store_name}
-                    </span>
-                    {/* <span className="text-xs bg-primary3 text-primary5 px-2 py-0.5 rounded-full font-medium">
-                      {store.type}
-                    </span> */}
-                  </div>
-                  <div className="text-gray-500 text-sm truncate mt-1">
-                    {store.address}
-                  </div>
+        <ul>
+          {stores.map((store) => (
+            <div
+              key={store.store_id}
+              className="flex items-center gap-4 p-3 border-b border-gray-100 last:border-b-0 hover:bg-primary4 hover:cursor-pointer"
+              onClick={() => {
+                setSelectedDetailStoreId(store.store_id);
+                // setRestaurantEdit(store.store_id);
+                // setRestaurantSubpage("schedule-view-broadcasts");
+              }}
+            >
+              <img
+                src={store.main_img || "/noimg.png"}
+                alt={store.store_name}
+                className="w-16 h-16 rounded-lg object-cover border border-gray-200 bg-gray-100"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="block text-lg font-semibold text-gray-900 truncate">
+                    {store.store_name}
+                  </span>
                 </div>
-                {/* 상세보기 < 버튼 */}
-                <button
-                  onClick={() => setSelectedDetailStoreId(store.store_id)}
-                  className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-primary4 transition ml-1"
-                  aria-label="상세보기"
-                >
-                  <FiChevronLeft className="text-primary5 text-xl" />
-                </button>
-                {/* 수정 버튼 */}
-                <button
-                  onClick={() => {
-                    setRestaurantEdit(store.store_id);
-                    setRestaurantSubpage("restaurant-list-edit");
-                  }}
-                  className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-blue-50 transition ml-1"
-                  aria-label="수정"
-                >
-                  <FiEdit2 className="text-blue-500 text-xl" />
-                </button>
-                {/* 삭제 버튼 */}
-                <button
-                  onClick={() => handleRemove(store.store_id)}
-                  className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-red-50 transition ml-1"
-                  aria-label="삭제"
-                >
-                  <FiTrash2 className="text-red-500 text-xl" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </>
+                <div className="text-gray-500 text-sm truncate mt-1">
+                  {store.address}
+                </div>
+              </div>
+              {/* 상세보기 < 버튼 */}
+              <button
+                onClick={() => setSelectedDetailStoreId(store.store_id)}
+                className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-primary4 transition ml-1"
+                aria-label="상세보기"
+              >
+                <FiChevronLeft className="text-primary5 text-xl" />
+              </button>
+              {/* 수정 버튼 */}
+              <button
+                onClick={() => {
+                  setRestaurantEdit(store.store_id);
+                  setRestaurantSubpage("restaurant-edit");
+                }}
+                className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-blue-50 transition ml-1"
+                aria-label="수정"
+              >
+                <FiEdit2 className="text-blue-500 text-xl" />
+              </button>
+              {/* 삭제 버튼 */}
+              <button
+                onClick={() => handleRemove(store.store_id)}
+                className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-red-50 transition ml-1"
+                aria-label="삭제"
+              >
+                <FiTrash2 className="text-red-500 text-xl" />
+              </button>
+            </div>
+          ))}
+        </ul>
       )}
       {/* 상세보기 */}
       {selectedDetailStoreId && (

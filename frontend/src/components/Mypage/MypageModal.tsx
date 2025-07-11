@@ -6,6 +6,7 @@ import UserInfo from "./UserInfo";
 import RestaurantManager from "./RestaurantManage/RestaurantManager";
 import useMypageStore from "../../stores/mypageStore";
 import { useUserInfo } from "../../hooks/useUser";
+import { FiPlus } from "react-icons/fi";
 
 type TabType = "favorite" | "profile" | "restaurant";
 
@@ -15,7 +16,7 @@ export interface MypageProps {
 
 const MypageModal = ({ onClose }: MypageProps) => {
   const [selectedTab, setSelectedTab] = useState<TabType>("favorite");
-  const { setRestaurantSubpage } = useMypageStore();
+  const { restaurantSubpage, setRestaurantSubpage } = useMypageStore();
 
   const handleClose = () => {
     setRestaurantSubpage("restaurant-home");
@@ -37,7 +38,7 @@ const MypageModal = ({ onClose }: MypageProps) => {
           <Sidebar selected={selectedTab} onSelect={setSelectedTab} />
         </div>
         {/* 오른쪽 콘텐츠 영역 */}
-        <div className="w-[70%] h-full p-6 overflow-y-auto">
+        <div className="relative w-[70%] h-full p-6 overflow-y-auto">
           {/* 콘텐츠 */}
           {selectedTab === "favorite" && <FavoriteList onClose={onClose} />}
           {selectedTab === "profile" && (
@@ -56,7 +57,20 @@ const MypageModal = ({ onClose }: MypageProps) => {
             </>
           )}
           {selectedTab === "restaurant" && (
-            <RestaurantManager onClose={onClose} />
+            <div>
+              <RestaurantManager onClose={onClose} />
+              {/* 식당 등록 */}
+              {restaurantSubpage === "restaurant-home" && (
+                <button
+                  onClick={() => {
+                    setRestaurantSubpage("restaurant-register");
+                  }}
+                  className="absolute bottom-10 right-10 w-12 h-12 rounded-full bg-primary5 text-white shadow-lg flex items-center justify-center"
+                >
+                  <FiPlus />
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
