@@ -3,6 +3,7 @@ import { BigRegion } from "../entities/BigRegion";
 import { SmallRegion } from "../entities/SmallRegion";
 import { Sport } from "../entities/Sport";
 import { League } from "../entities/League";
+import { BusinessNumber } from "../entities/BusinessNumber"
 import { createError } from "../utils/errorUtils";
 import { log } from "../utils/logUtils";
 
@@ -91,6 +92,21 @@ const staticdataService = {
         sport_id: sportId,
       })),
     ];
+  },
+
+  // 5. 사업자등록번호 조회
+  getBusinessNumbers: async () => {
+    log("사업자등록번호 조회 시작");
+
+    const repo = AppDataSource.getRepository(BusinessNumber);
+    const BusinessNumbers = await repo.find();
+
+    if (!BusinessNumbers.length) {
+      throw createError("사업자등록번호를 찾을 수 없습니다.", 404);
+    }
+
+    log(`사업자등록번호 조회 완료 - ${BusinessNumbers.length}건`);
+    return BusinessNumbers;
   },
 };
 
