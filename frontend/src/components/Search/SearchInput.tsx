@@ -11,7 +11,7 @@ const SearchInput = ({ className }: SearchInputProps) => {
   return (
     <div className={`flex gap-2 ${className || ""}`}>
       <InputText
-        placeholder="식당 이름을 입력하세요."
+        placeholder="검색어를 입력해주세요."
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
       />

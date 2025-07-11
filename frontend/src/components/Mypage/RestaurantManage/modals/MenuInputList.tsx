@@ -1,16 +1,25 @@
+import classNames from "classnames";
+import type { menu } from "../../../../types/menu";
 import ErrorMessage from "./ErrorMessage";
 
 interface MenuInputListProps {
-  menus: string[];
-  setMenus: (menus: string[]) => void;
+  menus: menu[];
+  setMenus: (menus: menu[]) => void;
   error?: string;
 }
 
 const MenuInputList = ({ menus, setMenus, error }: MenuInputListProps) => {
-  const handleMenuChange = (idx: number, value: string) => {
-    setMenus(menus.map((m, i) => (i === idx ? value : m)));
+  const handleMenuNameChange = (idx: number, name: string) => {
+    setMenus(
+      menus.map((m, i) => (i === idx ? { name: name, price: m.price } : m))
+    );
   };
-  const addMenu = () => setMenus([...menus, ""]);
+  const handleMenuPriceChange = (idx: number, price: string) => {
+    setMenus(
+      menus.map((m, i) => (i === idx ? { name: m.name, price: price } : m))
+    );
+  };
+  const addMenu = () => setMenus([...menus, { name: "", price: "" }]);
   const removeMenu = (idx: number) =>
     setMenus(menus.filter((_, i) => i !== idx));
 
@@ -23,10 +32,22 @@ const MenuInputList = ({ menus, setMenus, error }: MenuInputListProps) => {
         {menus.map((menu, idx) => (
           <div key={idx} className="flex gap-2">
             <input
-              className="flex-1 border rounded px-3 py-2"
+              className={classNames(
+                "border rounded px-3 py-2",
+                menus.length > 1 ? "w-[60%]" : "w-[65%]"
+              )}
               placeholder={`메뉴 ${idx + 1}`}
-              value={menu}
-              onChange={(e) => handleMenuChange(idx, e.target.value)}
+              value={menu.name}
+              onChange={(e) => handleMenuNameChange(idx, e.target.value)}
+            />
+            <input
+              className={classNames(
+                "border rounded px-3 py-2",
+                menus.length > 1 ? "w-[27%]" : "w-[35%]"
+              )}
+              placeholder={`가격`}
+              value={menu.price}
+              onChange={(e) => handleMenuPriceChange(idx, e.target.value)}
             />
             {menus.length > 1 && (
               <button
@@ -42,7 +63,7 @@ const MenuInputList = ({ menus, setMenus, error }: MenuInputListProps) => {
         <button
           type="button"
           onClick={addMenu}
-          className="mt-1 text-emerald-600 text-sm"
+          className="mt-1 text-primary5 text-sm"
         >
           + 메뉴 추가
         </button>

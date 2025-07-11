@@ -1,9 +1,7 @@
+import RestaurantRegisterEdit from "./RestaurantRegisterEdit";
+
 const RestaurantEdit = () => {
-  return (
-    <div>
-      <h1>RestaurantEdit</h1>
-    </div>
-  );
+  return <RestaurantRegisterEdit mode="edit" />;
 };
 
 export default RestaurantEdit;

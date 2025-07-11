@@ -1,12 +1,12 @@
-export const sportsMap: Record<string, Record<string, string[]>> = {
-  야구: {
-    KBO: ["한화", "두산", "키움"],
-    MLB: ["양키스", "다저스", "메츠"],
-    NPB: ["요미우리", "한신", "주니치"],
-  },
-  축구: {
-    K리그: ["서울", "수원", "울산"],
-    EPL: ["첼시", "리버풀", "맨시티"],
-    라리가: ["레알 마드리드", "바르셀로나", "AT 마드리드"],
-  },
+export const sportsMap: Record<string, string[]> = {
+  야구: ["전체", "KBO", "MLB", "NPB"],
+  축구: ["전체", "K리그", "EPL", "라리가"],
+};
+
+export const getSportByLeague = (league: string): string => {
+  return (
+    Object.entries(sportsMap).find(([, leagues]) =>
+      leagues.includes(league)
+    )?.[0] || ""
+  );
 };

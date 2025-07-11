@@ -1,136 +1,155 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { FiTv, FiImage } from "react-icons/fi";
+import useMapStore from "../../stores/mapStore";
+import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail";
+import type { Broadcast } from "../../types/restaurant.types";
 
-// 더미 데이터
-const broadcasts = [
-  {
-    match_date: "2025-06-26",
-    match_time: "18:30",
-    sport: "야구",
-    league: "KBO",
-    team_one: {
-      name: "삼성",
-      logo: "https://upload.wikimedia.org/wikipedia/ko/thumb/2/25/Samsung_Lions.png/120px-Samsung_Lions.png",
-    },
-    team_two: {
-      name: "롯데",
-      logo: "https://upload.wikimedia.org/wikipedia/ko/thumb/2/29/Lotte_Giants.png/120px-Lotte_Giants.png",
-      home: true,
-    },
-    etc: "",
-  },
-  {
-    match_date: "2025-06-26",
-    match_time: "18:30",
-    sport: "야구",
-    league: "KBO",
-    team_one: {
-      name: "NC",
-      logo: "https://upload.wikimedia.org/wikipedia/ko/thumb/6/6d/NC_Dinos.png/120px-NC_Dinos.png",
-    },
-    team_two: {
-      name: "KT",
-      logo: "https://upload.wikimedia.org/wikipedia/ko/thumb/7/7e/KT_Wiz.png/120px-KT_Wiz.png",
-      home: true,
-    },
-    etc: "",
-  },
-  {
-    match_date: "2025-06-26",
-    match_time: "21:00",
-    sport: "축구",
-    league: "EPL",
-    team_one: {
-      name: "리버풀",
-      logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
-    },
-    team_two: {
-      name: "맨유",
-      logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
-    },
-    etc: "빅매치",
-  },
-];
-
-const SPORTS = ["야구", "해외야구", "축구", "해외축구", "농구", "배구"];
+// 시간 포맷팅 함수 추가
+function formatTime(timeStr: string | undefined | null): string {
+  if (!timeStr) return "";
+  return timeStr.split(":").slice(0, 2).join(":");
+}
 
 export default function TodayBroadcastSidebar() {
-  const [selectedSport, setSelectedSport] = useState("야구");
-  const today = "2025-06-26"; // 실제는 new Date().toISOString().slice(0, 10)
-  const filtered = broadcasts.filter(
-    (b) => b.match_date === today && b.sport === selectedSport
-  );
+  const restaurants = useMapStore((state) => state.restaurants);
+  const [selectedSport, setSelectedSport] = useState<string>("축구");
+  const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
+  const today = new Date().toISOString().slice(0, 10);
+
+  type TodayBroadcast = Broadcast & {
+    store_name: string;
+    store_id: number;
+    main_img: string | null;
+    address: string;
+    type: string;
+  };
+
+  const todayBroadcasts = useMemo(() => {
+    const result: TodayBroadcast[] = [];
+    restaurants.forEach((store) => {
+      (store.broadcasts || []).forEach((b) => {
+        if (b.match_date === today) {
+          result.push({
+            ...b,
+            store_name: store.store_name,
+            store_id: store.store_id,
+            main_img: store.main_img,
+            address: store.address,
+            type: store.type,
+          });
+        }
+      });
+    });
+    return result;
+  }, [restaurants, today]);
+
+  const SPORTS = Array.from(new Set(todayBroadcasts.map((b) => b.sport)));
+  const filtered = todayBroadcasts.filter((b) => b.sport === selectedSport);
 
   return (
-    <section className="w-full bg-white px-6 pt-6 pb-3 font-pretendard">
-      <h3 className="text-lg font-bold mb-2">오늘의 중계일정</h3>
-      {/* 종목 탭 */}
-      <nav className="flex gap-2 mb-4 border-b border-gray-100 pb-1">
-        {SPORTS.map((sport) => (
-          <button
-            key={sport}
-            onClick={() => setSelectedSport(sport)}
-            className={`px-2 pb-1 text-sm font-semibold border-b-2 ${
-              selectedSport === sport
-                ? "border-primary5 text-primary5"
-                : "border-transparent text-gray-400 hover:text-gray-700"
-            } transition`}
-            style={{ background: "none" }}
-          >
-            {sport}
-          </button>
-        ))}
-      </nav>
-      {/* 경기 리스트 */}
-      <ul>
-        {filtered.length === 0 ? (
-          <li className="text-gray-400 py-6 text-center">
-            오늘 중계되는 경기가 없습니다.
-          </li>
-        ) : (
-          filtered.map((game, idx) => (
-            <li
-              key={idx}
-              className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0"
-            >
-              {/* 팀1 */}
-              <img
-                src={game.team_one.logo}
-                alt={game.team_one.name}
-                className="w-7 h-7 rounded-full bg-gray-100 object-cover"
-              />
-              <span className="font-semibold text-gray-800">
-                {game.team_one.name}
-              </span>
-              {/* VS */}
-              <span className="mx-1 text-xs text-gray-400">vs</span>
-              {/* 팀2 */}
-              <img
-                src={game.team_two.logo}
-                alt={game.team_two.name}
-                className="w-7 h-7 rounded-full bg-gray-100 object-cover"
-              />
-              <span className="font-semibold text-gray-800">
-                {game.team_two.name}
-              </span>
-              {/* 홈 표시 */}
-              {game.team_two.home && (
-                <span className="ml-1 text-xs bg-gray-200 text-gray-700 rounded px-1.5 py-0.5">
-                  홈
-                </span>
-              )}
-              {/* 경기 시간, 리그 */}
-              <span className="ml-auto text-xs text-gray-500">
-                {game.match_time}
-              </span>
-              {game.etc && (
-                <span className="ml-2 text-xs bg-primary3 text-primary5 rounded px-2 py-0.5">
-                  {game.etc}
-                </span>
-              )}
-            </li>
-          ))
-        )}
-      </ul>
+    <section className="w-full bg-white px-5 pt-1 pb-10 rounded-2xl border border-gray-100">
+      {/* 헤더 */}
+      <div className="flex items-center gap-2 mb-1">
+        <FiTv className="text-primary1 text-xl" />
+        <span className="text-lg font-bold">오늘의 중계일정</span>
+      </div>
+      <div className="text-sm text-gray-500 mb-4 font-medium tracking-tight">
+        지도에서 탐색한 가게의 중계일정만 보여드려요
+      </div>
+
+      {/* 오늘 중계되는 경기가 없으면 종목탭 없이 안내문구만 노출 */}
+      {todayBroadcasts.length === 0 ? (
+        <div className="text-gray-400 py-8 text-center text-base">
+          오늘 중계되는 경기가 없습니다.
+        </div>
+      ) : (
+        <>
+          {/* 종목 탭 */}
+          <nav className="flex gap-2 mb-4 border-b border-gray-100 pb-1">
+            {SPORTS.map((sport) => (
+              <button
+                key={sport}
+                onClick={() => setSelectedSport(sport)}
+                className={`px-3 pb-1 text-sm font-semibold rounded-t-lg border-b-2 ${
+                  selectedSport === sport
+                    ? "border-primary5 text-primary5 bg-primary4"
+                    : "border-transparent text-gray-400 hover:text-primary5 hover:bg-primary4/50"
+                } transition-colors`}
+                style={{ background: "none" }}
+              >
+                {sport}
+              </button>
+            ))}
+          </nav>
+          {/* 카드형 경기 리스트 */}
+          <ul>
+            {filtered.length === 0 ? (
+              <li className="text-gray-400 py-8 text-center text-base">
+                오늘 중계되는 경기가 없습니다.
+              </li>
+            ) : (
+              filtered.map((game, idx) => (
+                <li
+                  key={idx}
+                  className="bg-white rounded-xl border border-gray-200 px-4 py-3 mb-3 flex items-center gap-4 cursor-pointer hover:bg-primary4 transition-colors"
+                  onClick={() => setSelectedStoreId(game.store_id)}
+                >
+                  {/* 대표 이미지(없으면 아이콘) */}
+                  {game.main_img ? (
+                    <img
+                      src={game.main_img}
+                      alt={game.store_name}
+                      className="w-12 h-12 rounded-lg object-cover bg-gray-100 flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-300 text-2xl">
+                      <FiImage />
+                    </div>
+                  )}
+                  {/* 경기 정보 */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-bold text-primary5 truncate">
+                        {game.store_name}
+                      </span>
+                      <span className="text-xs bg-primary4 text-primary5 rounded px-2 py-0.5 ml-2">
+                        {game.league}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-gray-800">
+                        {game.team_one}
+                      </span>
+                      <span className="mx-1 text-xs text-gray-400">vs</span>
+                      <span className="font-semibold text-gray-800">
+                        {game.team_two}
+                      </span>
+                      <span className="ml-auto text-xs text-gray-500">
+                        {formatTime(game.match_time)}
+                      </span>
+                    </div>
+                    {game.etc && (
+                      <div className="mt-1 text-xs text-primary5">
+                        {game.etc}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
+          {/* 하단 여백 추가 */}
+          <div className="h-8" />
+        </>
+      )}
+
+      {/* 상세보기 모달/사이드바 */}
+      {selectedStoreId && (
+        <RestaurantDetailComponent
+          storeId={selectedStoreId}
+          onClose={() => setSelectedStoreId(null)}
+        />
+      )}
     </section>
   );
 }

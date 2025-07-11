@@ -1,24 +1,33 @@
 import { create } from "zustand";
+import type { SelectedRegion } from "../types/staticdata";
 
 interface RegionState {
-  mainRegion: string;
-  subRegions: string[];
-  setMainRegion: (region: string) => void;
-  toggleSubRegion: (sub: string) => void;
-  resetRegion: () => void;
+  selectedRegions: SelectedRegion[];
+  toggleRegion: (big: string, small: string) => void;
+  resetRegions: () => void;
+  setSelectedRegions: (next: SelectedRegion[]) => void;
 }
 
 export const useRegionStore = create<RegionState>((set, get) => ({
-  mainRegion: "전체",
-  subRegions: [],
-  setMainRegion: (region) => set({ mainRegion: region }),
-  toggleSubRegion: (sub) => {
-    const current = get().subRegions;
-    if (current.includes(sub)) {
-      set({ subRegions: current.filter((s) => s !== sub) });
+  selectedRegions: [],
+  toggleRegion: (big, small) => {
+    const current = get().selectedRegions;
+    const exists = current.some(
+      (r) => r.bigRegion === big && r.smallRegion === small
+    );
+
+    if (exists) {
+      set({
+        selectedRegions: current.filter(
+          (r) => !(r.bigRegion === big && r.smallRegion === small)
+        ),
+      });
     } else {
-      set({ subRegions: [...current, sub] });
+      set({
+        selectedRegions: [...current, { bigRegion: big, smallRegion: small }],
+      });
     }
   },
-  resetRegion: () => set({ mainRegion: "전체", subRegions: [] }),
+  resetRegions: () => set({ selectedRegions: [] }),
+  setSelectedRegions: (next) => set({ selectedRegions: next }),
 }));

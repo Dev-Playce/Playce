@@ -10,19 +10,21 @@ interface AuthState {
   setIsSignupModalOpen: (modal: boolean) => void;
   storeLogin: (token: string) => void;
   storeLogout: () => void;
+  isPasswordResetModalOpen: boolean;
+  setIsPasswordResetModalOpen: (modal: boolean) => void;
 }
 
 export const getToken = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   return token;
 };
 
 const setToken = (token: string) => {
-  localStorage.setItem("token", token);
+  localStorage.setItem("accessToken", token);
 };
 
 export const removeToken = () => {
-  localStorage.removeItem("token");
+  localStorage.removeItem("accessToken");
 };
 
 const useAuthStore = create<AuthState>((set) => ({
@@ -31,6 +33,9 @@ const useAuthStore = create<AuthState>((set) => ({
   isAuthModalOpen: false,
   isLoggedIn: getToken() ? true : false,
   authModal: null,
+  isPasswordResetModalOpen: false,
+  setIsPasswordResetModalOpen: (modal) =>
+    set({ isPasswordResetModalOpen: modal }),
   setIsLoginModalOpen: (modal) => {
     set({ isLoginModalOpen: modal });
   },

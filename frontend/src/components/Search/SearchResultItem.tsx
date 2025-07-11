@@ -4,27 +4,36 @@ interface SearchResultItemProps {
   data: {
     storeName: string;
     address: string;
-    distance: number;
+    distance?: number | undefined;
     matchInfo: string;
     imgUrl: string;
   };
+  onClick?: () => void;
 }
 
-const SearchResultItem: FC<SearchResultItemProps> = ({ data }) => {
+const SearchResultItem: FC<SearchResultItemProps> = ({ data, onClick }) => {
   const { storeName, address, distance, matchInfo, imgUrl } = data;
 
   return (
     <div
       className="w-full hover:bg-primary4 transition-colors cursor-pointer border-b border-gray-200"
-      onClick={() => console.log(`클릭한 식당: ${storeName}`)}
+      onClick={onClick}
     >
       <div className="flex justify-between items-center px-4 py-3">
-        <div className="flex flex-col">
-          <h3 className="text-base font-semibold text-gray-800">{storeName}</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            {distance.toFixed(1)}km · {address}
+        <div className="flex flex-col leading-tight">
+          <h3 className="text-base font-semibold text-gray-800 mb-[2px]">
+            {storeName}
+          </h3>
+          {distance != null && (
+            <p className="text-sm text-gray-500 mb-[1px]">
+              {distance.toFixed(1)}km
+            </p>
+          )}
+
+          <p className="text-sm text-gray-600 mb-[1px]">{address}</p>
+          <p className="text-sm text-primary5 mt-1.5 min-h-[20px]">
+            {matchInfo || ""}
           </p>
-          <p className="text-sm text-primary5 mt-1">{matchInfo}</p>
         </div>
 
         <img

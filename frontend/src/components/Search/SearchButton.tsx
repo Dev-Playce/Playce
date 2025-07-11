@@ -1,39 +1,59 @@
-import { SearchOutlined } from '@ant-design/icons';
-import { useSearchStore } from '../../stores/searchStore';
-import { useRegionStore } from '../../stores/regionStore';
-import { useSportStore } from '../../stores/sportStore';
+import { SearchOutlined } from "@ant-design/icons";
+import { useSearchStore } from "../../stores/searchStore";
+import { useRegionStore } from "../../stores/regionStore";
+import { useSportStore } from "../../stores/sportStore";
+import Button from "../Common/Button";
 
 const SearchButton = () => {
-  const { searchText } = useSearchStore();
-  const { mainRegion, subRegions } = useRegionStore();
-  const { sport, league, teams } = useSportStore();
+  const {
+    searchText,
+    setTriggerSearch,
+    setBigRegions,
+    setSmallRegions,
+    setSports,
+    setLeagues,
+    setIsSearching,
+  } = useSearchStore();
+  const { selectedRegions } = useRegionStore();
+  const { sport, selectedLeagues } = useSportStore();
 
   const handleSearch = () => {
     const hasKeyword =
-      searchText.trim() !== '' ||
-      mainRegion !== '전체' ||
-      subRegions.length > 0 ||
-      sport !== '' ||
-      league !== '' ||
-      teams.length > 0;
+      searchText.trim() !== "" ||
+      selectedRegions.length > 0 ||
+      sport !== "" ||
+      selectedLeagues.length > 0;
 
     if (!hasKeyword) {
-      alert('검색 조건을 하나 이상 입력해주세요.');
+      alert("검색 조건을 하나 이상 입력해주세요.");
       return;
     }
 
-    console.log('검색어:', searchText);
-    console.log('지역:', { mainRegion, subRegions });
-    console.log('경기:', { sport, league, teams });
+    if (selectedRegions.length > 0) {
+      const bigs = [...new Set(selectedRegions.map((r) => r.bigRegion))];
+      const smalls = selectedRegions.map((r) => r.smallRegion);
+      setBigRegions(bigs);
+      setSmallRegions(smalls);
+    } else {
+      setBigRegions([]);
+      setSmallRegions([]);
+    }
+
+    const uniqueSports = [...new Set(selectedLeagues.map((l) => l.sport))];
+    setSports(uniqueSports);
+
+    const leagues = selectedLeagues.map((l) => l.league);
+    setLeagues(leagues);
+
+    setIsSearching(true);
+    setTriggerSearch(true);
   };
 
   return (
-    <button
-      onClick={handleSearch}
-      className="p-2 rounded bg-primary2 text-white hover:bg-primary1"
-    >
-      <SearchOutlined />
-    </button>
+    <Button onClick={handleSearch} scheme="primary" fullWidth size="semi">
+      <SearchOutlined className="text-sm mr-2" />
+      검색
+    </Button>
   );
 };
 

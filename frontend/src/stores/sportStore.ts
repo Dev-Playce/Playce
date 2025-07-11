@@ -1,30 +1,44 @@
 import { create } from "zustand";
+import type { SelectedSports } from "../types/staticdata";
 
 interface SportState {
   sport: string;
-  league: string;
-  teams: string[];
-
+  selectedLeagues: SelectedSports[];
   setSport: (sport: string) => void;
-  setLeague: (league: string) => void;
-  toggleTeam: (team: string) => void;
+  setSelectedLeagues: (leagues: SelectedSports[]) => void;
+  toggleLeague: (league: string) => void;
   resetSport: () => void;
 }
 
 export const useSportStore = create<SportState>((set, get) => ({
   sport: "",
-  league: "",
-  teams: [],
+  selectedLeagues: [],
 
-  setSport: (sport) => set({ sport, league: "", teams: [] }),
-  setLeague: (league) => set({ league, teams: [] }),
-  toggleTeam: (team) => {
-    const current = get().teams;
-    if (current.includes(team)) {
-      set({ teams: current.filter((t) => t !== team) });
+  setSport: (sport) =>
+    set((prev) => ({ sport, selectedLeagues: prev.selectedLeagues })),
+
+  setSelectedLeagues: (leagues) => set({ selectedLeagues: leagues }),
+
+  toggleLeague: (league) => {
+    const sport = get().sport;
+    const current = get().selectedLeagues;
+
+    const exists = current.some(
+      (item) => item.sport === sport && item.league === league
+    );
+
+    if (exists) {
+      set({
+        selectedLeagues: current.filter(
+          (item) => !(item.sport === sport && item.league === league)
+        ),
+      });
     } else {
-      set({ teams: [...current, team] });
+      set({
+        selectedLeagues: [...current, { sport, league }],
+      });
     }
   },
-  resetSport: () => set({ sport: "", league: "", teams: [] }),
+
+  resetSport: () => set({ sport: "", selectedLeagues: [] }),
 }));

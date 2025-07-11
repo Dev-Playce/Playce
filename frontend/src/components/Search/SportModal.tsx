@@ -5,28 +5,27 @@ import { useSportStore } from "../../stores/sportStore";
 
 interface SportModalProps {
   onClose: () => void;
-  onApply: (selected: {
-    sport: string;
-    league: string;
-    teams: string[];
-  }) => void;
+  onApply: (selected: { sport: string; leagues: string[] }) => void;
 }
 
 const SportModal = ({ onClose, onApply }: SportModalProps) => {
-  const { sport, league, teams, resetSport } = useSportStore();
+  const { sport, selectedLeagues, resetSport } = useSportStore();
 
   return (
-    <ModalBase onClose={onClose} title="경기">
-      <div className="p-4 flex-1 overflow-auto">
-        <SportPanel />
-      </div>
-      <div className="border-t p-4 flex gap-2">
+    <ModalBase onClose={onClose} title="경기" className="p-5">
+      <SportPanel />
+      <div className="border-t border-gray-200 pt-5 flex gap-3">
         <Button onClick={resetSport} scheme="secondary">
           초기화
         </Button>
         <Button
           onClick={() => {
-            onApply({ sport, league, teams });
+            onApply({
+              sport,
+              leagues: selectedLeagues
+                .filter((r) => r.sport === sport)
+                .map((r) => r.league),
+            });
             onClose();
           }}
           scheme="primary"

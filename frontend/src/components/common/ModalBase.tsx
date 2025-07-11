@@ -1,16 +1,16 @@
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import Button from "../Common/Button";
 import { FaTimes } from "react-icons/fa";
 import classNames from "classnames";
+import Button from "./Button";
 
 interface ModalBaseProps {
   children: ReactNode;
   onClose: () => void;
   title?: string;
   hideHeader?: boolean;
-  width?: string;
   className?: string;
+  type?: "auth" | "mypage";
 }
 
 const ModalBase = ({
@@ -18,8 +18,8 @@ const ModalBase = ({
   onClose,
   title,
   hideHeader = false,
-  width = "600px",
   className,
+  type,
 }: ModalBaseProps) => {
   return createPortal(
     <div
@@ -29,27 +29,39 @@ const ModalBase = ({
       <div
         className={classNames(
           "bg-white rounded-xl shadow-lg max-h-[90vh] overflow-hidden flex flex-col",
+          { "w-[400px]": type === "auth" },
+          { "w-[850px]": type === "mypage" },
+          { "w-[600px]": type !== "auth" && type !== "mypage" },
           className
         )}
-        style={{ width }}
         onClick={(e) => e.stopPropagation()}
       >
         {!hideHeader && (
-          <div className="flex items-center justify-between pl-4 pr-2 py-1 border-b">
-            <h2 className="text-lg font-bold pt-1 text-mainText">{title}</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-mainText items-center m-0">
+              {title}
+            </h2>
             <Button
               onClick={onClose}
               scheme="close"
               size="icon"
-              className="text-subText"
+              className="text-mainText"
             >
               <FaTimes />
             </Button>
           </div>
         )}
 
-        {/* 콘텐츠 */}
-        {children}
+        <div
+          className={classNames(
+            "overflow-y-auto flex-grow ",
+            { "mt-0": type === "mypage" },
+            { "mt-5": type !== "mypage" }
+            // { "px-4 py-3": type !== "mypage" }
+          )}
+        >
+          {children}
+        </div>
       </div>
     </div>,
     document.body

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { StoreFormRequest } from "../../../../types/storeFormRequest";
+import type { StoreFormRequest } from "../../../../types/restaurantFormRequest";
 import MenuInputList from "./MenuInputList";
 import ImageUrlInputList from "./ImageUrlInputList";
 import ErrorMessage from "./ErrorMessage";
