@@ -112,7 +112,7 @@ const StoreList = () => {
               <button
                 onClick={() => {
                   setRestaurantEdit(store.store_id);
-                  setRestaurantSubpage("restaurant-list-edit");
+                  setRestaurantSubpage("restaurant-edit");
                 }}
                 className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-blue-50 transition ml-1"
                 aria-label="수정"

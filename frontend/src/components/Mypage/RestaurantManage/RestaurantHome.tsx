@@ -15,7 +15,8 @@ const RestaurantHome = () => {
   const [selectedDetailStoreId, setSelectedDetailStoreId] = useState<
     number | null
   >(null);
-  const { setRestaurantSubpage, setRestaurantEdit } = useMypageStore();
+  const { setRestaurantSubpage, setRestaurantEditId, setRestaurantEditName } =
+    useMypageStore();
   const { setStore } = useBroadcastStore();
   const { storeLogout } = useAuthStore();
 
@@ -84,8 +85,6 @@ const RestaurantHome = () => {
               className="flex items-center gap-4 p-3 border-b border-gray-100 last:border-b-0 hover:bg-primary4 hover:cursor-pointer"
               onClick={() => {
                 setSelectedDetailStoreId(store.store_id);
-                // setRestaurantEdit(store.store_id);
-                // setRestaurantSubpage("schedule-view-broadcasts");
               }}
             >
               <img
@@ -107,7 +106,6 @@ const RestaurantHome = () => {
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
-                  // setRestaurantEdit(store.store_id);
                   setStore(store.store_name, store.store_id);
                   setRestaurantSubpage("schedule-view-broadcasts");
                 }}
@@ -120,8 +118,9 @@ const RestaurantHome = () => {
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setRestaurantEdit(store.store_id);
-                  setRestaurantSubpage("restaurant-list-edit");
+                  setRestaurantEditId(store.store_id);
+                  setRestaurantEditName(store.store_name);
+                  setRestaurantSubpage("restaurant-edit");
                 }}
                 scheme="storeCircle"
                 icon={<FiEdit2 className="text-blue-500 text-xl" />}
@@ -137,6 +136,7 @@ const RestaurantHome = () => {
                 icon={<FiTrash2 className="text-red-500 text-xl" />}
                 hoverColor="red-50"
               ></Button>
+              {/* 플로팅 버튼 */}
             </div>
           ))}
         </ul>

@@ -5,23 +5,29 @@ interface MypageState {
   isMypageOpen: boolean;
   restaurantSubpage: ExtendedSubpage;
   restaurantEditId: number | null;
+  restaurantEditName: string | null;
   setIsMypageOpen: (mypage: boolean) => void;
   setRestaurantSubpage: (subpage: ExtendedSubpage) => void;
-  setRestaurantEdit: (restaurant: number) => void;
+  setRestaurantEditId: (restaurant: number) => void;
+  setRestaurantEditName: (restaurant: string) => void;
 }
 
 const useMypageStore = create<MypageState>((set) => ({
   isMypageOpen: false,
   restaurantSubpage: "restaurant-home",
   restaurantEditId: null,
+  restaurantEditName: null,
   setIsMypageOpen: (mypage) => {
     set({ isMypageOpen: mypage });
   },
   setRestaurantSubpage: (subpage) => {
     set({ restaurantSubpage: subpage });
   },
-  setRestaurantEdit: (restaurant) => {
+  setRestaurantEditId: (restaurant) => {
     set({ restaurantEditId: restaurant });
+  },
+  setRestaurantEditName: (restaurant) => {
+    set({ restaurantEditName: restaurant });
   },
 }));
 
