@@ -46,7 +46,7 @@ const searchService = {
       lng: store.lng,
       broadcasts: store.broadcasts.map((b) => ({
         match_date: b.matchDate,
-        match_time: b.matchTime,
+        match_time: b.matchTime.slice(0, 5),
         sport: b.sport.name,
         league: b.league.name,
         team_one: b.teamOne,
@@ -193,7 +193,7 @@ const searchService = {
           ? {
             id: latestBroadcast.id,
             match_date: latestBroadcast.matchDate,
-            match_time: latestBroadcast.matchTime,
+            match_time: latestBroadcast.matchTime?.slice(0, 5),
             sport: latestBroadcast.sport?.name,
             league: latestBroadcast.league?.name,
             team_one: latestBroadcast.teamOne,

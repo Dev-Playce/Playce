@@ -300,7 +300,7 @@ const storeService = {
     const imgUrlsData = store.images.map((img) => img.imgUrl);
     const broadcastData = store.broadcasts.map((bc) => ({
       match_date: bc.matchDate,
-      match_time: bc.matchTime,
+      match_time: bc.matchTime.slice(0, 5),
       sport: bc.sport.name,
       league: bc.league.name,
       team_one: bc.teamOne,

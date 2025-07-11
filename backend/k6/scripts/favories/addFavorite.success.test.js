@@ -62,8 +62,7 @@ export default function () {
   const token = loginAndGetToken(__ENV.EMAIL, __ENV.PASSWORD);
 
   if (token) {
-    // const storeId = __ENV.STORE_ID || 1;
-    const storeIdList = [1, 2, 3];
+    const storeIdList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]; // 테스트용 식당 ID 목록
     const storeId = storeIdList[__VU % storeIdList.length];
     
     addFavoriteSuccessTest(token, storeId, true); // 테스트 전 DB 초기화(true)

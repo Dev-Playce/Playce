@@ -1,6 +1,6 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
+import { BASE_URL } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
 import { loginAndGetToken } from '../../utils/auth.js';
 import { addFavoriteSuccessTest } from './addFavorite.success.test.js';
@@ -12,7 +12,6 @@ export const removeFavoriteSuccessTest = (token, storeId) => {
   const url = `${BASE_URL}/favorites/${storeId}`;
   const params = {
     headers: {
-      ...DEFAULT_HEADERS,
       Authorization: `Bearer ${token}`,
     },
   };
@@ -45,8 +44,7 @@ export default function () {
   const token = loginAndGetToken(__ENV.EMAIL, __ENV.PASSWORD);
 
   if (token) {
-    // const storeId = __ENV.STORE_ID || 1;
-    const storeIdList = [1, 2, 3];
+    const storeIdList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]; // 테스트용 식당 ID 목록
     const storeId = storeIdList[__VU % storeIdList.length];
 
     // 1. 즐겨찾기 추가 (테스트 선행 작업)

@@ -30,6 +30,48 @@ const users = [
     nickname: "park",
     phone: "010-4444-4444",
   },
+  {
+    email: "choi@mail.com",
+    password: "$2b$10$kEvPaDFhVdLy/2PHavpMpO2rtv04ZNHfLVwq1IHbUApWCPCxtag9C",
+    name: "최민수",
+    nickname: "choi",
+    phone: "010-5555-5555",
+  },
+  {
+    email: "jung@mail.com",
+    password: "$2b$10$gLs.Km7b17HPpLM4PfBNo.jCXNgc8UwChXuqqlbsU4aHmTnZDJFIq",
+    name: "정민수",
+    nickname: "jung",
+    phone: "010-6666-6666",
+  },
+  {
+    email: "jang@mail.com",
+    password: "$2b$10$KCegaYtFZPjpuqsLQrwt2uDC/jsHpmDlLrVvCl49xMNrVbOrU.E.2",
+    name: "장민수",
+    nickname: "jang",
+    phone: "010-7777-7777",
+  },
+  {
+    email: "yoon@mail.com",
+    password: "$2b$10$SHwZeTNiu19tZpbWc23kPuC9sTCEZJzpGu.SYIgSHCLaKyWrtspR2",
+    name: "윤민수",
+    nickname: "yoon",
+    phone: "010-8888-8888",
+  },
+  {
+    email: "han@mail.com",
+    password: "$2b$10$r4UyqFImdhLQGkQxBNStDuG3BN1HVLGVIhbD2oHPvx7Km8a4/XUaS",
+    name: "한민수",
+    nickname: "han",
+    phone: "010-9999-9999",
+  },
+  {
+    email: "seo@mail.com",
+    password: "$2b$10$1yrVg9v8nkuBXgXXGFwm6Oj9n.EAF1WkYztaSuP/wn2Jerqyk8f8e",
+    name: "서민수",
+    nickname: "seo",
+    phone: "010-0000-0000",
+  },
 ];
 
 export const seedUsers = async () => {

@@ -85,15 +85,16 @@ export const getBusinessNumbers = () => {
 export const createStore = ({ vu = 1, iter = 0, loadBusinessNumbers, overrides = {} } = {}) => {
   const uniqueSuffix = `${vu}-${iter}`;
 
-  const businessNumberIndex = ((vu - 1) * 1000 + iter) % loadBusinessNumbers.length;
-  const selectedBusinessNumberObject = loadBusinessNumbers[businessNumberIndex];
+  const filteredBusinessNumbers = loadBusinessNumbers.filter(bn => bn.id > 16);
+  const businessNumberIndex = ((vu - 1) * 1000 + iter) % filteredBusinessNumbers.length;
+  const selectedBusinessNumberObject = filteredBusinessNumbers[businessNumberIndex];
   const selectedBusinessNumber = selectedBusinessNumberObject.businessNumber;
 
   return {
     store_name: `k6 테스트 store-${uniqueSuffix}`,
     business_number: selectedBusinessNumber,
     address: '서울특별시 중구 세종대로 80 지하1층',
-    phone: '010-1234-5678',
+    phone: `010-${getRandomNumber(4)}-${getRandomNumber(4)}`,
     opening_hours: '영업시간',
     menus: [
       { name: '메뉴_1', price: '1000' },
