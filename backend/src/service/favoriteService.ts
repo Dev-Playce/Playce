@@ -40,6 +40,7 @@ const favoriteService = {
     log("즐겨찾기 저장 완료 - ID:", saved.id);
     return {
       favorite_id: saved.id,
+      store_id: store.id,
       created_at: formatDateToKST(new Date(saved.createdAt)),
     };
   },

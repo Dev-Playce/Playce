@@ -10,7 +10,7 @@ import { seedStores } from "./storeSeeder";
 import { seedBroadcasts } from "./broadcastSeeder";
 import { seedFavorites } from "./favoriteSeeder";
 
-const resetTestDB = async () => {
+const resetDB = async () => {
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.connect();
 
@@ -23,9 +23,9 @@ const resetTestDB = async () => {
     await queryRunner.query(`TRUNCATE TABLE favorites`);
     await queryRunner.query(`TRUNCATE TABLE broadcasts`);
     await queryRunner.query(`TRUNCATE TABLE stores`);
-    await queryRunner.query(`TRUNCATE TABLE business_numbers`);
     await queryRunner.query(`TRUNCATE TABLE users`);
 
+    await queryRunner.query(`TRUNCATE TABLE business_numbers`);
     await queryRunner.query(`TRUNCATE TABLE small_regions`);
     await queryRunner.query(`TRUNCATE TABLE big_regions`);
     await queryRunner.query(`TRUNCATE TABLE sports`);
@@ -65,7 +65,7 @@ if (require.main === module) {
   (async () => {
     try {
       await AppDataSource.initialize(); // 데이터베이스 연결 초기화
-      await resetTestDB(); // DB 초기화
+      await resetDB(); // DB 초기화
       await runSeeders(); // 시드 삽입
     } catch (error) {
       console.error("❌ 초기화 및 시드 삽입 실패", error);

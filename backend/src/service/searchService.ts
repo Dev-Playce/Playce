@@ -1,13 +1,13 @@
 import { AppDataSource } from "../data-source";
 import { Store } from "../entities/Store";
-import { createError } from "../utils/errorUtils";
-import { log } from "../utils/logUtils";
+import { SmallRegion } from "../entities/SmallRegion";
+import { BigRegion } from "../entities/BigRegion";
+import { Sport } from "../entities/Sport";
+import { League } from "../entities/League";
+import { Brackets } from "typeorm";
 
 const searchService = {
-  // ✅ 현재 위치 기반 검색
   getNearbyStores: async (lat: number, lng: number, radius: number = 5) => {
-    log(`\n📍 [현재 위치 검색] lat: ${lat}, lng: ${lng}, radius: ${radius}km`);
-
     const storeRepo = AppDataSource.getRepository(Store);
 
     const stores = await storeRepo
@@ -36,9 +36,7 @@ const searchService = {
       `, { lat, lng, radius })
       .getMany();
 
-    log(`- 검색 결과: ${stores.length}개`);
-
-    const result = stores.map((store) => ({
+    return stores.map((store) => ({
       store_id: store.id,
       store_name: store.storeName,
       type: store.type,
@@ -56,34 +54,31 @@ const searchService = {
         etc: b.etc,
       })),
     }));
-
-    log("✅ 현재 위치 검색 완료");
-    return result;
   },
 
-  // ✅ 통합 검색
   searchStores: async (filters: {
     search?: string;
-    sport?: string;
-    league?: string;
+    sports?: string[];
+    leagues?: string[];
     team?: string;
-    big_region?: string;
-    small_region?: string;
-    // sort?: "date" | "name";
+    big_regions?: string[];
+    small_regions?: string[];
+    sort?: "date" | "name" | "distance";
   }) => {
-    log("\n🔎 [통합 검색] 요청 필터:", filters);
-
     const {
       search,
-      sport,
-      league,
+      sports = [],
+      leagues = [],
       team,
-      big_region,
-      small_region,
-      // sort,
+      big_regions = [],
+      small_regions = [],
+      sort,
     } = filters;
 
     const storeRepo = AppDataSource.getRepository(Store);
+    const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
+    const sportRepo = AppDataSource.getRepository(Sport);
+    const leagueRepo = AppDataSource.getRepository(League);
 
     const query = storeRepo
       .createQueryBuilder("store")
@@ -94,66 +89,97 @@ const searchService = {
       .leftJoinAndSelect("store.bigRegion", "bigRegion")
       .leftJoinAndSelect("store.smallRegion", "smallRegion");
 
-    // 🔍 필터 처리
     if (search) {
-      log(`- 필터: 검색어 '${search}'`);
       query.andWhere(
         "store.storeName LIKE :search OR store.address LIKE :search",
         { search: `%${search}%` }
       );
     }
 
-    if (sport) {
-      log(`- 필터: 스포츠 '${sport}'`);
-      query.andWhere("sport.name = :sport", { sport });
-    }
+    // ⚽ 스포츠/리그 필터링 (지역과 같은 로직)
+    if (sports.length > 0) {
+      const matchedSports = await sportRepo
+        .createQueryBuilder("sport")
+        .leftJoinAndSelect("sport.leagues", "league")
+        .where("sport.name IN (:...sports)", { sports })
+        .getMany();
 
-    if (league && league !== "전체" && league !== "all") {
-      log(`- 필터: 리그 '${league}'`);
-      query.andWhere("league.name = :league", { league });
-    }
+      const leaguesFromSports = matchedSports.flatMap((s) =>
+        s.leagues.map((l) => l.name)
+      );
 
+      const sportNames = Array.from(new Set(matchedSports.map((s) => s.name)));
+      const leagueNamesFromSport = Array.from(new Set(leaguesFromSports));
+
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where("sport.name IN (:...sportNames)", { sportNames });
+
+          if (leagues.length > 0) {
+            const extraLeagues = leagues.filter(
+              (l) => !leagueNamesFromSport.includes(l)
+            );
+            if (extraLeagues.length > 0) {
+              qb.orWhere("league.name IN (:...extraLeagues)", { extraLeagues });
+            }
+          }
+        })
+      );
+    } else if (leagues.length > 0 && !leagues.includes("전체") && !leagues.includes("all")) {
+      query.andWhere("league.name IN (:...leagues)", { leagues });
+    }
 
     if (team) {
-      log(`- 필터: 팀 '${team}'`);
       query.andWhere(
         "broadcast.teamOne = :team OR broadcast.teamTwo = :team",
         { team }
       );
     }
 
-    if (big_region) {
-      log(`- 필터: 대지역 '${big_region}'`);
-      query.andWhere("bigRegion.name = :bigRegion", { bigRegion: big_region });
+    // 🏙 지역 필터링
+    if (small_regions.length > 0) {
+      const matchedSmallRegions = await smallRegionRepo
+        .createQueryBuilder("smallRegion")
+        .leftJoinAndSelect("smallRegion.bigRegion", "bigRegion")
+        .where("smallRegion.name IN (:...smallRegions)", { smallRegions: small_regions })
+        .getMany();
+
+      const bigRegionsFromSmall = Array.from(
+        new Set(matchedSmallRegions.map(sr => sr.bigRegion.name))
+      );
+
+      query.andWhere(
+        new Brackets(qb => {
+          qb.where("smallRegion.name IN (:...smallRegions)", { smallRegions: small_regions });
+
+          if (big_regions.length > 0) {
+            const bigRegionsExtra = big_regions.filter(br => !bigRegionsFromSmall.includes(br));
+            if (bigRegionsExtra.length > 0) {
+              qb.orWhere("bigRegion.name IN (:...bigRegionsExtra)", { bigRegionsExtra });
+            }
+          }
+        })
+      );
+    } else if (big_regions.length > 0) {
+      query.andWhere("bigRegion.name IN (:...bigRegions)", { bigRegions: big_regions });
     }
 
-    if (small_region && small_region !== "전체" && small_region !== "all") {
-      query.andWhere("smallRegion.name = :smallRegion", { smallRegion: small_region });
-    } else {
-      log("- 필터: 소지역 전체 (필터 생략)");
+    // 🔤 정렬
+    if (sort === "name") {
+      query.orderBy("store.storeName", "ASC");
+    } else if (sort === "date") {
+      query.orderBy("broadcast.matchDate", "ASC");
     }
-
-    // // 🔃 정렬
-    // if (sort === "date") {
-    //   log("- 정렬: 날짜순");
-    //   query.orderBy("broadcast.matchDate", "ASC");
-    // } else if (sort === "name") {
-    //   log("- 정렬: 이름순");
-    //   query.orderBy("store.storeName", "ASC");
-    // }
 
     const stores = await query.getMany();
 
-    log(`- 검색 결과: ${stores.length}개`);
-
-    const result = stores.map((store) => {
-      // 최신 중계 일정 1개 추출
+    return stores.map((store) => {
       const latestBroadcast = store.broadcasts
         .slice()
         .sort((a, b) => {
           const aDate = new Date(`${a.matchDate}T${a.matchTime}`);
           const bDate = new Date(`${b.matchDate}T${b.matchTime}`);
-          return bDate.getTime() - aDate.getTime(); // 최신순
+          return bDate.getTime() - aDate.getTime();
         })[0];
 
       return {
@@ -174,12 +200,9 @@ const searchService = {
             team_two: latestBroadcast.teamTwo,
             etc: latestBroadcast.etc,
           }
-          : null, // 중계 일정이 없을 경우 null
+          : null,
       };
     });
-
-    log("✅ 통합 검색 완료");
-    return result;
   },
 };
 

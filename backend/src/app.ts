@@ -1,4 +1,11 @@
-import "dotenv/config";
+// import "dotenv/config";
+import dotenv from 'dotenv';
+if (process.env.NODE_ENV === 'test') {
+  dotenv.config({ path: '.env.test'});
+} else {
+  dotenv.config();
+}
+
 import "reflect-metadata";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
@@ -59,8 +66,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
   return fail(res, message, status);
 });
-
-
 
 AppDataSource.initialize()
   .then(() => {

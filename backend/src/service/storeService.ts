@@ -97,6 +97,8 @@ const storeService = {
       }
 
       await queryRunner.commitTransaction();
+
+      return saveStore.id;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.error("❌ 식당 등록 : 트랜잭션 롤백됨");
@@ -320,6 +322,7 @@ const storeService = {
       description: store.description,
       broadcasts: broadcastData,
       is_owner: isOwner,
+
     };
     log("- 응답 데이터 : ", responseData);
 

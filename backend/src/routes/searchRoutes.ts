@@ -125,40 +125,56 @@ router.get("/nearby", NearbySearchValidator, searchController.getNearbyStores);
  *           example: 플레이스
  *         description: 식당 이름 검색 키워드
  *       - in: query
- *         name: sport
+ *         name: sports
  *         required: false
  *         schema:
- *           type: string
- *           example: soccer
+ *           type: array
+ *           items:
+ *             type: string
+ *           style: form
+ *           explode: true
+ *           example: [축구, 야구]
  *         description: "종목 (예: 축구, 야구 등)"
  *       - in: query
- *         name: league
+ *         name: leagues
  *         required: false
  *         schema:
- *           type: string
- *           example: K League
+ *           type: array
+ *           items: 
+ *             type: string
+ *           style: form
+ *           explode: true
+ *           example: [K League, KBO]
  *         description: "리그 (예: 프리미어리그)"
  *       - in: query
  *         name: team
  *         required: false
  *         schema:
  *           type: string
- *           example: FC서울
+ *           example: FC 서울
  *         description: 응원팀
  *       - in: query
- *         name: big_region
+ *         name: big_regions
  *         required: false
  *         schema:
- *           type: string
- *           example: 서울
- *         description: 시/도 단위 지역명
+ *           type: array
+ *           items:
+ *             type: string  
+ *           style: form
+ *           explode: true
+ *           example: [서울특별시, 경기도]
+ *         description: 도단위 지역명
  *       - in: query
- *         name: small_region
+ *         name: small_regions
  *         required: false
  *         schema:
- *           type: string
- *           example: 강남구
- *         description: 구/군 단위 지역명
+ *           type: array
+ *           items:
+ *             type: string  
+ *           style: form
+ *           explode: true
+ *           example: [강남구, 중구]
+ *         description: 시/구/군 단위 지역명
  *     responses:
  *       200:
  *         description: 통합 검색 성공 또는 검색 결과 없음

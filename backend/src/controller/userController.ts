@@ -9,9 +9,9 @@ const userController = {
   join: async (req: Request, res: Response, next: NextFunction) => {
     try {
       log("\n📝 [회원가입] 요청");
-      await userService.join(req);
+      const newUserId = await userService.join(req);
       log("✅ [회원가입] 성공");
-      return success(res, "회원가입이 완료되었습니다.", undefined, 201);
+      return success(res, "회원가입이 완료되었습니다.", { id: newUserId }, 201);
     } catch (error) {
       logApiError("회원가입", error);
       next(error);
