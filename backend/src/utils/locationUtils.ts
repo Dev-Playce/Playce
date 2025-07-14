@@ -34,8 +34,29 @@ export const getLocationDataFromAddress = async (
   bigRegionRepo: Repository<BigRegion>,
   smallRegionRepo: Repository<SmallRegion>,
 ) => {
-  // 카카오 API 호출 -> 좌표, 지역명 가져오기
-  const { bigRegionName, smallRegionName, lat, lng } = await getCoordinatesByAddress(address);
+  let bigRegionName: string;
+  let smallRegionName: string;
+  let lat: number;
+  let lng: number;
+
+  // .env 파일의 MOCK_GEOCODING 값이 true인 경우 mock 데이터 반환
+  if (process.env.MOCK_GEOCODING === 'true') {
+    bigRegionName = '서울';
+    smallRegionName = '중구';
+    lat = 37.5637;
+    lng = 126.977;
+
+    log('- 지역 데이터 : mock 데이터 사용');
+  } else {
+    // 카카오 API 호출 -> 좌표, 지역명 가져오기
+    const result = await getCoordinatesByAddress(address);
+    bigRegionName = result.bigRegionName;
+    smallRegionName = result.smallRegionName;
+    lat = result.lat;
+    lng = result.lng;
+    log('- 지역 데이터 : 카카오 API 호출');
+  }
+
   log(`- 좌표 : 위도(${lat}), 경도(${lng})`);
 
   // DB에서 지역 대분류 id 찾기
