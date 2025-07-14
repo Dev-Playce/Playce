@@ -5,6 +5,7 @@ import { Sport } from "../entities/Sport";
 import { League } from "../entities/League";
 import { createError } from "../utils/errorUtils";
 import { log } from "../utils/logUtils";
+import { getCache, setCache, deleteCache } from "../utils/redis";
 
 const broadcastRepo = AppDataSource.getRepository(Broadcast);
 const storeRepo = AppDataSource.getRepository(Store);
@@ -60,6 +61,10 @@ const createBroadcast = async (data: any, userId: number) => {
 
   await broadcastRepo.save(newBroadcast);
   log(`✅ 중계 일정 등록 완료 (broadcastId: ${newBroadcast.id})`);
+
+  // Redis 캐시 무효화
+  await deleteCache(`broadcasts:store:${store.id}`);
+
   return newBroadcast;
 };
 
@@ -94,6 +99,10 @@ const updateBroadcast = async (broadcastId: number, data: any, userId: number) =
 
   await broadcastRepo.save(broadcast);
   log(`✅ 중계 일정 수정 완료 (broadcastId: ${broadcast.id})`);
+
+  // Redis 캐시 무효화
+  await deleteCache(`broadcasts:store:${broadcast.store.id}`);
+
   return broadcast;
 };
 
@@ -110,10 +119,20 @@ const deleteBroadcast = async (broadcastId: number, userId: number) => {
 
   await broadcastRepo.delete(broadcastId);
   log("✅ 중계 일정 삭제 완료");
+
+  // Redis 캐시 무효화
+  await deleteCache(`broadcasts:store:${broadcast.store.id}`);
 };
 
-// 중계 일정 목록 조회
+// 중계 일정 목록 조회 (Redis 캐시 사용)
 const getBroadcastsByStore = async (storeId: number) => {
+  const cacheKey = `broadcasts:store:${storeId}`;
+  const cached = await getCache(cacheKey);
+  if (cached) {
+    log("📦 Redis 캐시 사용 (중계 일정)");
+    return cached;
+  }
+
   const broadcasts = await broadcastRepo.find({
     where: { store: { id: storeId } },
     relations: ["sport", "league"],
@@ -130,7 +149,10 @@ const getBroadcastsByStore = async (storeId: number) => {
     team_two: b.teamTwo,
     etc: b.etc,
   }));
-  log(`✅ 조회 완료 - ${broadcasts.length}건`);
+
+  await setCache(cacheKey, responseData); // 기본 TTL 적용
+  log(`✅ 조회 완료 - ${broadcasts.length}건 (캐시 저장)`);
+
   return responseData;
 };
 

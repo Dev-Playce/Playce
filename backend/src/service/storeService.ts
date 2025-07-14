@@ -8,6 +8,7 @@ import { getLocationDataFromAddress } from "../utils/locationUtils";
 import { createError } from "../utils/errorUtils";
 import { deleteS3Object } from "../utils/s3";
 import { log } from "../utils/logUtils";
+import { getCache, setCache, deleteCache } from "../utils/redis";
 
 const storeService = {
   // 1. 식당 등록
@@ -97,6 +98,9 @@ const storeService = {
       }
 
       await queryRunner.commitTransaction();
+
+      // Redis 캐시 삭제
+      await deleteCache(`store:mypage:${userId}`);
 
       return saveStore.id;
     } catch (error) {
@@ -240,6 +244,10 @@ const storeService = {
       log("- 수정 완료");
 
       await queryRunner.commitTransaction();
+
+      // Redis 캐시 삭제
+      await deleteCache(`store:${storeId}`);
+      await deleteCache(`store:mypage:${userId}`);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.error("❌ 식당 수정 : 트랜잭션 롤백됨");
@@ -277,10 +285,24 @@ const storeService = {
 
     // 3. DB에서 store 삭제
     await storeRepo.remove(storeToDelete);
+
+    // Redis 캐시 삭제
+    await deleteCache(`store:${storeId}`);
+    await deleteCache(`store:mypage:${userId}`);
     return;
   },
   // 4. 식당 상세 조회
   getStoreDetail: async (userId: number | undefined, storeId: number) => {
+    // Redis 캐시 확인
+    const CACHE_KEY = `store:${storeId}`;
+    const cached = getCache(CACHE_KEY);
+
+    if (cached) {
+      log('- Redis 캐시에서 식당 상세 조회 : ', cached);
+      return cached;
+    }
+
+    // DB 조회
     const storeRepo = AppDataSource.getRepository(Store);
 
     const store = await storeRepo.findOne({
@@ -324,12 +346,24 @@ const storeService = {
       is_owner: isOwner,
 
     };
-    log("- 응답 데이터 : ", responseData);
+    log("- DB에서 식당 상세 조회 : ", responseData);
 
+    // Redis 캐시에 저장
+    await setCache(CACHE_KEY, responseData);
     return responseData;
   },
   // 5. 내 식당 목록
   getMyStores: async (userId: number) => {
+    // Redis 캐시 확인
+    const CACHE_KEY = `store:mypage:${userId}`;
+    const cached = await getCache(CACHE_KEY);
+
+    if (cached) {
+      log('- Redis 캐시에서 내 식당 목록 조회 : ', cached);
+      return cached;
+    }
+
+    // DB 조회
     const storeRepo = AppDataSource.getRepository(Store);
 
     const myStores = await storeRepo.find({
@@ -349,8 +383,10 @@ const storeService = {
         address: store.address,
       };
     });
-    log("- 응답 데이터 : ", responseData);
+    log("- DB에서 내 식당 목록 조회 : ", responseData);
 
+    // Redis 캐시에 저장
+    await setCache(CACHE_KEY, responseData);
     return responseData;
   },
 };

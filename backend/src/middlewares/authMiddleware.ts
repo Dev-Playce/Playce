@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import userService from "../service/userService";
 import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
-import { createError } from "../utils/errorUtils";
 import { fail } from "../utils/response";
+import { getCache } from "../utils/redis";
 
 const userRepository = AppDataSource.getRepository(User);
 
@@ -30,6 +30,14 @@ export const authenticate = async (
     const decoded = jwt.verify(token, process.env.PRIVATE_KEY as string) as {
       userId: number;
     };
+
+    // Redis에 토큰 존재 여부 확인 (유효한 세션인지)
+    const redisKey = `login:token:${token}`;
+    const storedUserId = await getCache(redisKey);
+
+    if (!storedUserId || storedUserId !== String(decoded.userId)) {
+      return fail(res, "유효하지 않은 토큰입니다.", 401);
+    }
 
     // DB의 users.id 확인
     const user = await userRepository.findOneBy({ id: decoded.userId });
@@ -61,6 +69,16 @@ export const optionalAuthenticate = async (
     const decoded = jwt.verify(token, process.env.PRIVATE_KEY as string) as {
       userId: number;
     };
+
+    // Redis에 토큰 존재 여부 확인
+    const redisKey = `login:token:${token}`;
+    const storedUserId = await getCache(redisKey);
+    console.log(`[Auth] Redis에서 토큰 조회: ${storedUserId}`);
+
+    if (!storedUserId || storedUserId !== String(decoded.userId)) {
+      // Redis에 토큰 없으면 인증 정보 없는 상태로 넘김
+      return next();
+    }
 
     // DB의 users.id 확인
     const user = await userService.getMyInfo(decoded.userId);

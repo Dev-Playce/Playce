@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { createError } from "../utils/errorUtils";
 import { sendMail } from "../utils/email";
 import { log } from "../utils/logUtils";
+import { getCache, setCache } from "../utils/redis";
 
 require("dotenv").config();
 
@@ -77,7 +78,20 @@ const userService = {
       { expiresIn: "1h" }
     );
 
-    log("[UserService] 로그인 성공 - userId:", user.id);
+    // Redis에 토큰 저장, TTL 3600초 (1시간)
+    const redisKey = `login:token:${token}`;
+    await setCache(redisKey, user.id, 3600);
+    // await redisClient.set(redisKey, String(user.id), {
+    //   EX: 3600,
+    // });
+    console.log(`[Login] Redis에 토큰 저장: ${redisKey}`);
+
+    const cachedUserId = getCache(redisKey);
+    console.log(`[Login] Redis에서 토큰 조회: ${cachedUserId}`);
+    
+    log(
+      `[UserService] 로그인 성공 - userId: ${user.id}, Redis Key: ${redisKey}`
+    );
     return token;
   },
   // 3. 비밀번호 초기화 요청

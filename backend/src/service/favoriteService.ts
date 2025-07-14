@@ -1,24 +1,18 @@
 import { AppDataSource } from "../data-source";
 import { Favorite } from "../entities/Favorite";
 import { Store } from "../entities/Store";
-import { User } from "../entities/User";
 import { createError } from "../utils/errorUtils";
 import { formatDateToKST } from "../utils/dateFormatter";
 import { log } from "../utils/logUtils";
+import { getCache, setCache, deleteCache } from "../utils/redis";
 
 const favoriteRepository = AppDataSource.getRepository(Favorite);
 const storeRepository = AppDataSource.getRepository(Store);
-const userRepository = AppDataSource.getRepository(User);
 
 const favoriteService = {
   // 1. 즐겨찾기 추가
   addFavorite: async (userId: number, storeId: number) => {
-    log(
-      "[Service]즐겨찾기 추가 - userId:",
-      userId,
-      "storeId:",
-      storeId
-    );
+    log("[Service]즐겨찾기 추가 - userId:", userId, "storeId:", storeId);
 
     const store = await storeRepository.findOneBy({ id: storeId });
     if (!store) throw createError("해당 식당을 찾을 수 없습니다.", 404);
@@ -34,8 +28,16 @@ const favoriteService = {
 
     if (existing) throw createError("이미 즐겨찾기에 추가된 식당입니다.", 409);
 
-    const newFavorite = favoriteRepository.create({ user: { id: userId }, store });
+    const newFavorite = favoriteRepository.create({
+      user: { id: userId },
+      store,
+    });
     const saved = await favoriteRepository.save(newFavorite);
+
+    // Redis 캐시 무효화
+    const cacheKey = `favorites:user:${userId}`;
+    await deleteCache(cacheKey);
+    log("Redis 캐시 무효화 완료:", cacheKey);
 
     log("즐겨찾기 저장 완료 - ID:", saved.id);
     return {
@@ -47,12 +49,7 @@ const favoriteService = {
 
   // 2. 즐겨찾기 삭제
   removeFavorite: async (userId: number, storeId: number) => {
-    log(
-      "[Service]즐겨찾기 삭제 - userId:",
-      userId,
-      "storeId:",
-      storeId
-    );
+    log("[Service]즐겨찾기 삭제 - userId:", userId, "storeId:", storeId);
 
     const favorite = await favoriteRepository.findOne({
       where: {
@@ -67,12 +64,26 @@ const favoriteService = {
     }
 
     await favoriteRepository.remove(favorite);
+
+    // Redis 캐시 무효화
+    const cacheKey = `favorites:user:${userId}`;
+    await deleteCache(cacheKey);
+    log("Redis 캐시 무효화 완료:", cacheKey);
+
     log("즐겨찾기 삭제 완료");
   },
 
   // 3. 즐겨찾기 목록 조회
   getFavorites: async (userId: number) => {
     log("[Service]즐겨찾기 목록 조회 - userId:", userId);
+
+    // Redis 캐시 조회
+    const cacheKey = `favorites:user:${userId}`;
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      log("✅ Redis 캐시 사용:", cacheKey);
+      return cached;
+    }
 
     const favorites = await favoriteRepository.find({
       where: { user: { id: userId } },
@@ -82,11 +93,9 @@ const favoriteService = {
 
     log("즐겨찾기 개수:", favorites.length);
 
-    return favorites.map((fav) => {
+    const result = favorites.map((fav) => {
       const images = fav.store.images || [];
       const mainImage = images.find((img) => img.isMain);
-
-      log("즐겨찾기 매핑 중 -", fav.store.storeName);
 
       return {
         store_id: fav.store.id,
@@ -97,6 +106,15 @@ const favoriteService = {
         created_at: formatDateToKST(fav.createdAt),
       };
     });
+
+    // Redis 저장 - TTL 300초 (5분)
+    await setCache(cacheKey, result);
+    // await redisClient.set(cacheKey, JSON.stringify(result), {
+    //   EX: 300,
+    // });
+    log("📝 Redis 캐시 저장 완료:", cacheKey);
+
+    return result;
   },
 };
 

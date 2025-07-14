@@ -5,7 +5,7 @@ if (process.env.NODE_ENV === 'test') {
 } else {
   dotenv.config();
 }
-console.log(`설정 : .env${process.env.NODE_ENV ? `.${process.env.NODE_ENV} 파일` : " 파일"}, log(${process.env.LOG_ENABLED !== 'false' ? '활성화' : '비활성화'}), 식당 관련 지역 데이터(${process.env.MOCK_GEOCODING !== 'false' ? 'mock 데이터 사용' : 'kakaoAPI 사용'})`);
+console.log(`설정 : .env${process.env.NODE_ENV ? `.${process.env.NODE_ENV} 파일` : " 파일"}, log(${process.env.LOG_ENABLED !== 'false' ? '활성화' : '비활성화'}), 식당 관련 지역 데이터(${process.env.MOCK_GEOCODING === 'true' ? 'mock 데이터 사용' : 'kakaoAPI 사용'})`);
 
 import "reflect-metadata";
 import express, { Request, Response, NextFunction } from "express";

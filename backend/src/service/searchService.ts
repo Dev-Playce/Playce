@@ -4,9 +4,11 @@ import { SmallRegion } from "../entities/SmallRegion";
 import { Sport } from "../entities/Sport";
 import { League } from "../entities/League";
 import { Brackets } from "typeorm";
+import { getCache, setCache } from "../utils/redis";
 import crypto from "crypto"; // 해시 생성용
 
 const searchService = {
+  // 캐시 없이 그대로 유지
   getNearbyStores: async (lat: number, lng: number, radius: number = 5) => {
     const storeRepo = AppDataSource.getRepository(Store);
 
@@ -65,6 +67,19 @@ const searchService = {
     small_regions?: string[];
     sort?: "date" | "name" | "distance";
   }) => {
+    //  캐시 키 생성
+    const filtersHash = crypto
+      .createHash("md5")
+      .update(JSON.stringify(filters))
+      .digest("hex");
+    const cacheKey = `search:filters:${filtersHash}`;
+
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      console.log(`[Redis Cache] Cache hit for key: ${cacheKey}`);
+      return cached;
+    }
+
     const {
       search,
       sports = [],
@@ -99,6 +114,7 @@ const searchService = {
         })
       );
     }
+
 
     if (sports.length > 0) {
       const matchedSports = await sportRepo
@@ -204,6 +220,9 @@ const searchService = {
           : null,
       };
     });
+
+    await setCache(cacheKey, response); // TTL 기본값 사용
+    console.log(`[Redis Cache] Cache set for key: ${cacheKey}`);
     return response;
   },
 };
