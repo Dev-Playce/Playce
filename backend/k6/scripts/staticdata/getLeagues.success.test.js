@@ -18,8 +18,8 @@ export const getLeaguesSuccessTest = (sportsId) => {
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('리그 조회 성공'),
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('리그 조회 성공'),
   });
 
   if (!success) {
@@ -30,10 +30,14 @@ export const getLeaguesSuccessTest = (sportsId) => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
 };
 
-export default function () {
+export function setup () {
   const sportId = __ENV.SPORTS_ID || 1;
-  getLeaguesSuccessTest(sportId);
+  return { sportId };
+}
+
+export default function (data) {
+  getLeaguesSuccessTest(data.sportId);
 }

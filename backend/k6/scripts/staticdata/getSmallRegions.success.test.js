@@ -18,8 +18,8 @@ export const getSmallRegionsSuccessTest = (bigRegionId) => {
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('지역 소분류 조회 성공'),
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('지역 소분류 조회 성공'),
   });
 
   if (!success) {
@@ -30,10 +30,14 @@ export const getSmallRegionsSuccessTest = (bigRegionId) => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
 };
 
-export default function () {
+export function setup () {
   const bigRegionId = __ENV.BIG_REGION_ID || 1;
-  getSmallRegionsSuccessTest(bigRegionId);
+  return { bigRegionId };
+}
+
+export default function (data) {
+  getSmallRegionsSuccessTest(data.bigRegionId);
 }

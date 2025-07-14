@@ -8,20 +8,20 @@ export const options = getOptions();
 
 export const loginSuccessTest =  (loginUser) => {
   const url = `${BASE_URL}/users/login`;
-  const payload = JSON.stringify(loginUser);
+  const payload = loginUser;
   const params = {
     headers: {
       ...DEFAULT_HEADERS,
     }
   };
 
-  const res = http.post(url, payload, params); // 요청 보내기
+  const res = http.post(url, JSON.stringify(payload), params); // 요청 보내기
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('로그인이 완료되었습니다.'),
-    '토큰 확인': () => json?.data?.token && typeof json.data.token === 'string',
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('로그인이 완료되었습니다.'),
+    [`[${CONTEXT}] 토큰 확인`]: () => json?.data?.token && typeof json.data.token === 'string',
   });
 
   if (!success) {
@@ -33,7 +33,7 @@ export const loginSuccessTest =  (loginUser) => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
   return json?.data?.token || null;
 };
 

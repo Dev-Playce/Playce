@@ -1,4 +1,4 @@
-import { Like, Repository } from "typeorm";
+import { Equal, Repository } from "typeorm";
 import { BigRegion } from "../entities/BigRegion";
 import { SmallRegion } from "../entities/SmallRegion";
 import { getCoordinatesByAddress } from "./kakaoAPI";
@@ -62,9 +62,13 @@ export const getLocationDataFromAddress = async (
   // DB에서 지역 대분류 id 찾기
   const searchBigRegionName = normalizeRegionName(bigRegionName);
   const findBigRegion = await bigRegionRepo.findOne({
-    where: { name: Like(`${searchBigRegionName}%`) },
+    where: { name: Equal(searchBigRegionName) },
   });
-  if (!findBigRegion) throw createError('유효하지 않은 지역-대분류입니다.', 400);
+  // if (!findBigRegion) throw createError('유효하지 않은 지역-대분류입니다.', 400);
+  if (!findBigRegion){
+    log('유효하지 않은 지역-대분류');
+    throw createError('유효하지 않은 지역-대분류입니다.', 400);
+  }
 
   // DB에서 지역 소분류 id 찾기
   let searchSmallRegionName = smallRegionName;
@@ -73,11 +77,16 @@ export const getLocationDataFromAddress = async (
   }
   const findSmallRegion = await smallRegionRepo.findOne({
     where: {
-      name: Like(`${searchSmallRegionName}%`),
+      name: Equal(searchSmallRegionName),
       bigRegion: findBigRegion
     }
   });
-  if (!findSmallRegion) throw createError('유효하지 않은 지역-소분류입니다.', 400);
+  // if (!findSmallRegion) throw createError('유효하지 않은 지역-소분류입니다.', 400);
+  if (!findSmallRegion) {
+    log('유효하지 않은 지역-소분류');
+    throw createError('유효하지 않은 지역-소분류입니다.', 400);
+  }
+
   log(`- 지역 id : 대분류(id: ${findBigRegion.id}, name: ${bigRegionName}), 소분류(id: ${findSmallRegion.id}, name: ${smallRegionName})`);
 
   return { lat, lng, bigRegion: findBigRegion, smallRegion: findSmallRegion };

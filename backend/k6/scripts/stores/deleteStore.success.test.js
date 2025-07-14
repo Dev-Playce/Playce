@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { BASE_URL } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
-import { loginAndGetToken } from '../../utils/auth.js';
+import { getTokenOrFail } from '../../utils/auth.js';
 import { createStore, getBusinessNumbers } from '../../utils/factories.js';
 import { createStoreSuccessTest } from './createStore.success.test.js';
 
@@ -17,12 +17,12 @@ export const deleteStoreSuccessTest = (token, storeId) => {
     },
   };
 
-  const res = http.del(url, null, params); // 요청 보내기
+  const res = http.del(url, params); // 요청 보내기
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('식당이 삭제되었습니다.'),
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('식당이 삭제되었습니다.'),
   });
 
   if (!success) {
@@ -33,31 +33,26 @@ export const deleteStoreSuccessTest = (token, storeId) => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
 };
 
 export function setup () {
+  const token = getTokenOrFail();
   const businessNumbers = getBusinessNumbers();
-  return { businessNumbers };
+  return { token, businessNumbers };
 }
 
 export default function (data) {
-  const token = loginAndGetToken(__ENV.EMAIL, __ENV.PASSWORD);
+  // 1. 식당 등록 (테스트 선행 작업)
+  const newStore = createStore({
+    vu: __VU,
+    iter: __ITER,
+    loadBusinessNumbers: data.businessNumbers,
+  });
+  const storeId = createStoreSuccessTest(data.token, newStore, false); // 테스트 후 DB 초기화 : false
 
-  if (token) {
-    // 1. 식당 등록 (테스트 선행 작업)
-    const newStore = createStore({
-      vu: __VU,
-      iter: __ITER,
-      loadBusinessNumbers: data.businessNumbers,
-    });
-    const storeId = createStoreSuccessTest(token, newStore, false); // 테스트 후 DB 초기화 : false
-
-    // 2. 식당 삭제
-    if (storeId) {
-      deleteStoreSuccessTest(token, storeId);
-    }
-  } else {
-    console.error('❌ 토큰 발급 실패 - 사용자 인증 불가');
+  // 2. 식당 삭제
+  if (storeId) {
+    deleteStoreSuccessTest(data.token, storeId);
   }
 }

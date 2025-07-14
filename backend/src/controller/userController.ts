@@ -22,7 +22,7 @@ const userController = {
     try {
       log("\n🔐 [로그인] 요청");
       const token = await userService.login(req);
-      console.log("✅ [로그인] 성공");
+      log("✅ [로그인] 성공");
       return success(res, "로그인이 완료되었습니다.", { token });
     } catch (error) {
       logApiError("로그인", error);

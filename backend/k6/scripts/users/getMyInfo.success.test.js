@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
-import { loginAndGetToken } from '../../utils/auth.js';
+import { getTokenOrFail } from '../../utils/auth.js';
 
 const CONTEXT = '내 정보 조회';
 export const options = getOptions();
@@ -20,8 +20,8 @@ export const getMyInfoSuccessTest = (token) => {
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('내 정보 조회 성공'),
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('내 정보 조회 성공'),
   });
 
   if (!success) {
@@ -32,15 +32,14 @@ export const getMyInfoSuccessTest = (token) => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
 };
 
-export default function () {
-  const token = loginAndGetToken(__ENV.EMAIL, __ENV.PASSWORD);
+export function setup () {
+  const token = getTokenOrFail();
+  return { token };
+}
 
-  if (token) {
-    getMyInfoSuccessTest(token);
-  } else {
-    console.error('❌ 토큰 발급 실패 - 사용자 인증 불가');
-  }
+export default function (data) {
+  getMyInfoSuccessTest(data.token);
 }

@@ -18,8 +18,8 @@ export const getNearbyStoresSuccessTest = (lat, lng, radius) => {
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('현재 위치 기반 검색 성공'),
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('현재 위치 기반 검색 성공'),
   });
 
   if (!success) {
@@ -30,13 +30,17 @@ export const getNearbyStoresSuccessTest = (lat, lng, radius) => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
 };
 
-export default function () {
+export function setup () {
   const lat = __ENV.LAT || 37.5665; // 서울시청 위도
-  const lng = __ENV.LNG || 126.978; // 서울시청 경
+  const lng = __ENV.LNG || 126.978; // 서울시청 경도
   const radius = __ENV.RADIUS || 1000; // 기본 반경 1000m
   
-  getNearbyStoresSuccessTest(lat, lng, radius);
+  return { lat, lng, radius };
+}
+
+export default function (data) {
+  getNearbyStoresSuccessTest(data.lat, data.lng, data.radius);
 }

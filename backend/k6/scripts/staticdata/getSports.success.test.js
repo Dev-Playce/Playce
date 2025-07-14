@@ -18,8 +18,8 @@ export const getSportsSuccessTest = () => {
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('종목 조회 성공'),
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('종목 조회 성공'),
   });
 
   if (!success) {
@@ -30,7 +30,7 @@ export const getSportsSuccessTest = () => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
 };
 
 export default function () {

@@ -1,33 +1,48 @@
 /**
  * k6 부하 테스트 옵션 설정
+ * @param {number} allowStatusCode - 성공으로 처리하는 status code (기본값: undefined)
  * @returns {Object} - k6 부하 테스트 옵션
  */
-export const getOptions = () => {
-  return {
-    vus: 10,         // 가상 사용자 수
-    duration: '30s', // 테스트 시간
-    thresholds: {    // 성능 기준 설정 -> 자동 pass/fail 판정 가능
-      http_req_failed: ['rate<0.01'], // 실패율 1% 미만
-      http_req_duration: ['p(95)<500'],  // 95% 요청 응답시간이 500ms 이하
-    },
+export const getOptions = (allowStatusCode = undefined) => {
+  const selectIndex = 0;
+  const vusOption = [2, 100, 500, 1000];
+  const durationOption = ['20s', '1m', '2m', '5m'];
+
+  let options;
+
+  if (selectIndex === 4) {
+    options = {
+      stages: [
+        { duration: '1m', target: 10 },
+        { duration: '3m', target: 500 },
+        { duration: '5m', target: 1000 },
+        { duration: '2m', target: 0 },
+      ],
+    };
+  } else {
+    options = {
+      vus: vusOption[selectIndex],           // 가상 사용자 수
+      duration: durationOption[selectIndex], // 테스트 시간
+    };
   }
 
-  // [ 테스트 옵션 ]
-  // 기본 부하 테스트 - vus: 10, duration : '30s' (소규모 트래픽 시나리오, 빠른 결과 확인)
-  // 중간 부하 테스트 - vus: 50,  duration : '1m' (어느 정도 트래픽이 있는 상황을 시뮬레이션, 성능 병목 확인용)
-  // 고부하 테스트    - vus: 200, duration : '5m' (서버 최대 처리 능력 확인, 시스템 안정성 점검)
+  options.thresholds = {              // 성능 기준 설정 -> 자동 pass/fail 판정 가능
+    http_req_failed: ['rate<0.01'],   // 실패율 1% 미만
+    http_req_duration: ['p(95)<500'], // 95% 요청 응답시간이 500ms 이하
+  };
 
-  // 점진적 증가 : 실제 트래픽 변화처럼 점진적으로 부하 조절 가능, 시스템의 동적 반응 확인에 유용
-  // return {
-  //   stages : [
-  //     { duration: '1m', target: 10 }, // 0~1분(1분간) : 10명까지 점진 증가
-  //     { duration: '2m', target: 50 }, // 1~3분(2분간) : 50명까지 유지/증가
-  //     { duration: '3m', target: 0 },  // 3~6분(3분간) : 사용자 0명으로 감소
-  //   ],
-  //   thresholds: {
-  //     http_req_duration: ['p(95)<500'],
-  //   },
-  // }
+  // 성공으로 처리할 status code가 있다면 설정
+  if (allowStatusCode) {
+    options.ext = {
+      loadimpact: {
+        expected_response: {
+          status: [allowStatusCode],
+        },
+      },
+    };
+  }
+
+  return options;
 }
 
 /**

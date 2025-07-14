@@ -93,7 +93,7 @@ export const createStore = ({ vu = 1, iter = 0, loadBusinessNumbers, overrides =
   return {
     store_name: `k6 테스트 store-${uniqueSuffix}`,
     business_number: selectedBusinessNumber,
-    address: '서울특별시 중구 세종대로 80 지하1층',
+    address: '서울 중구 세종대로 80 지하1층',
     phone: `010-${getRandomNumber(4)}-${getRandomNumber(4)}`,
     opening_hours: '영업시간',
     menus: [

@@ -10,8 +10,8 @@ import { parseJson } from './common.js';
  * @returns {string} - JWT 토큰 (로그인 실패 시 빈 문자열)
  */
 export const loginAndGetToken = (email, password) => {
-  const loginEmail = email || 'hong@mail.com';
-  const loginPassword = password || '111111';
+  const loginEmail = email || __ENV.EMAIL || 'hong@mail.com';
+  const loginPassword = password || __ENV.PASSWORD || '111111';
 
   const url = `${BASE_URL}/users/login`;
   const payload = JSON.stringify({ email: loginEmail, password: loginPassword });
@@ -29,8 +29,8 @@ export const loginAndGetToken = (email, password) => {
     const json = parseJson(res, 'auth');
 
     const success = check(res, {
-      '(auth) 로그인 성공': (r) => r.status === 200,
-      '(auth) 토큰 확인': () => json?.data?.token && typeof json.data.token === 'string',
+      '[인증] 로그인 성공': (r) => r.status === 200,
+      '[인증] 토큰 확인': () => json?.data?.token && typeof json.data.token === 'string',
     });
 
     if (!success) {
@@ -59,3 +59,12 @@ export const loginAndGetToken = (email, password) => {
 
   return token;
 }
+
+export const getTokenOrFail = () => {
+  const token = loginAndGetToken();
+  if (!token) {
+    console.error('❌ 토큰 발급 실패 - 사용자 인증 불가');
+    throw new Error('토큰 발급 실패');
+  }
+  return token;
+};

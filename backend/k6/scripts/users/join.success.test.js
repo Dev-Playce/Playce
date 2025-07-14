@@ -9,19 +9,19 @@ export const options = getOptions();
 
 export const joinSuccessTest = (newUser, cleanupAfterTest = false) => {
   const url = `${BASE_URL}/users/join`;
-  const payload = JSON.stringify(newUser);
+  const payload = newUser;
   const params = {
     headers: {
       ...DEFAULT_HEADERS,
     }
   };
 
-  const res = http.post(url, payload, params); // 요청 보내기
+  const res = http.post(url, JSON.stringify(payload), params); // 요청 보내기
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 201`]: (r) => r.status === 201,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('회원가입이 완료되었습니다.'),
+    [`[${CONTEXT}] 성공 : status is 201`]: (r) => r.status === 201,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('회원가입이 완료되었습니다.'),
   });
 
   if (!success) {
@@ -39,7 +39,7 @@ export const joinSuccessTest = (newUser, cleanupAfterTest = false) => {
 
   }
 
-  sleep(1);
+  // sleep(1);
   return success ? newUserId : null;
 }
 

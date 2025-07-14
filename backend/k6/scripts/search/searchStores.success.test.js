@@ -22,8 +22,8 @@ export const searchStoresSuccessTest = (query = {}) => {
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('통합 검색 성공'),
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('통합 검색 성공'),
   });
 
   if (!success) {
@@ -34,16 +34,20 @@ export const searchStoresSuccessTest = (query = {}) => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
 };
 
-export default function () {
+export function setup () {
   const query = {
     // search: '플레이스',
-    // sport: 'soccer',
+    // sport: '축구',
     // league: 'K League',
     big_region: '서울특별시',
-    // small_region: '강남구',
+    small_region: '강남구',
   };
-  searchStoresSuccessTest(query);
+  return { query };
+}
+
+export default function (data) {
+  searchStoresSuccessTest(data.query);
 }

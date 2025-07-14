@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
-import { loginAndGetToken } from '../../utils/auth.js';
+import { getTokenOrFail } from '../../utils/auth.js';
 import { getBusinessNumbers, createStore } from '../../utils/factories.js';
 
 const CONTEXT = '식당 등록';
@@ -33,11 +33,11 @@ export const createStoreSuccessTest = (token, newStore, cleanupAfterTest = false
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 201 or 409`]: (r) => r.status === 201 || r.status === 409,
-    '성공 메시지 확인': () => 
-      json?.success === true
-      || json?.message?.includes('식당이 등록되었습니다.') 
-      || json?.message?.includes('이미 등록된 사업자등록번호입니다.'),
+    [`[${CONTEXT}] 성공 : status is 201`]: (r) => r.status === 201, //|| r.status === 409,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => 
+      json?.success === true && json?.message?.includes('식당이 등록되었습니다.'),
+      //|| json?.message?.includes('식당이 등록되었습니다.') 
+      //|| json?.message?.includes('이미 등록된 사업자등록번호입니다.'),
   });
 
   if (!success) {
@@ -68,26 +68,22 @@ export const createStoreSuccessTest = (token, newStore, cleanupAfterTest = false
     }
   }
 
-  sleep(1);
+  // sleep(1);
   return newStoreId;
 };
 
 export function setup () {
+  const token = getTokenOrFail();
   const businessNumbers = getBusinessNumbers();
-  return { businessNumbers };
+  return { token, businessNumbers };
 }
 
 export default function (data) {
-  const token = loginAndGetToken(__ENV.EMAIL, __ENV.PASSWORD);
+  const newStore = createStore({
+    vu: __VU,
+    iter: __ITER,
+    loadBusinessNumbers: data.businessNumbers,
+  });
 
-  if (token) {
-    const newStore = createStore({
-      vu: __VU,
-      iter: __ITER,
-      loadBusinessNumbers: data.businessNumbers,
-    });
-    createStoreSuccessTest(token, newStore, true); // 테스트 후 DB 초기화 : true
-  } else {
-    console.error('❌ 토큰 발급 실패 - 사용자 인증 불가');
-  }
+  createStoreSuccessTest(data.token, newStore, true); // 테스트 후 DB 초기화 : true
 }

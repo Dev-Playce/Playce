@@ -2,10 +2,10 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
-import { loginAndGetToken } from '../../utils/auth.js';
+import { getTokenOrFail } from '../../utils/auth.js';
 
 const CONTEXT = '즐겨찾기 추가';
-export const options = getOptions();
+export const options = getOptions(); // 중복 추가(409) 허용?
 
 export const addFavoriteSuccessTest = (token, storeId, cleanupAfterTest = false) => {
   const url = `${BASE_URL}/favorites/${storeId}`;
@@ -16,15 +16,15 @@ export const addFavoriteSuccessTest = (token, storeId, cleanupAfterTest = false)
     },
   };
 
-  const res = http.post(url, null, params); // 요청 보내기
+  const res = http.post(url, params); // 요청 보내기
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 201 or 409`]: (r) => r.status === 201 || r.status === 409,
-    '성공 메시지 확인': () => 
-      json?.success === true 
-      || json?.message?.includes('즐겨찾기가 추가되었습니다.')
-      || json?.message?.includes('이미 즐겨찾기에 추가된 식당입니다.'), // 거의 동시에 추가되기 때문에 허용하지 않으면 실패 많음
+    [`[${CONTEXT}] 성공 : status is 201`]: (r) => r.status === 201, //|| r.status === 409,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => 
+      json?.success === true && json?.message?.includes('즐겨찾기가 추가되었습니다.'),
+      // || json?.message?.includes('즐겨찾기가 추가되었습니다.')
+      // || json?.message?.includes('이미 즐겨찾기에 추가된 식당입니다.'), // 거의 동시에 추가되기 때문에 허용하지 않으면 실패 많음
   });
 
   if (!success) {
@@ -54,19 +54,19 @@ export const addFavoriteSuccessTest = (token, storeId, cleanupAfterTest = false)
     }
   }
 
-  sleep(1);
+  // sleep(1);
   return storeId;
 }
 
-export default function () {
-  const token = loginAndGetToken(__ENV.EMAIL, __ENV.PASSWORD);
+export function setup () {
+  const token = getTokenOrFail();
+  return { token };
+}
 
-  if (token) {
-    const storeIdList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]; // 테스트용 식당 ID 목록
-    const storeId = storeIdList[__VU % storeIdList.length];
-    
-    addFavoriteSuccessTest(token, storeId, true); // 테스트 전 DB 초기화(true)
-  } else {
-    console.error('❌ 토큰 발급 실패 - 사용자 인증 불가');
-  }
+
+export default function (data) {
+  const storeIdList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]; // 테스트용 식당 ID 목록
+  const storeId = storeIdList[__VU % storeIdList.length];
+  
+  addFavoriteSuccessTest(data.token, storeId, true); // 테스트 전 DB 초기화(true)
 }

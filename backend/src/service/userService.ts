@@ -82,13 +82,13 @@ const userService = {
   },
   // 3. 비밀번호 초기화 요청
   requestResetPassword: async (email: string) => {
-    console.log("👤 유저 : 3. 비밀번호 초기화 요청");
+    log("👤 유저 : 3. 비밀번호 초기화 요청");
 
     const user = await userRepository.findOneBy({ email });
     if (!user) {
       throw createError("해당 사용자를 찾을 수 없습니다.", 404);
     }
-    console.log("✅ 사용자 존재 확인 - 이메일:", email);
+    log("✅ 사용자 존재 확인 - 이메일:", email);
 
     const jwtSecret = process.env.PRIVATE_KEY;
     if (!jwtSecret) {
@@ -98,7 +98,7 @@ const userService = {
     const token = jwt.sign({ email: user.email }, jwtSecret, {
       expiresIn: "30m",
     });
-    console.log("🔐 비밀번호 초기화 토큰 생성 완료");
+    log("🔐 비밀번호 초기화 토큰 생성 완료");
 
     const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
     const resetUrl = `${clientUrl}/reset-password/${token}`;
@@ -110,11 +110,11 @@ const userService = {
       html,
     });
 
-    console.log("📩 비밀번호 재설정 이메일 전송 완료 - 수신자:", email);
+    log("📩 비밀번호 재설정 이메일 전송 완료 - 수신자:", email);
   },
   // 4. 비밀번호 초기화
   resetPassword: async (resetToken: string, newPassword: string) => {
-    console.log("👤 유저 : 4. 비밀번호 초기화");
+    log("👤 유저 : 4. 비밀번호 초기화");
 
     const jwtSecret = process.env.PRIVATE_KEY;
     if (!jwtSecret) {
@@ -125,7 +125,7 @@ const userService = {
       // 🔐 토큰 검증
       const decoded = jwt.verify(resetToken, jwtSecret) as { email: string };
       const email = decoded.email;
-      console.log("✅ 토큰 검증 성공 - 이메일:", email);
+      log("✅ 토큰 검증 성공 - 이메일:", email);
 
       // 👤 사용자 존재 확인
       const user = await userRepository.findOneBy({ email });
@@ -137,7 +137,7 @@ const userService = {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       await userRepository.update({ email }, { password: hashedPassword });
 
-      console.log("🔐 비밀번호 초기화 완료");
+      log("🔐 비밀번호 초기화 완료");
     } catch (err) {
       console.error("❌ 비밀번호 초기화 실패:", err);
       throw createError("유효하지 않거나 만료된 토큰입니다.", 400);
@@ -150,8 +150,8 @@ const userService = {
       select: ["email", "name", "nickname", "phone"],
     });
 
-    console.log("[UserService] 사용자 정보 조회 성공");
-    console.log("응답 데이터:", user);
+    log("[UserService] 사용자 정보 조회 성공");
+    log("응답 데이터:", user);
     return user;
   },
 

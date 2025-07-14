@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { BASE_URL } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
-import { loginAndGetToken } from '../../utils/auth.js';
+import { getTokenOrFail } from '../../utils/auth.js';
 import { createBroadcast } from '../../utils/factories.js';
 import { createBroadcastSuccessTest } from './createBroadcast.success.test.js';
 
@@ -17,12 +17,12 @@ export const deleteBroadcastSuccessTest = (token, broadcastId) => {
     },
   };
 
-  const res = http.del(url, null, params); // 요청 보내기
+  const res = http.del(url, params); // 요청 보내기
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('중계 일정이 삭제되었습니다.'),
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('중계 일정이 삭제되었습니다.'),
   });
 
   if (!success) {
@@ -33,22 +33,21 @@ export const deleteBroadcastSuccessTest = (token, broadcastId) => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
 };
 
-export default function () {
-  const token = loginAndGetToken(__ENV.EMAIL, __ENV.PASSWORD);
+export function setup () {
+  const token = getTokenOrFail();
+  return { token };
+}
 
-  if (token) {
-    // 1. 중계 일정 등록 (테스트 선행 작업)
-    const newBroadcast = createBroadcast({ vu: __VU, iter: __ITER });
-    const broadcastId = createBroadcastSuccessTest(token, newBroadcast, false); // 테스트 후 DB 초기화(false)
-    
-    // 2. 중계 일정 삭제
-    if (broadcastId) {
-      deleteBroadcastSuccessTest(token, broadcastId);
-    }
-  } else {
-    console.error('❌ 토큰 발급 실패 - 사용자 인증 불가');
+export default function (data) {
+  // 1. 중계 일정 등록 (테스트 선행 작업)
+  const newBroadcast = createBroadcast({ vu: __VU, iter: __ITER });
+  const broadcastId = createBroadcastSuccessTest(data.token, newBroadcast, false); // 테스트 후 DB 초기화(false)
+  
+  // 2. 중계 일정 삭제
+  if (broadcastId) {
+    deleteBroadcastSuccessTest(data.token, broadcastId);
   }
 }

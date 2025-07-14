@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
-import { loginAndGetToken } from '../../utils/auth.js';
+import { getTokenOrFail } from '../../utils/auth.js';
 
 const CONTEXT = '특정 식당의 중계 일정 목록 조회';
 export const options = getOptions();
@@ -20,8 +20,8 @@ export const getBroadcastsByStoreSuccessTest = (token, storeId) => {
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`${CONTEXT} - 성공 : status is 200`]: (r) => r.status === 200,
-    '성공 메시지 확인': () => json?.success === true && json?.message?.includes('중계 일정 조회 성공'),
+    [`[${CONTEXT}] 성공 : status is 200`]: (r) => r.status === 200,
+    [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('중계 일정 조회 성공'),
   });
 
   if (!success) {
@@ -32,16 +32,15 @@ export const getBroadcastsByStoreSuccessTest = (token, storeId) => {
     });
   }
 
-  sleep(1);
+  // sleep(1);
 };
 
-export default function () {
-  const token = loginAndGetToken(__ENV.EMAIL, __ENV.PASSWORD);
+export function setup () {
+  const token = getTokenOrFail();
+  const storeId = __ENV.STORE_ID || 1;
+  return { token, storeId };
+}
 
-  if (token) {
-    const storeId = __ENV.STORE_ID || 1;
-    getBroadcastsByStoreSuccessTest(token, storeId);
-  } else {
-    console.error('❌ 토큰 발급 실패 - 사용자 인증 불가');
-  }
+export default function (data) {
+  getBroadcastsByStoreSuccessTest(data.token, data.storeId);
 }

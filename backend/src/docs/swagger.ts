@@ -8,10 +8,14 @@ const swaggerDefinition = {
         description: "Playce 서비스 API 명세서",
     },
     servers: [
-        {
-            url: "http://3.35.146.155:3000",
-            description: "EC2 배포 서버",
-        }
+      {
+          url: "http://3.35.146.155:3000",
+          description: "EC2 배포 서버",
+      },
+      {
+        url: `http://localhost:${process.env.PORT || 3000}`,
+        description: "로컬 개발 서버",
+      },
     ],
     // 토큰 인증 
     components: {
