@@ -10,10 +10,12 @@ import { formatTime } from "../../../../utils/formatTime";
 import { fetchSports } from "../../../../api/staticdata.api";
 import useMypageStore from "../../../../stores/mypageStore";
 
-
 const TabList = () => {
   const { year, month, date, setDate } = useBroadcastStore();
-  const tabRef = useRef<HTMLDivElement>(null);
+  const tabRef = useRef<HTMLDivElement>(
+    null
+  ) as React.RefObject<HTMLDivElement>;
+  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const scrollAmount = 150;
   const {
     broadcastLists = [],
@@ -23,11 +25,23 @@ const TabList = () => {
   const { setEditingId } = useBroadcastFormStore();
   const { setRestaurantSubpage } = useMypageStore();
 
-  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const [, setSports] = useState<{ id: number; name: string }[]>([]);
 
   useEffect(() => {
     fetchSports().then(setSports);
+  }, []);
+
+  useEffect(() => {
+    setTabRef(tabRef);
+    setItemRefs(itemRefs);
+  }, []);
+
+  const { setTabRef, setItemRefs, scrollToTodayCenter } = useBroadcastStore();
+
+  useEffect(() => {
+    setTimeout(() => {
+      scrollToTodayCenter();
+    }, 0);
   }, []);
 
   const handleScrollLeft = () => {
@@ -50,20 +64,6 @@ const TabList = () => {
   const broadcastsForSelectedDate = broadcastLists
     .filter((b) => b.match_date === currentDate)
     .sort((a, b) => a.match_time.localeCompare(b.match_time));
-
-  useEffect(() => {
-    const scrollContainer = tabRef.current;
-    const targetItem = itemRefs.current.get(date);
-    if (scrollContainer && targetItem) {
-      requestAnimationFrame(() => {
-        const scrollTo =
-          targetItem.offsetLeft +
-          targetItem.offsetWidth / 2 -
-          scrollContainer.offsetWidth * 1.5;
-        scrollContainer.scrollTo({ left: scrollTo, behavior: "smooth" });
-      });
-    }
-  }, [year, month, date]);
 
   const handleDelete = async (id: number) => {
     if (!confirm("중계 일정을 삭제하시겠습니까?")) return;

@@ -26,9 +26,15 @@ interface BoradcastState {
   setStore: (r: string, rId: number) => void;
   setViewOption: (view: TViewOption) => void;
   setBroadcastLists: (broadcasts: Broadcast[]) => void;
+  tabRef: React.RefObject<HTMLDivElement> | null;
+  itemRefs: React.RefObject<Map<number, HTMLDivElement>> | null;
+  setTabRef: (ref: React.RefObject<HTMLDivElement>) => void;
+  setItemRefs: (ref: React.RefObject<Map<number, HTMLDivElement>>) => void;
+
+  scrollToTodayCenter: () => void;
 }
 
-const useBroadcastStore = create<BoradcastState>((set) => ({
+const useBroadcastStore = create<BoradcastState>((set, get) => ({
   year: dateInfo.yearNum,
   month: dateInfo.monthNum + 1,
   date: dateInfo.dateNum,
@@ -59,6 +65,28 @@ const useBroadcastStore = create<BoradcastState>((set) => ({
     set({ viewOption: view });
   },
   setBroadcastLists: (broadcasts) => set({ broadcastLists: broadcasts }),
+  tabRef: null,
+  itemRefs: null,
+  setTabRef: (ref) => set({ tabRef: ref }),
+  setItemRefs: (ref) => set({ itemRefs: ref }),
+
+  scrollToTodayCenter: () => {
+    const tabRef = get().tabRef?.current;
+    const itemRefs = get().itemRefs?.current;
+    const today = new Date();
+    const todayDate = today.getDate();
+
+    if (tabRef && itemRefs) {
+      const todayEl = itemRefs.get(todayDate);
+      if (todayEl) {
+        const scrollPos =
+          todayEl.offsetLeft + todayEl.offsetWidth / 2 - tabRef.clientWidth / 2;
+
+        tabRef.scrollTo({ left: scrollPos, behavior: "smooth" });
+        get().setDate(todayDate);
+      }
+    }
+  },
 }));
 
 export default useBroadcastStore;

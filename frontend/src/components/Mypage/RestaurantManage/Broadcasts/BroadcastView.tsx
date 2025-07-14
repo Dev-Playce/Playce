@@ -32,6 +32,7 @@ const BroadcastView = () => {
     setViewOption,
     storeId,
     setBroadcastLists,
+    scrollToTodayCenter,
   } = useBroadcastStore();
 
   const { editingId } = useBroadcastFormStore();
@@ -107,6 +108,10 @@ const BroadcastView = () => {
             setYear(todayYear);
             setMonth(todayMonth);
             setDate(todayDate);
+
+            setTimeout(() => {
+              scrollToTodayCenter();
+            }, 0);
           }}
         >
           오늘
@@ -152,11 +157,7 @@ const BroadcastView = () => {
 
       <div className="relative h-full w-full">
         <div className="min-h-[400px]">
-          {viewOption === "calendar" ? (
-            <Calendar />
-          ) : (
-            <TabList />
-          )}
+          {viewOption === "calendar" ? <Calendar /> : <TabList />}
         </div>
 
         <FloatingRegisterButton

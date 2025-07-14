@@ -267,7 +267,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         {/* 약관동의 체크박스: 등록(create) 모드에서만 노출 */}
         {mode === "create" && (
           <>
-            <div className="flex items-start gap-2 mt-2">
+            <div className="flex mt-5 items-start gap-2 ">
               <input
                 type="checkbox"
                 id="agreement"
@@ -299,7 +299,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         <div className="flex justify-end gap-2 mt-4">
           <button
             type="submit"
-            className="px-4 py-2 rounded bg-emerald-500 text-white font-bold"
+            className="px-4 py-2 rounded bg-primary5 text-white font-bold"
           >
             {mode === "edit" ? "수정" : "등록"}
           </button>
