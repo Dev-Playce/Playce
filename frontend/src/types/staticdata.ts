@@ -17,7 +17,7 @@ export interface SelectedRegion {
 export interface Sport {
   id: number;
   name: string;
-  is_team_competition: boolean;
+  isTeamCompetition: boolean;
 }
 
 export interface League {
