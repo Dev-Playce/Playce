@@ -62,7 +62,7 @@ const MypageModal = ({ onClose }: MypageProps) => {
                   onClick={() => {
                     setRestaurantSubpage("restaurant-register");
                   }}
-                  className="absolute bottom-10 right-10 w-12 h-12 rounded-full bg-primary5 text-white shadow-lg flex items-center justify-center"
+                  className="absolute bottom-10 right-10 w-12 h-12 rounded-full bg-primary5 text-mainText hover:bg-primary1 text-white shadow-lg flex items-center justify-center"
                 >
                   <FiPlus />
                 </button>
