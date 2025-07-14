@@ -1,10 +1,10 @@
 import { AppDataSource } from "../data-source";
 import { Store } from "../entities/Store";
 import { SmallRegion } from "../entities/SmallRegion";
-import { BigRegion } from "../entities/BigRegion";
 import { Sport } from "../entities/Sport";
 import { League } from "../entities/League";
 import { Brackets } from "typeorm";
+import crypto from "crypto"; // 해시 생성용
 
 const searchService = {
   getNearbyStores: async (lat: number, lng: number, radius: number = 5) => {
@@ -91,12 +91,15 @@ const searchService = {
 
     if (search) {
       query.andWhere(
-        "store.storeName LIKE :search OR store.address LIKE :search",
-        { search: `%${search}%` }
+        new Brackets(qb => {
+          qb.where("store.storeName LIKE :search", { search: `%${search}%` })
+            .orWhere("store.address LIKE :search", { search: `%${search}%` })
+            .orWhere("broadcast.teamOne LIKE :search", { search: `%${search}%` })
+            .orWhere("broadcast.teamTwo LIKE :search", { search: `%${search}%` });
+        })
       );
     }
 
-    // ⚽ 스포츠/리그 필터링 (지역과 같은 로직)
     if (sports.length > 0) {
       const matchedSports = await sportRepo
         .createQueryBuilder("sport")
@@ -129,14 +132,13 @@ const searchService = {
       query.andWhere("league.name IN (:...leagues)", { leagues });
     }
 
-    if (team) {
-      query.andWhere(
-        "broadcast.teamOne = :team OR broadcast.teamTwo = :team",
-        { team }
-      );
-    }
+    // if (team) {
+    //   query.andWhere(
+    //     "broadcast.teamOne = :team OR broadcast.teamTwo = :team",
+    //     { team }
+    //   );
+    // }
 
-    // 🏙 지역 필터링
     if (small_regions.length > 0) {
       const matchedSmallRegions = await smallRegionRepo
         .createQueryBuilder("smallRegion")
@@ -164,7 +166,6 @@ const searchService = {
       query.andWhere("bigRegion.name IN (:...bigRegions)", { bigRegions: big_regions });
     }
 
-    // 🔤 정렬
     if (sort === "name") {
       query.orderBy("store.storeName", "ASC");
     } else if (sort === "date") {
@@ -173,7 +174,7 @@ const searchService = {
 
     const stores = await query.getMany();
 
-    return stores.map((store) => {
+    const response = stores.map((store) => {
       const latestBroadcast = store.broadcasts
         .slice()
         .sort((a, b) => {
@@ -203,6 +204,7 @@ const searchService = {
           : null,
       };
     });
+    return response;
   },
 };
 

@@ -123,7 +123,7 @@ router.get("/nearby", NearbySearchValidator, searchController.getNearbyStores);
  *         schema:
  *           type: string
  *           example: 플레이스
- *         description: 식당 이름 검색 키워드
+ *         description: 식당 이름, 팀 이름, 주소
  *       - in: query
  *         name: sports
  *         required: false
@@ -147,13 +147,6 @@ router.get("/nearby", NearbySearchValidator, searchController.getNearbyStores);
  *           example: [K League, KBO]
  *         description: "리그 (예: 프리미어리그)"
  *       - in: query
- *         name: team
- *         required: false
- *         schema:
- *           type: string
- *           example: FC 서울
- *         description: 응원팀
- *       - in: query
  *         name: big_regions
  *         required: false
  *         schema:
@@ -162,7 +155,7 @@ router.get("/nearby", NearbySearchValidator, searchController.getNearbyStores);
  *             type: string  
  *           style: form
  *           explode: true
- *           example: [서울특별시, 경기도]
+ *           example: [서울, 경기]
  *         description: 도단위 지역명
  *       - in: query
  *         name: small_regions
@@ -237,7 +230,7 @@ router.get("/nearby", NearbySearchValidator, searchController.getNearbyStores);
  *                             example: K League
  *                           team_one:
  *                             type: string
- *                             example: FC서울
+ *                             example: FC 서울
  *                           team_two:
  *                             type: string
  *                             example: 수원삼성

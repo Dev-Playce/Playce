@@ -38,13 +38,13 @@ const createBroadcast = async (data: any, userId: number) => {
 
   if (!sport.isTeamCompetition) {
     if (data.team_one || data.team_two) {
-      data.team_one = undefined;
-      data.team_two = undefined;
       throw createError(
         `해당 스포츠(${sport.name})는 팀 이름을 입력할 필요가 없습니다.`,
         400
       );
     }
+    data.team_one = undefined;
+    data.team_two = undefined;
   }
 
   const newBroadcast = broadcastRepo.create({
@@ -64,39 +64,26 @@ const createBroadcast = async (data: any, userId: number) => {
 };
 
 // 중계 일정 수정
-const updateBroadcast = async (
-  broadcastId: number,
-  data: any,
-  userId: number
-) => {
+const updateBroadcast = async (broadcastId: number, data: any, userId: number) => {
   log(`\n✏️ [중계 일정 수정] broadcastId: ${broadcastId}`);
   const broadcast = await broadcastRepo.findOne({
     where: { id: broadcastId },
     relations: ["store", "store.user", "sport", "league"],
   });
   if (!broadcast) throw createError("해당 중계 일정을 찾을 수 없습니다.", 404);
-
   if (broadcast.store.user.id !== userId)
     throw createError("해당 중계 일정의 수정 권한이 없습니다.", 403);
-
-  // if (data.store_id && data.store_id !== broadcast.store.id) {
-  //   const store = await checkStoreOwnership(data.store_id, userId);
-  //   broadcast.store = store;
-  //   log(`- store 변경 완료 -> storeId: ${data.store_id}`);
-  // }
 
   if (data.sport_id) {
     const sport = await sportRepo.findOneBy({ id: data.sport_id });
     if (!sport) throw createError("해당 스포츠를 찾을 수 없습니다.", 404);
     broadcast.sport = sport;
-    log(`- sport 변경 완료 -> sportId: ${data.sport_id}`);
   }
 
   if (data.league_id) {
     const league = await leagueRepo.findOneBy({ id: data.league_id });
     if (!league) throw createError("해당 리그를 찾을 수 없습니다.", 404);
     broadcast.league = league;
-    log(`- league 변경 완료 -> leagueId: ${data.league_id}`);
   }
 
   broadcast.matchDate = data.match_date ?? broadcast.matchDate;
@@ -118,7 +105,6 @@ const deleteBroadcast = async (broadcastId: number, userId: number) => {
     relations: ["store", "store.user"],
   });
   if (!broadcast) throw createError("삭제할 중계 일정이 없습니다.", 404);
-
   if (broadcast.store.user.id !== userId)
     throw createError("해당 중계 일정의 삭제 권한이 없습니다.", 403);
 
@@ -135,13 +121,14 @@ const getBroadcastsByStore = async (storeId: number) => {
   });
 
   const responseData = broadcasts.map((b) => ({
-    match_data: b.matchDate,
+    broadcast_id: b.id,
+    match_date: b.matchDate,
     match_time: b.matchTime.slice(0, 5),
     sport: b.sport.name,
     league: b.league.name,
     team_one: b.teamOne,
     team_two: b.teamTwo,
-    ect: b.etc,
+    etc: b.etc,
   }));
   log(`✅ 조회 완료 - ${broadcasts.length}건`);
   return responseData;
