@@ -13,7 +13,9 @@ const LeagueSelect = ({
 }: LeagueSelectProps) => {
   return (
     <div>
-      <label className="mb-2 block text-mainText">리그</label>
+      <label className="mb-2 block font-semibold text-mainText">
+        리그 <span className="text-red-500">*</span>
+      </label>
       <select
         value={value}
         onChange={(e) => {

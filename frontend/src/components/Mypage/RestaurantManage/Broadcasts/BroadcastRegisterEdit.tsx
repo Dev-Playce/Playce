@@ -12,6 +12,7 @@ import SportSelect from "../../../Select/SportSelect";
 import LeagueSelect from "../../../Select/LeagueSelect";
 import type { BroadcastRegisterEditProps } from "../../../../types/broadcastForm";
 import useMypageStore from "../../../../stores/mypageStore";
+import type { Sport, League } from "../../../../types/staticdata";
 
 const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
   const {
@@ -33,9 +34,10 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
   } = useBroadcastFormStore();
 
   const { broadcastLists } = useBroadcastStore();
-  const [sports, setSports] = useState<{ id: number; name: string }[]>([]);
-  const [leagues, setLeagues] = useState<{ id: number; name: string }[]>([]);
+  const [sports, setSports] = useState<Sport[]>([]);
+  const [leagues, setLeagues] = useState<League[]>([]);
   const { setRestaurantSubpage } = useMypageStore();
+  const [isTeamCompetition, setIsTeamCompetition] = useState(true);
 
   useEffect(() => {
     fetchSports().then(setSports);
@@ -43,7 +45,7 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
 
   useEffect(() => {
     if (sportId) {
-      fetchLeagues(sportId).then((res: { id: number; name: string }[]) => {
+      fetchLeagues(sportId).then((res: League[]) => {
         setLeagues(res);
         const leagueIds = res.map((l) => l.id);
         if (leagueId !== null && !leagueIds.includes(leagueId)) {
@@ -67,32 +69,35 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
         return;
       }
 
-      fetchSports().then((sports: { id: number; name: string }[]) => {
-        const sportMatch = sports.find(
-          (s: { id: number; name: string }) => s.name === target.sport
-        );
+      fetchSports().then((sports: Sport[]) => {
+        setSports(sports);
+        const sportMatch = sports.find((s) => s.name === target.sport);
         if (sportMatch) {
           handleSportChange(sportMatch.name, sportMatch.id);
-          fetchLeagues(sportMatch.id).then(
-            (leagues: { id: number; name: string }[]) => {
-              const leagueMatch = leagues.find(
-                (l: { id: number; name: string }) => l.name === target.league
-              );
-              if (leagueMatch) {
-                handleLeagueChange(leagueMatch.name, leagueMatch.id);
-              }
 
-              setInitialForm({
-                date: dayjs(target.match_date),
-                time: dayjs(target.match_time, "HH:mm"),
-                sport: target.sport,
-                league: target.league,
-                team1: target.team_one,
-                team2: target.team_two,
-                note: target.etc,
-              });
+          setIsTeamCompetition(sportMatch.isTeamCompetition);
+          if (!sportMatch.isTeamCompetition) {
+            setteam1("");
+            setteam2("");
+          }
+
+          fetchLeagues(sportMatch.id).then((leagues: League[]) => {
+            setLeagues(leagues);
+            const leagueMatch = leagues.find((l) => l.name === target.league);
+            if (leagueMatch) {
+              handleLeagueChange(leagueMatch.name, leagueMatch.id);
             }
-          );
+
+            setInitialForm({
+              date: dayjs(target.match_date),
+              time: dayjs(target.match_time, "HH:mm"),
+              sport: target.sport,
+              league: target.league,
+              team1: target.team_one,
+              team2: target.team_two,
+              note: target.etc,
+            });
+          });
         }
       });
     }
@@ -130,7 +135,6 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
         alert("중계 일정 수정 완료");
         setRestaurantSubpage("schedule-view-broadcasts");
       }
-
     } catch {
       alert(`오류가 발생했습니다. 다시 시도해주세요.`);
     }
@@ -140,18 +144,22 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex gap-4">
         <div className="flex-1 min-w-[180px]">
-          <label className="block mb-1 text-mainText">날짜</label>
+          <label className="block mb-1 font-semibold text-mainText">
+            날짜 <span className="text-red-500">*</span>
+          </label>
           <DatePicker
-            className="w-full"
+            className="w-full py-2 border-gray-200"
             value={date}
             onChange={(v) => v && setDate(v)}
             getPopupContainer={(trigger) => trigger.parentNode as HTMLElement}
           />
         </div>
         <div className="flex-1 min-w-[180px]">
-          <label className="block mb-1 text-mainText">시간</label>
+          <label className="block mb-1 font-semibold text-mainText">
+            시간 <span className="text-red-500">*</span>
+          </label>
           <TimePicker
-            className="w-full"
+            className="w-full py-2 border-gray-200"
             format="HH:mm"
             value={time}
             onChange={(v) => setTime(v)}
@@ -165,7 +173,17 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
           <SportSelect
             value={sportId ?? ""}
             options={sports}
-            onChange={(id, name) => handleSportChange(name, id)}
+            onChange={(id, name) => {
+              handleSportChange(name, id);
+              const selected = sports.find((s) => s.id === id);
+              if (selected) {
+                setIsTeamCompetition(selected.isTeamCompetition);
+                if (!selected.isTeamCompetition) {
+                  setteam1("");
+                  setteam2("");
+                }
+              }
+            }}
           />
         </div>
         <div className="flex-1 min-w-[180px]">
@@ -180,25 +198,37 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
 
       <div className="flex gap-4">
         <div className="flex-1 min-w-[180px]">
-          <label className="block mb-1 text-mainText">팀 1</label>
+          <label className="block mb-1 font-semibold text-mainText">팀 1</label>
           <input
+            placeholder={
+              isTeamCompetition
+                ? "팀 이름을 입력해주세요."
+                : "팀 입력이 필요하지 않습니다."
+            }
             value={team1 ?? ""}
             onChange={(e) => setteam1(e.target.value)}
+            disabled={!isTeamCompetition}
             className="w-full border px-3 py-2 rounded"
           />
         </div>
         <div className="flex-1 min-w-[180px]">
-          <label className="block mb-1 text-mainText">팀 2</label>
+          <label className="block mb-1 font-semibold text-mainText">팀 2</label>
           <input
+            placeholder={
+              isTeamCompetition
+                ? "팀 이름을 입력해주세요."
+                : "팀 입력이 필요하지 않습니다."
+            }
             value={team2 ?? ""}
             onChange={(e) => setteam2(e.target.value)}
+            disabled={!isTeamCompetition}
             className="w-full border px-3 py-2 rounded"
           />
         </div>
       </div>
 
       <div>
-        <label className="block mb-1 text-mainText">기타</label>
+        <label className="block mb-1 font-semibold text-mainText">기타</label>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}

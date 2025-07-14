@@ -5,20 +5,13 @@ import { useRef, useEffect, useState } from "react";
 import useBroadcastStore from "../../../../stores/broadcastStore";
 import useBroadcastFormStore from "../../../../stores/broadcastFormStore";
 import BroadcastActionButtons from "./BroadcastActionButtons";
-import {
-  deleteBroadcast,
-  getBroadcast,
-} from "../../../../api/broadcast.api";
+import { deleteBroadcast, getBroadcast } from "../../../../api/broadcast.api";
 import { formatTime } from "../../../../utils/formatTime";
 import { fetchSports } from "../../../../api/staticdata.api";
 import useMypageStore from "../../../../stores/mypageStore";
 
 
-interface TabListProps {
-  onEditClick: () => void;
-}
-
-const TabList = ({ onEditClick }: TabListProps) => {
+const TabList = () => {
   const { year, month, date, setDate } = useBroadcastStore();
   const tabRef = useRef<HTMLDivElement>(null);
   const scrollAmount = 150;
@@ -29,8 +22,6 @@ const TabList = ({ onEditClick }: TabListProps) => {
   } = useBroadcastStore();
   const { setEditingId } = useBroadcastFormStore();
   const { setRestaurantSubpage } = useMypageStore();
-
-
 
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const [, setSports] = useState<{ id: number; name: string }[]>([]);
@@ -87,9 +78,14 @@ const TabList = ({ onEditClick }: TabListProps) => {
     }
   };
 
+  const today = new Date();
+  const todayDate = today.getDate();
+  const todayMonth = today.getMonth() + 1;
+  const todayYear = today.getFullYear();
+
   return (
     <div>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center mt-2">
         <button
           className="hover:cursor-pointer text-[25px] disabled:text-lightgray mr-5 outline-none"
           onClick={handleScrollLeft}
@@ -97,26 +93,42 @@ const TabList = ({ onEditClick }: TabListProps) => {
           <MdKeyboardArrowLeft />
         </button>
         <div
-          className="flex gap-3 overflow-x-auto scrollbar-hide"
+          className="flex gap-3 overflow-x-auto scrollbar-hide pt-2"
           style={{ maxWidth: "calc(100% - 60px)" }}
           ref={tabRef}
         >
-          {dateArray.map((d) => (
-            <div
-              key={d}
-              ref={(el) => {
-                if (el) itemRefs.current.set(d, el);
-                else itemRefs.current.delete(d);
-              }}
-              className={`flex flex-col justify-center items-center w-8 text-center 
-              flex-shrink-0 hover:cursor-pointer
-              ${d === date ? "text-blue-500 font-bold" : "text-black"}`}
-              onClick={() => setDate(d)}
-            >
-              <p className="text-[14px]">{getDay(year, month, d)}</p>
-              <p className="text-[19px]">{d}</p>
-            </div>
-          ))}
+          {dateArray.map((d) => {
+            const isToday =
+              d === todayDate && month === todayMonth && year === todayYear;
+
+            return (
+              <div
+                key={d}
+                ref={(el) => {
+                  if (el) itemRefs.current.set(d, el);
+                  else itemRefs.current.delete(d);
+                }}
+                className={`flex flex-col justify-center items-center w-8 text-center flex-shrink-0 hover:cursor-pointer
+                            ${
+                              d === date
+                                ? "text-primary5 font-semibold"
+                                : "text-black"
+                            }`}
+                onClick={() => setDate(d)}
+              >
+                <div
+                  className={`flex flex-col px-1 rounded h-[45px] ${
+                    isToday ? "border border-primary5" : ""
+                  }`}
+                >
+                  <p className="text-[14px] leading-tight mb-[1px]">
+                    {getDay(year, month, d)}
+                  </p>
+                  <p className="text-[19px] leading-tight">{d}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
         <button
           className="hover:cursor-pointer text-[25px] disabled:text-lightgray ml-5 outline-none"
@@ -126,32 +138,39 @@ const TabList = ({ onEditClick }: TabListProps) => {
         </button>
       </div>
 
-      <div className="mt-4 space-y-2 border-t">
+      <div className="mt-3 space-y-1 border-t">
         {broadcastsForSelectedDate.length > 0 ? (
-          broadcastsForSelectedDate.map((b) => (
-            <div key={b.broadcast_id} className="flex justify-between border-b">
-              <div className="p-3 flex flex-col text-[15px] w-0 flex-1">
-                <span className="font-semibold truncate">
-                  [{b.league}] {formatTime(b.match_time)}
-                </span>
-                <span className="text-[18px] truncate">
-                  {b.team_one} vs {b.team_two}
-                </span>
-                {b.etc && (
-                  <span className="text-darkgray truncate">{b.etc}</span>
-                )}
+          broadcastsForSelectedDate.map((b, index) => {
+            return (
+              <div
+                key={`${b.broadcast_id}-${index}`}
+                className="flex justify-between border-b"
+              >
+                <div className="p-3 flex flex-col text-[15px] w-0 flex-1">
+                  <span className="font-semibold truncate">
+                    [{b.league}] {formatTime(b.match_time)}
+                  </span>
+                  <span className="text-[16px] min-h-[18px] leading-[22px] block">
+                    {b.team_one && b.team_two
+                      ? `${b.team_one} vs ${b.team_two}`
+                      : ""}
+                  </span>
+                  {b.etc && (
+                    <span className="text-darkgray truncate">{b.etc}</span>
+                  )}
+                </div>
+                <div className="p-3 flex text-[25px] gap-6 items-center shrink-0">
+                  <BroadcastActionButtons
+                    onEdit={() => {
+                      setEditingId(b.broadcast_id);
+                      setRestaurantSubpage("broadcast-edit");
+                    }}
+                    onDelete={() => handleDelete(b.broadcast_id)}
+                  />
+                </div>
               </div>
-              <div className="p-3 flex text-[25px] gap-6 items-center shrink-0">
-                <BroadcastActionButtons
-                  onEdit={() => {
-                    setEditingId(b.broadcast_id);
-                    setRestaurantSubpage("broadcast-edit");
-                  }}
-                  onDelete={() => handleDelete(b.broadcast_id)}
-                />
-              </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="p-3">중계 정보가 없습니다.</div>
         )}
