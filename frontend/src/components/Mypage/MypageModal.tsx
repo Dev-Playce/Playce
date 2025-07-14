@@ -1,4 +1,3 @@
-import { useState } from "react";
 import ModalBase from "../Common/ModalBase";
 import Sidebar from "../Mypage/Sidebar";
 import FavoriteList from "./FavoriteList";
@@ -8,14 +7,12 @@ import useMypageStore from "../../stores/mypageStore";
 import { useUserInfo } from "../../hooks/useUser";
 import { FiPlus } from "react-icons/fi";
 
-type TabType = "favorite" | "profile" | "restaurant";
-
 export interface MypageProps {
   onClose: () => void;
 }
 
 const MypageModal = ({ onClose }: MypageProps) => {
-  const [selectedTab, setSelectedTab] = useState<TabType>("favorite");
+  const { selectedTab, setSelectedTab } = useMypageStore();
   const { restaurantSubpage, setRestaurantSubpage } = useMypageStore();
 
   const handleClose = () => {

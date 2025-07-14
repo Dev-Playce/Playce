@@ -3,6 +3,8 @@ import { FiTv, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import Button from "../Common/Button";
 import type { RestaurantDetail, Broadcast } from "../../types/restaurant.types";
 import EmptyMessage from "./EmptyMessage";
+import useBroadcastStore from "../../stores/broadcastStore";
+import useMypageStore from "../../stores/mypageStore";
 
 // 날짜를 "7월 9일" 형식으로 변환
 function getKoreanDateString(dateStr: string): string {
@@ -31,10 +33,12 @@ function compareDate(a: string, b: string): number {
 
 interface RestaurantDetailBroadcastTabProps {
   detail: RestaurantDetail;
+  storeId: number;
 }
 
 export default function RestaurantDetailBroadcastTab({
   detail,
+  storeId,
 }: RestaurantDetailBroadcastTabProps) {
   const [showPast, setShowPast] = useState<boolean>(false);
   const today: string = new Date().toISOString().slice(0, 10);
@@ -62,6 +66,10 @@ export default function RestaurantDetailBroadcastTab({
   const sortedPastDates: string[] = Object.keys(groupedPast).sort((a, b) =>
     compareDate(b, a)
   );
+
+  const { setStore } = useBroadcastStore();
+  const { setRestaurantSubpage, setSelectedTab, setIsMypageOpen } =
+    useMypageStore();
 
   return (
     <div>
@@ -102,9 +110,15 @@ export default function RestaurantDetailBroadcastTab({
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-base font-bold text-gray-800">
-                    {b.team_one}
-                    <span className="mx-1 text-primary5">vs</span>
-                    {b.team_two}
+                    {b.team_one && b.team_two ? (
+                      <>
+                        <span>{b.team_one}</span>
+                        <span className="mx-1 text-primary5">vs</span>
+                        <span>{b.team_two}</span>
+                      </>
+                    ) : (
+                      <></>
+                    )}
                     {b.etc && (
                       <span className="ml-2 text-xs bg-primary3 text-primary5 rounded px-2 py-0.5">
                         {b.etc}
@@ -174,9 +188,15 @@ export default function RestaurantDetailBroadcastTab({
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-base font-bold text-gray-500">
-                        {b.team_one}
-                        <span className="mx-1 text-gray-400">vs</span>
-                        {b.team_two}
+                        {b.team_one && b.team_two ? (
+                          <>
+                            <span>{b.team_one}</span>
+                            <span className="mx-1 text-primary5">vs</span>
+                            <span>{b.team_two}</span>
+                          </>
+                        ) : (
+                          <></>
+                        )}
                         {b.etc && (
                           <span className="ml-2 text-xs bg-gray-100 text-gray-400 rounded px-2 py-0.5">
                             {b.etc}
@@ -192,10 +212,19 @@ export default function RestaurantDetailBroadcastTab({
         )}
       </div>
 
-      {/* 중계 관리 버튼 (하단에만 표시) */}
       {detail.is_owner && (
         <div className="mt-10 flex justify-end">
-          <Button scheme="primary">중계 관리</Button>
+          <Button
+            scheme="primary"
+            onClick={() => {
+              setSelectedTab("restaurant");
+              setStore(detail.store_name, storeId);
+              setRestaurantSubpage("schedule-view-broadcasts");
+              setIsMypageOpen(true);
+            }}
+          >
+            중계 관리
+          </Button>
         </div>
       )}
     </div>
