@@ -117,13 +117,19 @@ export default function TodayBroadcastSidebar() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-800">
-                        {game.team_one}
-                      </span>
-                      <span className="mx-1 text-xs text-gray-400">vs</span>
-                      <span className="font-semibold text-gray-800">
-                        {game.team_two}
-                      </span>
+                      {game.team_one && game.team_two ? (
+                        <>
+                          <span className="font-semibold text-gray-800">
+                            {game.team_one}
+                          </span>
+                          <span className="mx-1 text-xs text-gray-400">vs</span>
+                          <span className="font-semibold text-gray-800">
+                            {game.team_two}
+                          </span>
+                        </>
+                      ) : (
+                        <></>
+                      )}
                       <span className="ml-auto text-xs text-gray-500">
                         {formatTime(game.match_time)}
                       </span>

@@ -3,7 +3,8 @@ import { getDayIdx } from "../../../../utils/getDay";
 import getDaysInMonth from "../../../../utils/getDaysInMonth";
 
 const Calendar = () => {
-  const { year, month, broadcastLists } = useBroadcastStore();
+  const { year, month, setDate, setViewOption, broadcastLists } =
+    useBroadcastStore();
   const daysInMonth = getDaysInMonth(year, month);
   const firstDayOfWeek = getDayIdx(year, month, 1); // 시작 요일
   const weeks: (number | null)[][] = [];
@@ -27,6 +28,11 @@ const Calendar = () => {
 
   const weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"];
 
+  const today = new Date();
+  const todayYear = today.getFullYear();
+  const todayMonth = today.getMonth() + 1;
+  const todayDate = today.getDate();
+
   const broadcastCountMap = broadcastLists.reduce((acc, item) => {
     const date = new Date(item.match_date);
     const y = date.getFullYear();
@@ -39,50 +45,66 @@ const Calendar = () => {
   }, {} as Record<string, number>);
 
   return (
-    <div className="border-[2px]">
-      <div className="grid grid-cols-7 font-semibold">
-        {weekdayLabels.map((day) => (
-          <div
-            className="flex justify-center items-center py-2 px-4 border-[1px] border-b-[2px]"
-            key={day}
-          >
-            {day}
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-7 ">
-        {weeks.flat().map((day, idx) => {
-          const key = day ? `${year}-${month}-${day}` : null;
-
-          return (
+    <div className="min-h-[415px]">
+      <div className="border-[2px]">
+        <div className="grid grid-cols-7 font-semibold">
+          {weekdayLabels.map((day) => (
             <div
-              className={`flex justify-center items-center border-[1px] ${
-                day ? "hover:bg-lightgray hover:cursor-pointer" : ""
-              }`}
-              key={idx}
+              className="flex justify-center items-center py-2 px-4 border-[1px] border-b-[2px]"
+              key={day}
             >
-              {day ? (
-                <div className="flex flex-col w-full px-3 py-2 gap-1">
-                  <div className="flex justify-center font-semibold">
-                    <span>{day}</span>
-                  </div>
-                  <div>
-                    {key && broadcastCountMap[key] ? (
-                      <span className="border-l-[3px] border-primary5 pl-1">
-                        {broadcastCountMap[key]}개
-                      </span>
-                    ) : (
-                      <span>&nbsp;</span>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                ""
-              )}
+              {day}
             </div>
-          );
-        })}
+          ))}
+        </div>
+
+        <div className="grid grid-cols-7">
+          {weeks.flat().map((day, idx) => {
+            const key = day ? `${year}-${month}-${day}` : null;
+            const isToday =
+              year === todayYear && month === todayMonth && day === todayDate;
+
+            return (
+              <div
+                className={`flex justify-center items-center border-[1px] ${
+                  day ? "hover:bg-lightgray hover:cursor-pointer" : ""
+                }`}
+                key={idx}
+              >
+                {day ? (
+                  <div
+                    className="flex flex-col w-full px-3 py-2 gap-1"
+                    onClick={() => {
+                      setDate(day);
+                      setViewOption("tab");
+                    }}
+                  >
+                    <div className="flex justify-center font-semibold">
+                      {isToday ? (
+                        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-primary5 text-white">
+                          <span>{day}</span>
+                        </div>
+                      ) : (
+                        <span>{day}</span>
+                      )}
+                    </div>
+                    <div>
+                      {key && broadcastCountMap[key] ? (
+                        <span className="border-l-[3px] border-primary5 pl-1">
+                          {broadcastCountMap[key]}개
+                        </span>
+                      ) : (
+                        <span>&nbsp;</span>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

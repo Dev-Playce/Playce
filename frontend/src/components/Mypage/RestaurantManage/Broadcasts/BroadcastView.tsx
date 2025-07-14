@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
-import { FaBars, FaPlus, FaRegCalendarAlt } from "react-icons/fa";
+import { FaBars, FaRegCalendarAlt } from "react-icons/fa";
 
 import TabList from "./TabLists";
 import Calendar from "./Calendar";
@@ -12,6 +12,7 @@ import useBroadcastFormStore from "../../../../stores/broadcastFormStore";
 import { getBroadcast } from "../../../../api/broadcast.api";
 import getDaysInMonth from "../../../../utils/getDaysInMonth";
 import useMypageStore from "../../../../stores/mypageStore";
+import FloatingRegisterButton from "./FloatingRegisterButton";
 
 const BroadcastView = () => {
   const { yearNum, monthNum } = dateInfo;
@@ -33,7 +34,7 @@ const BroadcastView = () => {
     setBroadcastLists,
   } = useBroadcastStore();
 
-  const { setEditingId, resetForm } = useBroadcastFormStore();
+  const { editingId } = useBroadcastFormStore();
 
   const isInTwoMonths = (year: number, month: number) => {
     const target = new Date(year, month - 1);
@@ -81,7 +82,7 @@ const BroadcastView = () => {
     );
   }
 
-  if (formMode === "edit") {
+  if (formMode === "edit" && editingId) {
     return (
       <BroadcastEdit
         onClose={() => {
@@ -92,18 +93,23 @@ const BroadcastView = () => {
     );
   }
 
+  const today = new Date();
+  const todayYear = today.getFullYear();
+  const todayMonth = today.getMonth() + 1;
+  const todayDate = today.getDate();
+
   return (
-    <div className="flex flex-col pl-2">
-      <div className="flex text-[28px] items-center justify-between mb-5 gap-3">
+    <div className="flex flex-col pl-2 relative h-full">
+      <div className="flex text-[28px] items-center justify-between mb-3 gap-3">
         <button
-          className="text-[25px]"
+          className="text-[16px] px-2 py-1 rounded bg-primary1 text-mainText hover:bg-primary5 hover:text-white transition"
           onClick={() => {
-            resetForm();
-            setEditingId(null);
-            setRestaurantSubpage("broadcast-register");
+            setYear(todayYear);
+            setMonth(todayMonth);
+            setDate(todayDate);
           }}
         >
-          <FaPlus />
+          오늘
         </button>
 
         <div className="flex items-center gap-3">
@@ -144,15 +150,22 @@ const BroadcastView = () => {
         </button>
       </div>
 
-      {viewOption === "tab" ? (
-        <TabList
-          onEditClick={() => {
-            setFormMode("edit");
-          }}
+      <div className="relative h-full w-full">
+        <div className="min-h-[400px]">
+          {viewOption === "calendar" ? (
+            <Calendar />
+          ) : (
+            <TabList />
+          )}
+        </div>
+
+        <FloatingRegisterButton
+          className={`absolute bottom-[-2px] right-[29px] translate-x-[22px] ${
+            viewOption === "tab" ? "translate-y-[7px]" : ""
+          }`}
+          onClick={() => setRestaurantSubpage("broadcast-register")}
         />
-      ) : (
-        <Calendar />
-      )}
+      </div>
     </div>
   );
 };
