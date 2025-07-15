@@ -295,7 +295,7 @@ const storeService = {
   getStoreDetail: async (userId: number | undefined, storeId: number) => {
     // Redis 캐시 확인
     const CACHE_KEY = `store:${storeId}`;
-    const cached = getCache(CACHE_KEY);
+    const cached = await getCache(CACHE_KEY);
 
     if (cached) {
       log('- Redis 캐시에서 식당 상세 조회 : ', cached);

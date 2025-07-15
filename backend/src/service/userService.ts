@@ -86,9 +86,9 @@ const userService = {
     // });
     console.log(`[Login] Redis에 토큰 저장: ${redisKey}`);
 
-    const cachedUserId = getCache(redisKey);
+    const cachedUserId = await getCache(redisKey);
     console.log(`[Login] Redis에서 토큰 조회: ${cachedUserId}`);
-    
+
     log(
       `[UserService] 로그인 성공 - userId: ${user.id}, Redis Key: ${redisKey}`
     );

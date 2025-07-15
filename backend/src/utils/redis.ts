@@ -1,16 +1,16 @@
 import Redis from "ioredis";
 
 export const redisClient = new Redis({
-  host: process.env.REDIS_HOST || 'playce-redis', // 로컬 : 127.0.0.1
-  port: Number(process.env.REDIS_PORT) || 6379,
+    host: process.env.REDIS_HOST || 'playce-redis', // 로컬 : 'playce-redis'
+    port: Number(process.env.REDIS_PORT) || 6379,
 });
 
 redisClient.on('ready', () => {
-  console.log('✅ Redis 연결 성공');
+    console.log('✅ Redis 연결 성공');
 });
 
 redisClient.on('error', (err) => {
-  console.error('❌ Redis 연결 오류:', err);
+    console.error('❌ Redis 연결 오류:', err);
 });
 
 const DEFAULT_TTL_SECONDS = 60 * 5; // 기본 TTL: 5분 (60초 * 5)

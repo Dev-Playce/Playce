@@ -4,7 +4,7 @@
  * @returns {Object} - k6 부하 테스트 옵션
  */
 export const getOptions = (allowStatusCode = undefined) => {
-  const selectIndex = 1;
+  const selectIndex = 4;
   const vusOption = [2, 100, 500, 1000];
   const durationOption = ['20s', '1m', '2m', '5m'];
 
