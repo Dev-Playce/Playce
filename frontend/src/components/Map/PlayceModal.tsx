@@ -9,7 +9,7 @@ import useAuthStore from "../../stores/authStore";
 const defaultImage = "https://placehold.co/300x200?text=No+Image";
 
 interface PlayceModalProps {
-  restaurant: RestaurantBasic;
+  restaurant: RestaurantBasic | undefined; // undefined도 허용하면 더 안전
   onDetailClick: (restaurant: RestaurantBasic) => void;
   onClose: () => void;
 }
@@ -19,11 +19,24 @@ const PlayceModal = ({
   onDetailClick,
   onClose,
 }: PlayceModalProps) => {
+  // ✅ 모든 Hook은 함수 최상단에서 선언
   const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
+  // 🛡 restaurant 및 lat/lng 방어 코드
+  if (
+    !restaurant ||
+    typeof restaurant.lat !== "number" ||
+    typeof restaurant.lng !== "number"
+  ) {
+    // 필요하다면 자동 닫기 (선택)
+    onClose?.();
+    return null;
+  }
+
   const isFavorite = favorites.some(
     (fav) => fav.store_id === restaurant.store_id
   );
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -51,7 +64,7 @@ const PlayceModal = ({
             alt={restaurant.store_name || "가게 이미지"}
             className="w-full h-full object-cover"
           />
-          {/* 좌상단: 저장(즐겨찾기) 버튼 */}
+          {/* 좌상단: 즐겨찾기 버튼 */}
           <button
             onMouseDown={(e) => e.stopPropagation()}
             onClick={handleToggleFavorite}
