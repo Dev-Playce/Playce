@@ -60,9 +60,13 @@ const SearchResultList = () => {
 
             const matchInfo =
               date && item.broadcast
-                ? `${date.getMonth() + 1}/${date.getDate()} · ${
-                    item.broadcast.team_one
-                  } vs ${item.broadcast.team_two}`
+                ? item.broadcast.team_one && item.broadcast.team_two
+                  ? `${date.getMonth() + 1}/${date.getDate()} · ${
+                      item.broadcast.team_one
+                    } vs ${item.broadcast.team_two}`
+                  : `${date.getMonth() + 1}/${date.getDate()} · ${
+                      item.broadcast.league
+                    }`
                 : "";
 
             const displayItem = {
