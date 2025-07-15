@@ -70,6 +70,7 @@ const BroadcastView = () => {
 
   useEffect(() => {
     fetchBroadcasts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeId]);
 
   if (formMode === "create") {

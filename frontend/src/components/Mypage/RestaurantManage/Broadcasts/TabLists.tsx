@@ -34,6 +34,7 @@ const TabList = () => {
   useEffect(() => {
     setTabRef(tabRef);
     setItemRefs(itemRefs);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { setTabRef, setItemRefs, scrollDateCenter } = useBroadcastStore();
@@ -42,6 +43,7 @@ const TabList = () => {
     setTimeout(() => {
       scrollDateCenter();
     }, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleScrollLeft = () => {

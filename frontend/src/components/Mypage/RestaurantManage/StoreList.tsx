@@ -13,7 +13,7 @@ const StoreList = () => {
   const [selectedDetailStoreId, setSelectedDetailStoreId] = useState<
     number | null
   >(null);
-  const { setRestaurantSubpage, setRestaurantEdit } = useMypageStore();
+  const { setRestaurantSubpage, setRestaurantEditId } = useMypageStore();
   const { storeLogout } = useAuthStore();
 
   useEffect(() => {
@@ -38,6 +38,7 @@ const StoreList = () => {
     };
 
     fetchMyStores();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 삭제
@@ -111,7 +112,7 @@ const StoreList = () => {
               {/* 수정 버튼 */}
               <button
                 onClick={() => {
-                  setRestaurantEdit(store.store_id);
+                  setRestaurantEditId(store.store_id);
                   setRestaurantSubpage("restaurant-edit");
                 }}
                 className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow hover:bg-blue-50 transition ml-1"
