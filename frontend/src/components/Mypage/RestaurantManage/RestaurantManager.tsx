@@ -41,12 +41,7 @@ const RestaurantManager = ({ onClose }: MypageProps) => {
             <FaArrowLeft
               className="hover:cursor-pointer hover:text-primary5"
               onClick={() => {
-                if (
-                  restaurantSubpage === "broadcast-register" ||
-                  restaurantSubpage === "broadcast-edit"
-                ) {
-                  setRestaurantSubpage("schedule-view-broadcasts");
-                } else if (restaurantSubpage === "schedule-view-broadcasts") {
+                if (restaurantSubpage === "schedule-view-broadcasts") {
                   setRestaurantSubpage("restaurant-home");
                   resetYMD();
                 } else if (restaurantSubpage === "restaurant-edit") {

@@ -8,6 +8,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | "close"
     | "tab"
     | "custom"
+    | "reset"
+    | "apply"
     | "storeCircle";
   size?: "small" | "medium" | "large" | "icon" | "semi";
   isLoading?: boolean;
@@ -31,20 +33,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseStyle = classNames(
-      "inline-flex items-center justify-center rounded transition-colors duration-200",
-      scheme !== "storeCircle" && "font-semibold"
-    );
+    const baseStyle =
+      "inline-flex items-center justify-center font-semibold rounded transition-colors duration-200";
 
     const schemeStyle = {
       primary:
         "bg-primary1 text-white border border-primary1 hover:bg-primary5 hover:border-primary5",
       secondary:
         "bg-white text-primary5 border border-primary5 hover:bg-primary5 hover:border-primary5 hover:text-white",
-
       close: "text-gray-400 hover:text-primary5",
       tab: "bg-transparent text-gray-400 hover:text-primary5 border-b-2 border-transparent",
       custom: "",
+      apply:
+        "bg-primary5 text-white border border-primary5 shadow-none hover:shadow-none hover:text-white hover:brightness-95",
+      reset:
+        "bg-white text-primary5 border border-primary5 hover:bg-primary4 hover:text-primary5 hover:border-primary5",
       storeCircle: classNames(
         "w-8 h-8 flex items-center justify-center bg-white rounded-full shadow transition ml-1",
         hoverColor && `hover:bg-${hoverColor}`
@@ -80,10 +83,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             {icon && (
               <span
                 className={classNames(
-                  "flex items-center",
-                  React.isValidElement(children) || typeof children === "string"
-                    ? "mr-2"
-                    : null,
+                  "mr-2 flex items-center",
                   scheme === "storeCircle" && "mr-0"
                 )}
               >
