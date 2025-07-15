@@ -8,7 +8,7 @@ import { getLocationDataFromAddress } from "../utils/locationUtils";
 import { createError } from "../utils/errorUtils";
 import { deleteS3Object } from "../utils/s3";
 import { log } from "../utils/logUtils";
-import { getCache, setCache, deleteCache } from "../utils/redis";
+import { getCache, setCache, deleteCache, deleteCacheByPattern } from "../utils/redis";
 
 const storeService = {
   // 1. 식당 등록
@@ -99,8 +99,10 @@ const storeService = {
 
       await queryRunner.commitTransaction();
 
-      // Redis 캐시 삭제
-      await deleteCache(`store:mypage:${userId}`);
+      // Redis 캐시 무효화
+      await deleteCacheByPattern(`store:${saveStore.id}:owner:*`); // 식당 상세 조회
+      // await deleteCache(`store:mypage:${userId}`); // 내 식당 목록 조회
+      await deleteCacheByPattern('search:filters:*'); // 통합 검색
 
       return saveStore.id;
     } catch (error) {
@@ -245,9 +247,10 @@ const storeService = {
 
       await queryRunner.commitTransaction();
 
-      // Redis 캐시 삭제
-      await deleteCache(`store:${storeId}`);
-      await deleteCache(`store:mypage:${userId}`);
+      // Redis 캐시 무효화
+      await deleteCacheByPattern(`store:${storeId}:owner:*`); // 식당 상세 조회
+      // await deleteCache(`store:mypage:${userId}`); // 내 식당 목록 조회
+      await deleteCacheByPattern('search:filters:*'); // 통합 검색
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.error("❌ 식당 수정 : 트랜잭션 롤백됨");
@@ -286,22 +289,14 @@ const storeService = {
     // 3. DB에서 store 삭제
     await storeRepo.remove(storeToDelete);
 
-    // Redis 캐시 삭제
-    await deleteCache(`store:${storeId}`);
-    await deleteCache(`store:mypage:${userId}`);
+    // Redis 캐시 무효화
+    await deleteCacheByPattern(`store:${storeId}:owner:*`); // 식당 상세 조회
+    // await deleteCache(`store:mypage:${userId}`); // 내 식당 목록 조회
+    await deleteCacheByPattern('search:filters:*'); // 통합 검색
     return;
   },
   // 4. 식당 상세 조회
   getStoreDetail: async (userId: number | undefined, storeId: number) => {
-    // Redis 캐시 확인
-    const CACHE_KEY = `store:${storeId}`;
-    const cached = await getCache(CACHE_KEY);
-
-    if (cached) {
-      log('- Redis 캐시에서 식당 상세 조회 : ', cached);
-      return cached;
-    }
-
     // DB 조회
     const storeRepo = AppDataSource.getRepository(Store);
 
@@ -319,6 +314,17 @@ const storeService = {
     if (!store) throw createError("해당 식당을 찾을 수 없습니다.", 404);
     log("- store 유효성 검사");
 
+    // Redis 캐시 확인
+    // const CACHE_KEY = `store:${storeId}`;
+    const isOwner = !!userId && userId === store.user.id;
+    const CACHE_KEY = `store:${storeId}:owner:${isOwner ? "true" : "false"}`;
+    const cached = await getCache(CACHE_KEY);
+
+    if (cached) {
+      log('- Redis 캐시에서 식당 상세 조회 : ', cached);
+      return cached;
+    }
+
     const imgUrlsData = store.images.map((img) => img.imgUrl);
     const broadcastData = store.broadcasts.map((bc) => ({
       match_date: bc.matchDate,
@@ -329,7 +335,6 @@ const storeService = {
       team_two: bc.teamTwo,
       etc: bc.etc,
     }));
-    const isOwner = !!userId && userId === store.user.id;
 
     const responseData = {
       store_name: store.storeName,
@@ -355,13 +360,13 @@ const storeService = {
   // 5. 내 식당 목록
   getMyStores: async (userId: number) => {
     // Redis 캐시 확인
-    const CACHE_KEY = `store:mypage:${userId}`;
-    const cached = await getCache(CACHE_KEY);
+    // const CACHE_KEY = `store:mypage:${userId}`;
+    // const cached = await getCache(CACHE_KEY);
 
-    if (cached) {
-      log('- Redis 캐시에서 내 식당 목록 조회 : ', cached);
-      return cached;
-    }
+    // if (cached) {
+    //   log('- Redis 캐시에서 내 식당 목록 조회 : ', cached);
+    //   return cached;
+    // }
 
     // DB 조회
     const storeRepo = AppDataSource.getRepository(Store);
@@ -386,7 +391,7 @@ const storeService = {
     log("- DB에서 내 식당 목록 조회 : ", responseData);
 
     // Redis 캐시에 저장
-    await setCache(CACHE_KEY, responseData);
+    // await setCache(CACHE_KEY, responseData);
     return responseData;
   },
 };

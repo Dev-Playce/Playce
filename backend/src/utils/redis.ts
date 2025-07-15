@@ -53,3 +53,14 @@ export const deleteCache = async (key: string): Promise<void> => {
         console.error(`❌ Redis deleteCache 실패 (key: ${key})`, error);
     }
 };
+
+export const deleteCacheByPattern = async (pattern: string): Promise<void> => {
+  try {
+    const keys = await redisClient.keys(pattern);
+    if (keys.length > 0) {
+      await redisClient.del(...keys);
+    }
+  } catch (error) {
+    console.error(`❌ Redis deleteCacheByPattern 실패 (pattern: ${pattern})`, error);
+  }
+};
