@@ -32,7 +32,7 @@ const BroadcastView = () => {
     setViewOption,
     storeId,
     setBroadcastLists,
-    scrollToTodayCenter,
+    scrollDateCenter,
   } = useBroadcastStore();
 
   const { editingId } = useBroadcastFormStore();
@@ -100,7 +100,7 @@ const BroadcastView = () => {
   const todayDate = today.getDate();
 
   return (
-    <div className="flex flex-col pl-2 relative h-full">
+    <div className="flex flex-col pl-2 h-full">
       <div className="flex text-[28px] items-center justify-between mb-3 gap-3">
         <button
           className="text-[16px] px-2 py-1 rounded bg-primary1 text-mainText hover:bg-primary5 hover:text-white transition"
@@ -110,7 +110,7 @@ const BroadcastView = () => {
             setDate(todayDate);
 
             setTimeout(() => {
-              scrollToTodayCenter();
+              scrollDateCenter();
             }, 0);
           }}
         >
@@ -159,14 +159,11 @@ const BroadcastView = () => {
         <div className="min-h-[400px]">
           {viewOption === "calendar" ? <Calendar /> : <TabList />}
         </div>
-
-        <FloatingRegisterButton
-          className={`absolute bottom-[-2px] right-[29px] translate-x-[22px] ${
-            viewOption === "tab" ? "translate-y-[7px]" : ""
-          }`}
-          onClick={() => setRestaurantSubpage("broadcast-register")}
-        />
       </div>
+      <FloatingRegisterButton
+        className={`absolute bottom-10 right-10`}
+        onClick={() => setRestaurantSubpage("broadcast-register")}
+      />
     </div>
   );
 };

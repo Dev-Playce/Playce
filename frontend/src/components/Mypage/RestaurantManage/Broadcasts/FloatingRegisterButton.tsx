@@ -12,7 +12,7 @@ const FloatingRegisterButton = ({
   return (
     <button
       onClick={onClick}
-      className={`w-12 h-12 rounded-full bg-primary5 text-white shadow-lg flex items-center justify-center hover:bg-primary4 transition-all ${className}`}
+      className={`w-12 h-12 rounded-full bg-primary5 text-white shadow-lg flex items-center justify-center hover:bg-primary1 transition-all ${className}`}
     >
       <FiPlus />
     </button>
