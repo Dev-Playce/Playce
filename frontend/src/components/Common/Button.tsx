@@ -9,11 +9,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | "tab"
     | "custom"
     | "reset"
-    | "apply";
+    | "apply"
+    | "storeCircle";
   size?: "small" | "medium" | "large" | "icon" | "semi";
   isLoading?: boolean;
   fullWidth?: boolean;
   icon?: React.ReactNode;
+  hoverColor?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -24,6 +26,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       isLoading = false,
       fullWidth = false,
       icon,
+      hoverColor,
       className,
       children,
       ...props
@@ -45,6 +48,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         "bg-primary5 text-white border border-primary5 shadow-none hover:shadow-none hover:text-white hover:brightness-95",
       reset:
         "bg-white text-primary5 border border-primary5 hover:bg-primary4 hover:text-primary5 hover:border-primary5",
+      storeCircle: classNames(
+        "w-8 h-8 flex items-center justify-center bg-white rounded-full shadow transition ml-1",
+        hoverColor && `hover:bg-${hoverColor}`
+      ),
     };
 
     const sizeStyle = {
@@ -73,7 +80,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           "로딩중..."
         ) : (
           <>
-            {icon && <span className="mr-2 flex items-center">{icon}</span>}
+            {icon && (
+              <span
+                className={classNames(
+                  "mr-2 flex items-center",
+                  scheme === "storeCircle" && "mr-0"
+                )}
+              >
+                {icon}
+              </span>
+            )}
             {children}
           </>
         )}

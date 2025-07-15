@@ -16,7 +16,7 @@ import ImageUrlInputList from "./modals/ImageUrlInputList";
 import type { menu } from "../../../types/menu";
 import { apiErrorStatusMessage } from "../../../utils/apiErrorStatusMessage";
 import type { AxiosError } from "axios";
-import { useAuth } from "../../../hooks/useAuth";
+import useAuthStore from "../../../stores/authStore";
 
 interface StoreFormModalProps {
   mode: "create" | "edit";
@@ -24,7 +24,7 @@ interface StoreFormModalProps {
 
 const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
   const { restaurantEditId, setRestaurantSubpage } = useMypageStore();
-  const { userLogout } = useAuth();
+  const { storeLogout } = useAuthStore();
 
   const [storeDetail, setStoreDetail] = useState<RestaurantDetail | null>(null);
   const [storeName, setStoreName] = useState("");
@@ -105,8 +105,9 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         ];
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
-        if (axiosError.status === 401) {
-          userLogout();
+        const status = axiosError.response?.status;
+        if (status === 401) {
+          storeLogout();
         }
         alert(message);
       }
@@ -137,8 +138,9 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         ];
         const message = apiErrorStatusMessage(error, errorList);
         const axiosError = error as AxiosError;
-        if (axiosError.status === 401) {
-          userLogout();
+        const status = axiosError.response?.status;
+        if (status === 401) {
+          storeLogout();
         }
         alert(message);
       }
@@ -265,7 +267,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         {/* 약관동의 체크박스: 등록(create) 모드에서만 노출 */}
         {mode === "create" && (
           <>
-            <div className="flex items-start gap-2 mt-2">
+            <div className="flex mt-5 items-start gap-2 ">
               <input
                 type="checkbox"
                 id="agreement"
@@ -297,7 +299,7 @@ const RestaurantRegisterEdit = ({ mode }: StoreFormModalProps) => {
         <div className="flex justify-end gap-2 mt-4">
           <button
             type="submit"
-            className="px-4 py-2 rounded bg-emerald-500 text-white font-bold"
+            className="px-4 py-2 rounded bg-primary5 text-white font-bold"
           >
             {mode === "edit" ? "수정" : "등록"}
           </button>
