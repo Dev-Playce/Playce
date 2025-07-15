@@ -1,7 +1,7 @@
-import ModalBase from "../Common/ModalBase";
 import Button from "../Common/Button";
 import SportPanel from "./SportPanel";
 import { useSportStore } from "../../stores/sportStore";
+import ModalBase from "../Common/ModalBase";
 
 interface SportModalProps {
   onClose: () => void;

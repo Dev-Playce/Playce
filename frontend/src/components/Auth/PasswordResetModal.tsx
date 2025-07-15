@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/useAuth";
-import ModalBase from "../Common/ModalBase";
 import InputText from "../Common/InputText";
 import Button from "../Common/Button";
 import ErrorText from "./ErrorText";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
+import ModalBase from "../Common/ModalBase";
 
 const PasswordResetModal = () => {
   const { token } = useParams<{ token: string }>();
