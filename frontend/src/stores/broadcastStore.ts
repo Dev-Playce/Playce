@@ -31,7 +31,7 @@ interface BoradcastState {
   setTabRef: (ref: React.RefObject<HTMLDivElement>) => void;
   setItemRefs: (ref: React.RefObject<Map<number, HTMLDivElement>>) => void;
 
-  scrollToTodayCenter: () => void;
+  scrollDateCenter: () => void;
 }
 
 const useBroadcastStore = create<BoradcastState>((set, get) => ({
@@ -70,11 +70,10 @@ const useBroadcastStore = create<BoradcastState>((set, get) => ({
   setTabRef: (ref) => set({ tabRef: ref }),
   setItemRefs: (ref) => set({ itemRefs: ref }),
 
-  scrollToTodayCenter: () => {
+  scrollDateCenter: () => {
     const tabRef = get().tabRef?.current;
     const itemRefs = get().itemRefs?.current;
-    const today = new Date();
-    const todayDate = today.getDate();
+    const todayDate = get().date;
 
     if (tabRef && itemRefs) {
       const todayEl = itemRefs.get(todayDate);
