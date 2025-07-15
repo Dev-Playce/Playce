@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import { FiTv, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FiTv, FiChevronDown, FiChevronUp, FiVolume2 } from "react-icons/fi";
 import Button from "../Common/Button";
 import type { RestaurantDetail, Broadcast } from "../../types/restaurant.types";
 import EmptyMessage from "./EmptyMessage";
@@ -12,13 +12,11 @@ function getKoreanDateString(dateStr: string): string {
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
 
-// 시간에서 초 제거 ("HH:mm:ss" -> "HH:mm")
 function formatTime(timeStr: string | undefined | null): string {
   if (!timeStr) return "";
   return timeStr.split(":").slice(0, 2).join(":");
 }
 
-// 날짜별 그룹핑
 function groupByDate(broadcasts: Broadcast[]): Record<string, Broadcast[]> {
   return broadcasts.reduce((acc, b) => {
     (acc[b.match_date] = acc[b.match_date] || []).push(b);
@@ -26,7 +24,6 @@ function groupByDate(broadcasts: Broadcast[]): Record<string, Broadcast[]> {
   }, {} as Record<string, Broadcast[]>);
 }
 
-// 날짜 비교 함수 (YYYY-MM-DD 문자열 비교)
 function compareDate(a: string, b: string): number {
   return a.localeCompare(b);
 }
@@ -41,10 +38,9 @@ export default function RestaurantDetailBroadcastTab({
   detail,
   storeId,
 }: RestaurantDetailBroadcastTabProps) {
-  const [showPast, setShowPast] = useState<boolean>(false);
+  const [showPast, setShowPast] = useState(false);
   const today: string = new Date().toISOString().slice(0, 10);
 
-  // 중계일정 분리
   const futureAndToday: Broadcast[] = [];
   const past: Broadcast[] = [];
   detail.broadcasts.forEach((b: Broadcast) => {
@@ -55,12 +51,10 @@ export default function RestaurantDetailBroadcastTab({
     }
   });
 
-  // 날짜별 그룹핑 및 정렬
   const groupedFuture: Record<string, Broadcast[]> =
     groupByDate(futureAndToday);
   const groupedPast: Record<string, Broadcast[]> = groupByDate(past);
 
-  // 날짜 오름차순(오늘~미래), 내림차순(과거)
   const sortedFutureDates: string[] = Object.keys(groupedFuture).sort((a, b) =>
     compareDate(a, b)
   );
@@ -72,16 +66,22 @@ export default function RestaurantDetailBroadcastTab({
   const { setRestaurantSubpage, setSelectedTab, setIsMypageOpen } =
     useMypageStore();
 
+  // 소개 라벨+아이콘
+  const ETC_LABEL = (
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary5 mr-1">
+      <FiVolume2 className="text-primary5 text-base" />
+    </span>
+  );
+
   return (
     <div>
       <ul>
-        {/* 오늘+미래 일정 */}
         {futureAndToday.length === 0 ? (
           <li>
             <EmptyMessage message="예정된 중계정보가 없습니다." />
           </li>
         ) : (
-          sortedFutureDates.map((date: string, groupIdx: number) => (
+          sortedFutureDates.map((date, groupIdx) => (
             <Fragment key={date}>
               <h4
                 className={`mb-2 ${
@@ -94,7 +94,7 @@ export default function RestaurantDetailBroadcastTab({
                   {date}
                 </span>
               </h4>
-              {groupedFuture[date].map((b: Broadcast, idx: number) => (
+              {groupedFuture[date].map((b, idx) => (
                 <li
                   key={idx}
                   className="rounded-xl p-4 mb-3 flex flex-col gap-2 border border-primary2 bg-white"
@@ -110,22 +110,32 @@ export default function RestaurantDetailBroadcastTab({
                       {formatTime(b.match_time)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-base font-bold text-gray-800">
-                    {b.team_one && b.team_two ? (
-                      <>
+                  {b.team_one && b.team_two ? (
+                    <>
+                      <div className="flex items-center gap-2 text-base font-bold text-gray-800">
                         <span>{b.team_one}</span>
                         <span className="mx-1 text-primary5">vs</span>
                         <span>{b.team_two}</span>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {b.etc && (
-                      <span className="ml-2 text-xs bg-primary3 text-primary5 rounded px-2 py-0.5">
-                        {b.etc}
-                      </span>
-                    )}
-                  </div>
+                      </div>
+                      {b.etc && (
+                        <div className="mt-1 flex items-start gap-2 text-xs text-gray-700">
+                          {ETC_LABEL}
+                          <span className="whitespace-pre-line break-words">
+                            {b.etc}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    b.etc && (
+                      <div className="mt-1 flex items-start gap-2 text-xs text-gray-700">
+                        {ETC_LABEL}
+                        <span className="whitespace-pre-line break-words">
+                          {b.etc}
+                        </span>
+                      </div>
+                    )
+                  )}
                 </li>
               ))}
             </Fragment>
@@ -159,7 +169,7 @@ export default function RestaurantDetailBroadcastTab({
                 지난 중계정보가 없습니다.
               </li>
             ) : (
-              sortedPastDates.map((date: string, groupIdx: number) => (
+              sortedPastDates.map((date, groupIdx) => (
                 <Fragment key={date}>
                   <h4
                     className={`mb-2 ${
@@ -172,7 +182,7 @@ export default function RestaurantDetailBroadcastTab({
                       {date}
                     </span>
                   </h4>
-                  {groupedPast[date].map((b: Broadcast, idx: number) => (
+                  {groupedPast[date].map((b, idx) => (
                     <li
                       key={idx}
                       className="rounded-xl p-4 mb-3 flex flex-col gap-2 border border-gray-200 bg-gray-50"
@@ -188,22 +198,32 @@ export default function RestaurantDetailBroadcastTab({
                           {formatTime(b.match_time)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-base font-bold text-gray-500">
-                        {b.team_one && b.team_two ? (
-                          <>
+                      {b.team_one && b.team_two ? (
+                        <>
+                          <div className="flex items-center gap-2 text-base font-bold text-gray-500">
                             <span>{b.team_one}</span>
-                            <span className="mx-1 text-primary5">vs</span>
+                            <span className="mx-1 text-gray-400">vs</span>
                             <span>{b.team_two}</span>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {b.etc && (
-                          <span className="ml-2 text-xs bg-gray-100 text-gray-400 rounded px-2 py-0.5">
-                            {b.etc}
-                          </span>
-                        )}
-                      </div>
+                          </div>
+                          {b.etc && (
+                            <div className="mt-1 flex items-start gap-2 text-xs text-gray-700">
+                              {ETC_LABEL}
+                              <span className="whitespace-pre-line break-words">
+                                {b.etc}
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        b.etc && (
+                          <div className="mt-1 flex items-start gap-2 text-xs text-gray-700">
+                            {ETC_LABEL}
+                            <span className="whitespace-pre-line break-words">
+                              {b.etc}
+                            </span>
+                          </div>
+                        )
+                      )}
                     </li>
                   ))}
                 </Fragment>
