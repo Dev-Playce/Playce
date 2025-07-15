@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import type { latlng } from "../types/map";
 import type { RestaurantBasic } from "../types/restaurant.types";
+import { CITY_STATION } from "../constant/map-constant";
 
 interface MapState {
-  position: latlng | null;
+  position: latlng;
   openedModal: number;
   restaurants: RestaurantBasic[];
   isRefreshBtnOn: boolean;
@@ -17,7 +18,7 @@ interface MapState {
 }
 
 const useMapStore = create<MapState>((set) => ({
-  position: null,
+  position: CITY_STATION,
   openedModal: -1,
   restaurants: [],
   isRefreshBtnOn: false,
