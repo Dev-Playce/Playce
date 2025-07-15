@@ -9,6 +9,7 @@ import RestaurantDetailComponent from "../../RestaurantDetail/RestaurantDetail";
 import type { MyStore } from "../../../types/restaurant.types";
 import Button from "../../Common/Button";
 import useBroadcastStore from "../../../stores/broadcastStore";
+import FloatingRegisterButton from "./Broadcasts/FloatingRegisterButton";
 
 const RestaurantHome = () => {
   const [stores, setStores] = useState<MyStore[]>([]);
@@ -136,9 +137,12 @@ const RestaurantHome = () => {
                 icon={<FiTrash2 className="text-red-500 text-xl" />}
                 hoverColor="red-50"
               ></Button>
-              {/* 플로팅 버튼 */}
             </div>
           ))}
+          <FloatingRegisterButton
+            className={`absolute bottom-10 right-10`}
+            onClick={() => setRestaurantSubpage("restaurant-register")}
+          />
         </ul>
       )}
       {/* 상세보기 */}

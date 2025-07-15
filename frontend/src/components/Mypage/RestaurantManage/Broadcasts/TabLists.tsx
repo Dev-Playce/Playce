@@ -36,11 +36,11 @@ const TabList = () => {
     setItemRefs(itemRefs);
   }, []);
 
-  const { setTabRef, setItemRefs, scrollToTodayCenter } = useBroadcastStore();
+  const { setTabRef, setItemRefs, scrollDateCenter } = useBroadcastStore();
 
   useEffect(() => {
     setTimeout(() => {
-      scrollToTodayCenter();
+      scrollDateCenter();
     }, 0);
   }, []);
 

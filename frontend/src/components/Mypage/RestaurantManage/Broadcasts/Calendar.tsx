@@ -3,8 +3,14 @@ import { getDayIdx } from "../../../../utils/getDay";
 import getDaysInMonth from "../../../../utils/getDaysInMonth";
 
 const Calendar = () => {
-  const { year, month, setDate, setViewOption, broadcastLists } =
-    useBroadcastStore();
+  const {
+    year,
+    month,
+    setDate,
+    setViewOption,
+    scrollDateCenter,
+    broadcastLists,
+  } = useBroadcastStore();
   const daysInMonth = getDaysInMonth(year, month);
   const firstDayOfWeek = getDayIdx(year, month, 1); // 시작 요일
   const weeks: (number | null)[][] = [];
@@ -77,6 +83,7 @@ const Calendar = () => {
                     onClick={() => {
                       setDate(day);
                       setViewOption("tab");
+                      scrollDateCenter();
                     }}
                   >
                     <div className="flex justify-center font-semibold">
