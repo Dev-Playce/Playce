@@ -56,7 +56,7 @@ export default function RestaurantDetailComponent({
       })
       .catch(() => setError("상세 정보를 불러오지 못했습니다."))
       .finally(() => setLoading(false));
-  }, [storeId]);
+  }, [storeId, setPosition, setRestaurants, setRefreshBtn]);
 
   const handleToggleFavorite = async () => {
     if (!isLoggedIn) {

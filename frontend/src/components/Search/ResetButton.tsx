@@ -15,7 +15,7 @@ const ResetSearchButton = () => {
   };
 
   return (
-    <Button onClick={handleReset} scheme="secondary" fullWidth size="semi">
+    <Button onClick={handleReset} scheme="reset" fullWidth size="semi">
       초기화
     </Button>
   );

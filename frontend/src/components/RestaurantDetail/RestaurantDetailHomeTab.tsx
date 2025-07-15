@@ -1,5 +1,6 @@
 import { FiMapPin, FiClock, FiPhone, FiFileText } from "react-icons/fi";
 import type { RestaurantDetail } from "../../types/restaurant.types";
+import classNames from "classnames";
 
 export default function RestaurantDetailHomeTab({
   detail,
@@ -15,8 +16,18 @@ export default function RestaurantDetailHomeTab({
           </span>
         </div>
       )}
-      <h2 className="text-2xl font-bold mb-2">{detail.store_name}</h2>
-      <p className="mb-2 text-gray-700">{detail.description}</p>
+      <h2
+        className={classNames(
+          "text-2xl font-bold",
+          // description이 없으면 mb-0, 있으면 mb-2
+          detail.description ? "mb-2" : "mb-1"
+        )}
+      >
+        {detail.store_name}
+      </h2>
+      {detail.description && (
+        <p className="mb-2 text-gray-700">{detail.description}</p>
+      )}
       <div className="flex items-center gap-2">
         <FiMapPin className="text-xl" />
         <span>{detail.address}</span>
