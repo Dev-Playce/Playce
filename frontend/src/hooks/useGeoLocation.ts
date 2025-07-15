@@ -46,6 +46,7 @@ export const useGeoLocation = (options = {}) => {
     }
 
     geolocation.getCurrentPosition(handleSuccess, handleError, options);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { location, error };

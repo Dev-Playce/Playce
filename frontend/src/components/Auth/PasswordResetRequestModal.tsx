@@ -1,10 +1,10 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/useAuth";
-import ModalBase from "../Common/ModalBase";
 import InputText from "../Common/InputText";
 import Button from "../Common/Button";
 import ErrorText from "./ErrorText";
 import useAuthStore from "../../stores/authStore";
+import ModalBase from "../Common/ModalBase";
 
 const PasswordResetRequestModal = () => {
   const { userPasswordResetRequest } = useAuth();

@@ -1,8 +1,8 @@
 import { useSportStore } from "../../stores/sportStore";
-import Tag from "../Common/Tag";
 import { useSports } from "../../hooks/useSports";
 import { useLeagues } from "../../hooks/useLeagues";
 import { getUpdatedLeagueSelection } from "../../utils/sportUtils";
+import Tag from "../Common/Tag";
 
 const SportPanel = () => {
   const { sport, selectedLeagues, setSport, setSelectedLeagues } =

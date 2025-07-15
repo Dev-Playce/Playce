@@ -56,6 +56,7 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
       setLeagues([]);
       setLeague("", null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sportId]);
 
   useEffect(() => {
@@ -101,6 +102,7 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.mode, props.broadcastId, broadcastLists]);
 
   const handleSubmit = async (e: React.FormEvent) => {
