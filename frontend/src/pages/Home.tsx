@@ -34,6 +34,7 @@ const Home: React.FC = () => {
         radius: SEARCHNEARBY_RADIUS,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setRestaurants]);
 
   return (

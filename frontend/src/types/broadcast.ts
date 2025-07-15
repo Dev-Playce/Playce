@@ -1,5 +1,5 @@
 export type Broadcast = {
-  broadcast_id : number;
+  broadcast_id: number;
   match_date: string;
   match_time: string;
   sport: string;
@@ -17,5 +17,5 @@ export type StoreWithBroadcasts = {
   address: string;
   lat: number;
   lng: number;
-  broadcasts: broadcast[];
+  broadcasts: Broadcast[];
 };

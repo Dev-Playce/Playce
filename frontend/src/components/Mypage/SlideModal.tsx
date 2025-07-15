@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import ModalBase from "../Common/ModalBase";
 import { FaArrowLeft } from "react-icons/fa";
+import ModalBase from "../Common/ModalBase";
 
 interface SlideModalProps {
   title: string;

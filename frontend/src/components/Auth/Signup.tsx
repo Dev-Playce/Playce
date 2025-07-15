@@ -4,9 +4,8 @@ import { useForm } from "react-hook-form";
 import type { SignupProps } from "../../api/auth.api";
 import Button from "../Common/Button";
 import ErrorText from "./ErrorText";
-
-import ModalBase from "../Common/ModalBase";
 import { useAuth } from "../../hooks/useAuth";
+import ModalBase from "../Common/ModalBase";
 
 interface SignupFormProps {
   email: string;

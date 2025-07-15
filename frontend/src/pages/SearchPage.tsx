@@ -47,6 +47,7 @@ const SearchPage = () => {
       doSearch();
       setTriggerSearch(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerSearch]);
 
   return (
