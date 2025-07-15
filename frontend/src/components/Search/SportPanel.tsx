@@ -81,7 +81,14 @@ const SportPanel = () => {
               <Tag
                 key={`${r.sport}-${r.league}`}
                 label={label}
-                onRemove={() => handleLeagueClick(r.league)}
+                onRemove={() => {
+                  const updated = getUpdatedLeagueSelection(
+                    selectedLeagues,
+                    r.sport,
+                    r.league
+                  );
+                  setSelectedLeagues(updated);
+                }}
               />
             );
           })}
