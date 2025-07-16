@@ -29,6 +29,7 @@ const userController = {
       next(error);
     }
   },
+  
   requestResetPassword: async (
     req: Request,
     res: Response,
@@ -36,8 +37,8 @@ const userController = {
   ) => {
     try {
       console.log("\n🔄 [비밀번호 초기화 요청]");
-      const { email } = req.body;
-      await userService.requestResetPassword(email);
+      const { email, name } = req.body;
+      await userService.requestResetPassword(email, name);
       console.log("✅ [비밀번호 초기화 메일 전송] 성공");
       return success(res, "메일이 전송되었습니다.", undefined, 201);
     } catch (error) {
