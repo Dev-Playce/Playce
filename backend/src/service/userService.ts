@@ -7,6 +7,7 @@ import { createError } from "../utils/errorUtils";
 import { sendMail } from "../utils/email";
 import { log } from "../utils/logUtils";
 import { deleteCache, getCache, setCache } from "../utils/redis";
+import crypto from "crypto";
 
 require("dotenv").config();
 
@@ -115,7 +116,7 @@ const userService = {
     const token = crypto.randomUUID();
     const expirationMinutes = 15;
     const expirationSeconds = expirationMinutes * 60;
-    
+
     await setCache(`reset-password:${token}`, email, expirationSeconds);
     log("🔐 Redis에 비밀번호 초기화 토큰 저장 완료");
 
