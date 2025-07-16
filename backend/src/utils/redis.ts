@@ -13,7 +13,7 @@ redisClient.on('error', (err) => {
     console.error('❌ Redis 연결 오류:', err);
 });
 
-const DEFAULT_TTL_SECONDS = 60 * 5; // 기본 TTL: 5분 (60초 * 5)
+const DEFAULT_TTL_SECONDS = 60 * 1; // 기본 TTL: 5분 (60초 * 5)
 
 /**
  * Redis에서 캐시 값 조회 (JSON 파싱 포함)

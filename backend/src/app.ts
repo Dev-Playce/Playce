@@ -1,7 +1,7 @@
-// import "dotenv/config";
+import path from "path";
 import dotenv from 'dotenv';
 if (process.env.NODE_ENV === 'test') {
-  dotenv.config({ path: '.env.test'});
+  dotenv.config({ path: '.env.test' });
 } else {
   dotenv.config();
 }
@@ -27,40 +27,52 @@ import broadcastRoutes from "./routes/broadcastRoutes";
 import favoriteRoutes from "./routes/favoriteRoutes";
 import staticdataRoutes from "./routes/staticdataRoutes";
 
-//헬퍼
+// 헬퍼
 import { fail } from "./utils/response";
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
-// const port = process.env.PORT || 3000;
 
 // ✅ CORS 허용
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://3.35.146.155:3000'], // 배포 시 도메인 설정 가능
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://3.35.146.155:3000', 'http://13.125.106.55'],
   credentials: true,
 }));
 
-
 app.use(express.json());
 
-// 라우터 등록
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec)); // 스웨거
+// 정적 파일 제공 (빌드된 프론트 파일)
+app.use(express.static(path.resolve(__dirname, "../../public")));
 
-app.use("/users", userRoutes); // 유저
-app.use("/stores", storeRoutes); // 식당
-app.use("/search", searchRoutes); // 검색
-app.use("/broadcasts", broadcastRoutes); // 중계 일정
-app.use("/favorites", favoriteRoutes); // 즐겨찾기
-app.use("/staticdata", staticdataRoutes); // 지역/경기 관련
+// API 라우터 등록
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/users", userRoutes);
+app.use("/stores", storeRoutes);
+app.use("/search", searchRoutes);
+app.use("/broadcasts", broadcastRoutes);
+app.use("/favorites", favoriteRoutes);
+app.use("/staticdata", staticdataRoutes);
 
-// 정의되지 않은 라우터 -> 404 에러 처리
+// SPA 대응용 (정적 파일, API 라우터 모두 아닌 경우 index.html 응답)
+// 이 라우터는 404 미들웨어보다 **앞**에 둬야 합니다.
+app.get('/{*any}', (req, res, next) => {
+  const indexPath = path.resolve(__dirname, "../../public", "index.html");
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      next(err);
+    }
+  });
+});
+
+
+// 정의되지 않은 API 라우터 -> 404 에러 처리
 app.use((req: Request, res: Response, next: NextFunction) => {
   return fail(res, "Not Found", 404);
 });
 
-//  전역 에러 핸들러
+// 전역 에러 핸들러
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err);
+  console.error("🚨 전역 에러:", err);
 
   const status = err.status || 500;
   const message = err.message || "서버 내부 오류입니다.";

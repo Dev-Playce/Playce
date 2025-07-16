@@ -17,7 +17,7 @@ const staticdataService = {
 
     // redis 캐시 확인 -> 있으면 리턴
     const cacheKey = "bigRegions:all";
-    const cached = getCache(cacheKey);
+    const cached = await getCache(cacheKey);
     if (cached) {
       log("✅ Redis 캐시 사용:", cacheKey);
       return cached;
@@ -51,7 +51,7 @@ const staticdataService = {
 
     // redis 캐시 확인 -> 있으면 리턴
     const cacheKey = `smallRegions:${bigRegionId}`;
-    const cached = getCache(cacheKey);
+    const cached = await getCache(cacheKey);
     if (cached) {
       log("✅ Redis 캐시 사용:", cacheKey);
       return cached;

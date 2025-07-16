@@ -38,7 +38,8 @@
     "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d src/data-source.ts",
     "seed": "ts-node seeds/index.ts",
     "seed:test": "cross-env NODE_ENV=test ts-node seeds/index.ts",
-    "migration:run:test": "cross-env NODE_ENV=test ts-node ./node_modules/typeorm/cli.js migration:run -d src/data-source.ts"
+    "migration:run:test": "cross-env NODE_ENV=test ts-node ./node_modules/typeorm/cli.js migration:run -d src/data-source.ts",
+    "frontend:build": "cd ../Playce/frontend && npm run build && cp -r dist/* ../../backend/public/"
   },
   "keywords": [],
   "author": "",
