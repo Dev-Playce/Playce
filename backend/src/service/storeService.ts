@@ -357,7 +357,7 @@ const storeService = {
     await setCache(CACHE_KEY, responseData);
     return responseData;
   },
-  // 5. 내 식당 목록
+  // 5. 내 식당 목록 (redis 캐시 X)
   getMyStores: async (userId: number) => {
     // Redis 캐시 확인
     // const CACHE_KEY = `store:mypage:${userId}`;

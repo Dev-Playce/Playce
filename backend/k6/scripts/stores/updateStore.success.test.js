@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
-import { getOptions, parseJson } from '../../utils/common.js';
+import { encodeMultipart, getOptions, parseJson } from '../../utils/common.js';
 import { getTokenOrFail } from '../../utils/auth.js';
 
 const CONTEXT = '식당 수정';
@@ -10,7 +10,7 @@ export const options = getOptions();
 export const updateStoreSuccessTest = (token, storeId, updateData) => {
   const url = `${BASE_URL}/stores/${storeId}`;
 
-  const payload = {
+  const data = {
     ...(updateData.store_name && { store_name: updateData.store_name }),
     ...(updateData.address && { address: updateData.address }),
     ...(updateData.phone && { phone: updateData.phone }),
@@ -20,14 +20,16 @@ export const updateStoreSuccessTest = (token, storeId, updateData) => {
     ...(updateData.description && { description: updateData.description }),
   };
 
+  const { payload, boundary } = encodeMultipart(data);
+
   const params = {
     headers: {
-      ...DEFAULT_HEADERS,
+      'Content-Type': `multipart/form-data; boundary=${boundary}`,
       'Authorization': `Bearer ${token}`,
     },
   };
 
-  const res = http.patch(url, JSON.stringify(payload), params); // 요청 보내기
+  const res = http.patch(url, payload, params); // 요청 보내기
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {

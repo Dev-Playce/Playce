@@ -4,9 +4,9 @@
  * @returns {Object} - k6 부하 테스트 옵션
  */
 export const getOptions = (allowStatusCode = undefined) => {
-  const selectIndex = 4;
-  const vusOption = [2, 100, 500, 1000];
-  const durationOption = ['20s', '1m', '2m', '5m'];
+  const selectIndex = 1;
+  const vusOption = [8, 100, 500, 1000];
+  const durationOption = ['1m', '1m', '2m', '5m'];
 
   let options;
 
@@ -61,4 +61,42 @@ export const parseJson = (res, context = '') => {
     });
     return null;
   }
+};
+
+/**
+ * 객체 데이터를 multipart/form-data 형식으로 인코딩하는 함수
+ * @param {object} data - multipart로 인코딩할 객체
+ * @param {string} [boundary] - 사용할 boundary 문자열 (기본값은 webkit 형식)
+ * @returns {{ payload: string, boundary: string }} - 인코딩된 payload와 boundary 문자열
+ */
+export const encodeMultipart = (data, boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW') => {
+  const lines = [];
+
+  for (const key in data) {
+    const value = data[key];
+
+    // 배열은 반복해서 처리
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        lines.push(`--${boundary}`);
+        lines.push(`Content-Disposition: form-data; name="${key}[]"`);
+        lines.push('');
+        lines.push(item);
+      });
+    } else {
+      lines.push(`--${boundary}`);
+      lines.push(`Content-Disposition: form-data; name="${key}"`);
+      lines.push('');
+      lines.push(value);
+    }
+  }
+
+  lines.push(`--${boundary}--`);
+  lines.push('');
+
+  const payload = lines.join('\r\n');
+  return {
+    payload,
+    boundary,
+  };
 };

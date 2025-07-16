@@ -110,32 +110,3 @@ export const seedRegions = async () => {
 
   console.log("✅ 지역 데이터 시드 완료");
 };
-
-// const seed = async () => {
-//   const dataSource = await AppDataSource.initialize();
-
-//   try {
-//     for (const bigRegionName of bigRegionsData) {
-//       const bigRegion = dataSource.manager.create(BigRegion, { name: bigRegionName });
-//       await dataSource.manager.save(bigRegion);
-
-//       const smallRegions = smallRegionsMap[bigRegionName] || [];
-
-//       for (const smallRegionName of smallRegions) {
-//         const smallRegion = dataSource.manager.create(SmallRegion, {
-//           name: smallRegionName,
-//           bigRegion,
-//         });
-//         await dataSource.manager.save(smallRegion);
-//       }
-//     }
-
-//     console.log("✅ 지역 데이터 시드 완료");
-//   } catch (error) {
-//     console.error("❌ 시드 에러:", error);
-//   } finally {
-//     await dataSource.destroy();
-//   }
-// };
-
-// seed();

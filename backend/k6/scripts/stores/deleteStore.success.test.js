@@ -17,7 +17,7 @@ export const deleteStoreSuccessTest = (token, storeId) => {
     },
   };
 
-  const res = http.del(url, params); // 요청 보내기
+  const res = http.del(url, null, params); // 요청 보내기
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
@@ -52,7 +52,9 @@ export default function (data) {
   const storeId = createStoreSuccessTest(data.token, newStore, false); // 테스트 후 DB 초기화 : false
 
   // 2. 식당 삭제
-  if (storeId) {
-    deleteStoreSuccessTest(data.token, storeId);
+  if (!storeId) {
+    console.warn(`⚠️ [${CONTEXT}] storeId가 유효하지 않아 삭제를 건너뜀`);
+    return;
   }
+  deleteStoreSuccessTest(data.token, storeId);
 }

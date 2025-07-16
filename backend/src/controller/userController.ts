@@ -36,10 +36,10 @@ const userController = {
     next: NextFunction
   ) => {
     try {
-      console.log("\n🔄 [비밀번호 초기화 요청]");
+      log("\n🔄 [비밀번호 초기화 요청]");
       const { email, name } = req.body;
       await userService.requestResetPassword(email, name);
-      console.log("✅ [비밀번호 초기화 메일 전송] 성공");
+      log("✅ [비밀번호 초기화 메일 전송] 성공");
       return success(res, "메일이 전송되었습니다.", undefined, 201);
     } catch (error) {
       logApiError("비밀번호 초기화 요청", error);
@@ -49,7 +49,7 @@ const userController = {
 
   resetPassword: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("\n🔁 [비밀번호 초기화]");
+      log("\n🔁 [비밀번호 초기화]");
 
       const token = req.params.token;
       const { newPassword } = req.body;
@@ -60,7 +60,7 @@ const userController = {
 
       await userService.resetPassword(token, newPassword);
 
-      console.log("✅ [비밀번호 변경] 성공");
+      log("✅ [비밀번호 변경] 성공");
       return success(res, "비밀번호가 변경되었습니다.");
     } catch (error) {
       logApiError("비밀번호 초기화", error);

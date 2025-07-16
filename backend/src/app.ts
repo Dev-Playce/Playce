@@ -32,7 +32,6 @@ import { fail } from "./utils/response";
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
-// const port = process.env.PORT || 3000;
 
 // ✅ CORS 허용
 app.use(cors({

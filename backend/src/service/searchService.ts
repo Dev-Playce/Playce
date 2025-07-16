@@ -6,6 +6,7 @@ import { League } from "../entities/League";
 import { Brackets } from "typeorm";
 import { getCache, setCache } from "../utils/redis";
 import crypto from "crypto"; // 해시 생성용
+import { log } from "../utils/logUtils";
 
 const searchService = {
   // 현재 위치 기반 검색 (redis 캐시 사용 X)
@@ -77,7 +78,7 @@ const searchService = {
 
     const cached = await getCache(cacheKey);
     if (cached) {
-      console.log(`[Redis Cache] Cache hit for key: ${cacheKey}`);
+      log(`[Redis Cache] Cache hit for key: ${cacheKey}`);
       return cached;
     }
 
@@ -223,7 +224,7 @@ const searchService = {
     });
 
     await setCache(cacheKey, response); // TTL 기본값 사용
-    console.log(`[Redis Cache] Cache set for key: ${cacheKey}`);
+    log(`[Redis Cache] Cache set for key: ${cacheKey}`);
     return response;
   },
 };

@@ -2,6 +2,7 @@ import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import path from 'path';
+import { log } from "./logUtils";
 
 // S3 클라이언트 생성
 const s3 = new S3Client({
@@ -45,7 +46,7 @@ export const deleteS3Object = async (url: string) => {
     const key = decodeURIComponent(new URL(url).pathname.slice(1)); // images/파일명.jpg
 
     await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
-    console.log(`🗑️ S3 이미지 삭제 완료: ${key}`);
+    log(`🗑️ S3 이미지 삭제 완료: ${key}`);
   } catch (err) {
     console.error(`❌ S3 이미지 삭제 실패`, err);
   }
