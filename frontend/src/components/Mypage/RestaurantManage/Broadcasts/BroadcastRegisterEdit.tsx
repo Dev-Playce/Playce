@@ -210,7 +210,7 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
             value={team1 ?? ""}
             onChange={(e) => setteam1(e.target.value)}
             disabled={!isTeamCompetition}
-            className="w-full border px-3 py-2 rounded"
+            className="w-full border px-3 py-2 rounded hover:border-primary5 focus:border-primary5 focus:ring-1 focus:ring-primary1 focus:outline-none"
           />
         </div>
         <div className="flex-1 min-w-[180px]">
@@ -224,7 +224,7 @@ const BroadcastRegisterEdit = (props: BroadcastRegisterEditProps) => {
             value={team2 ?? ""}
             onChange={(e) => setteam2(e.target.value)}
             disabled={!isTeamCompetition}
-            className="w-full border px-3 py-2 rounded"
+            className="w-full border px-3 py-2 rounded hover:border-primary5 focus:border-primary5 focus:ring-1 focus:ring-primary1 focus:outline-none"
           />
         </div>
       </div>
