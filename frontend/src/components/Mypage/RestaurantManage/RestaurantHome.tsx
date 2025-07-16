@@ -140,12 +140,12 @@ const RestaurantHome = () => {
               ></Button>
             </div>
           ))}
-          <FloatingRegisterButton
-            className={`absolute bottom-10 right-10`}
-            onClick={() => setRestaurantSubpage("restaurant-register")}
-          />
         </ul>
       )}
+      <FloatingRegisterButton
+        className={`absolute bottom-10 right-10`}
+        onClick={() => setRestaurantSubpage("restaurant-register")}
+      />
       {/* 상세보기 */}
       {selectedDetailStoreId && (
         <RestaurantDetailComponent
