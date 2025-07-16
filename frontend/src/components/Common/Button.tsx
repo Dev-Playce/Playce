@@ -8,6 +8,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | "close"
     | "tab"
     | "custom"
+    | "apply"
+    | "reset"
     | "storeCircle";
   size?: "small" | "medium" | "large" | "icon" | "semi";
   isLoading?: boolean;
@@ -45,6 +47,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       close: "text-gray-400 hover:text-primary5",
       tab: "bg-transparent text-gray-400 hover:text-primary5 border-b-2 border-transparent",
       custom: "",
+      apply:
+        "bg-primary5 text-white border border-primary5 shadow-none hover:shadow-none hover:text-white hover:brightness-95",
+      reset:
+        "bg-white text-primary5 border border-primary5 hover:bg-gray-100 hover:text-primary5 hover:border-primary5",
       storeCircle: classNames(
         "w-8 h-8 flex items-center justify-center bg-white rounded-full shadow transition ml-1",
         hoverColor && `hover:bg-${hoverColor}`
