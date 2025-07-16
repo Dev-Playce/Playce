@@ -28,6 +28,11 @@ function compareDate(a: string, b: string): number {
   return a.localeCompare(b);
 }
 
+function compareTime(a: string, b: string): number {
+  // "21:00" < "23:00" 등 문자열 오름차순 정렬
+  return a.localeCompare(b);
+}
+
 interface RestaurantDetailBroadcastTabProps {
   detail: RestaurantDetail;
   storeId: number;
@@ -62,11 +67,18 @@ export default function RestaurantDetailBroadcastTab({
     compareDate(b, a)
   );
 
+  // ✅ 날짜 그룹마다 시간 정렬
+  sortedFutureDates.forEach((date) => {
+    groupedFuture[date].sort((a, b) => compareTime(a.match_time, b.match_time));
+  });
+  sortedPastDates.forEach((date) => {
+    groupedPast[date].sort((a, b) => compareTime(a.match_time, b.match_time));
+  });
+
   const { setStore } = useBroadcastStore();
   const { setRestaurantSubpage, setSelectedTab, setIsMypageOpen } =
     useMypageStore();
 
-  // 소개 라벨+아이콘
   const ETC_LABEL = (
     <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary5 mr-1">
       <FiVolume2 className="text-primary5 text-base" />

@@ -63,7 +63,7 @@ export const useAuth = () => {
     } catch (error) {
       const errorList = [
         { code: 400, message: "입력값이 유효하지 않습니다" },
-        { code: 404, message: "이메일이 존재하지 않습니다" },
+        { code: 404, message: "이메일 또는 이름이 일치하지 않습니다." },
       ];
       const message = apiErrorStatusMessage(error, errorList);
       alert(message);

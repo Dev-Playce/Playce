@@ -30,14 +30,14 @@ function GoToCurrentLocationButton({ mapRef }: GoToCurrentLocationButtonProps) {
     <button
       type="button"
       className="
-        fixed bottom-24 right-20 z-20
-        p-3 rounded-full bg-white shadow-md border border-gray-200
-        hover:bg-primary4 hover:border-primary5 transition-colors
-      "
+    group fixed bottom-24 right-12 z-20
+    p-4 rounded-full bg-primary5 text-white shadow-md border border-primary5
+    hover:bg-white hover:border-primary5 hover:text-primary5 transition-colors
+  "
       onClick={handleClick}
       aria-label="현위치로 이동"
     >
-      <IoLocateOutline className="text-primary5 text-2xl" />
+      <IoLocateOutline className="text-white group-hover:text-primary5 text-2xl transition-colors" />
     </button>
   );
 }
