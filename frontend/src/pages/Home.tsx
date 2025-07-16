@@ -17,11 +17,19 @@ const Home: React.FC = () => {
   const { position, isRefreshBtnOn, setRestaurants } = useMapStore();
   const { isMypageOpen, setIsMypageOpen } = useMypageStore();
   const { fetchRestaurants } = useMap();
+  const { setRestaurantSubpage } = useMypageStore();
+  const { setSelectedTab } = useMypageStore();
 
   const geolocationOptions = {
     enableHighAccuracy: true,
     timeout: 1000 * 10,
     maximumAge: 1000 * 3600 * 24,
+  };
+
+  const handleClose = () => {
+    setIsMypageOpen(false);
+    setRestaurantSubpage("restaurant-home");
+    setSelectedTab("favorite");
   };
 
   useGeoLocation(geolocationOptions);
@@ -49,7 +57,7 @@ const Home: React.FC = () => {
         <SignupModal />
         <PasswordResetRequestModal />
       </div>
-      {isMypageOpen && <MypageModal onClose={() => setIsMypageOpen(false)} />}
+      {isMypageOpen && <MypageModal onClose={() => handleClose()} />}
     </div>
   );
 };
