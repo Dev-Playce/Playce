@@ -23,15 +23,6 @@ export const useSearch = () => {
     setIsSearching(true);
     setHasSearched(true);
     try {
-      console.log("검색 조건:", {
-        searchText,
-        sports,
-        leagues,
-        big_region: bigRegions,
-        small_region: smallRegions,
-        sort,
-      });
-
       const res = await fetchSearchResults({
         search: searchText,
         sports,
@@ -63,7 +54,7 @@ export const useSearch = () => {
 
         setResults(enriched);
       } else {
-        setResults([])
+        setResults([]);
       }
     } catch (err) {
       console.error("검색 실패", err);

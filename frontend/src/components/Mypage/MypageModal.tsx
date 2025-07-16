@@ -16,6 +16,7 @@ const MypageModal = ({ onClose }: MypageProps) => {
 
   const handleClose = () => {
     setRestaurantSubpage("restaurant-home");
+    setSelectedTab("favorite");
     onClose();
   };
   const { data, isLoading, isError } = useUserInfo();

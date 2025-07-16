@@ -7,7 +7,6 @@ import RestaurantDetailComponent from "../RestaurantDetail/RestaurantDetail";
 import GoToCurrentLocationButton from "./CurrentMap";
 import type { RestaurantBasic } from "../../types/restaurant.types";
 import { CITY_STATION } from "../../constant/map-constant";
-import { getToken } from "../../stores/authStore";
 
 const PlayceMap: React.FC = () => {
   const {
@@ -45,7 +44,6 @@ const PlayceMap: React.FC = () => {
 
   // 상세보기 오픈 시 storeId만 저장
   const handleDetailClick = (restaurant: RestaurantBasic) => {
-    console.log(getToken());
     setSelectedStoreId(restaurant.store_id);
     setIsDetailOpen(true);
   };
