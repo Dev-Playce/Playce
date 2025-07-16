@@ -36,7 +36,7 @@ const favoriteService = {
 
     // Redis 캐시 무효화
     const cacheKey = `favorites:user:${userId}`;
-    await deleteCache(cacheKey);
+    await deleteCache(cacheKey); // 즐겨찾기 목록 조회
     log("Redis 캐시 무효화 완료:", cacheKey);
 
     log("즐겨찾기 저장 완료 - ID:", saved.id);
@@ -67,7 +67,7 @@ const favoriteService = {
 
     // Redis 캐시 무효화
     const cacheKey = `favorites:user:${userId}`;
-    await deleteCache(cacheKey);
+    await deleteCache(cacheKey); // 즐겨찾기 목록 조회
     log("Redis 캐시 무효화 완료:", cacheKey);
 
     log("즐겨찾기 삭제 완료");

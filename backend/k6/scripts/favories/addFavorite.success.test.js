@@ -16,7 +16,7 @@ export const addFavoriteSuccessTest = (token, storeId, cleanupAfterTest = false)
     },
   };
 
-  const res = http.post(url, params); // 요청 보내기
+  const res = http.post(url, null, params); // 요청 보내기
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {

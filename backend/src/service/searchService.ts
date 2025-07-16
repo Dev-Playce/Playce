@@ -8,7 +8,7 @@ import { getCache, setCache } from "../utils/redis";
 import crypto from "crypto"; // 해시 생성용
 
 const searchService = {
-  // 캐시 없이 그대로 유지
+  // 현재 위치 기반 검색 (redis 캐시 사용 X)
   getNearbyStores: async (lat: number, lng: number, radius: number = 5) => {
     const storeRepo = AppDataSource.getRepository(Store);
 
@@ -58,6 +58,7 @@ const searchService = {
     }));
   },
 
+  // 통합 검색
   searchStores: async (filters: {
     search?: string;
     sports?: string[];
