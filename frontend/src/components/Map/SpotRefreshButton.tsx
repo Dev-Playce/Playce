@@ -2,10 +2,20 @@ import Button from "../Common/Button";
 import useMapStore from "../../stores/mapStore";
 import { IoReloadOutline } from "react-icons/io5";
 import { searchNearby } from "../../api/map.api";
-import { SEARCHNEARBY_RADIUS } from "../../constant/map-constant";
 
 const SpotRefreshButton = () => {
-  const { position, setRefreshBtn, setRestaurants } = useMapStore();
+  const { position, zoomLevel, setRefreshBtn, setRestaurants } = useMapStore();
+
+  function getScaledValue(level: number): number {
+    if (level >= 8) {
+      return 20;
+    } else if (level === 7) {
+      return 10;
+    } else {
+      return 5;
+    }
+  }
+
   return (
     <Button
       icon={<IoReloadOutline />}
@@ -17,10 +27,11 @@ const SpotRefreshButton = () => {
     transition-colors
   `}
       onClick={async () => {
+        const rad = getScaledValue(zoomLevel);
         const res = await searchNearby({
           lat: position.lat,
           lng: position.lng,
-          radius: SEARCHNEARBY_RADIUS,
+          radius: rad,
         });
         setRestaurants(res.data);
         setRefreshBtn(false);

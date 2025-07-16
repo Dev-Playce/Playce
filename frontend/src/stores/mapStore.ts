@@ -8,6 +8,7 @@ interface MapState {
   openedModal: number;
   restaurants: RestaurantBasic[];
   isRefreshBtnOn: boolean;
+  zoomLevel: number;
   setPosition: (pos: latlng) => void;
   setRestaurants: (restaurantsList: RestaurantBasic[]) => void;
   resetSpots: () => void;
@@ -15,6 +16,7 @@ interface MapState {
   setOpenedModal: (modal: number) => void;
   closeModal: () => void;
   setRefreshBtn: (button: boolean) => void;
+  setZoomLevel: (zoom: number) => void;
 }
 
 const useMapStore = create<MapState>((set) => ({
@@ -22,6 +24,7 @@ const useMapStore = create<MapState>((set) => ({
   openedModal: -1,
   restaurants: [],
   isRefreshBtnOn: false,
+  zoomLevel: 3,
   setPosition: (pos) => {
     set({ position: pos });
   },
@@ -42,6 +45,9 @@ const useMapStore = create<MapState>((set) => ({
   },
   setRefreshBtn: (button) => {
     set({ isRefreshBtnOn: button });
+  },
+  setZoomLevel: (zoom) => {
+    set({ zoomLevel: zoom });
   },
 }));
 
