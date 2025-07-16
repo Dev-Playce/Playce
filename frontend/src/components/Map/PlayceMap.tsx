@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Map } from "react-kakao-maps-sdk";
 import useMapStore from "../../stores/mapStore";
 import PlayceMapMarker from "./PlayceMapMarker";
@@ -14,9 +14,11 @@ const PlayceMap: React.FC = () => {
     position,
     restaurants,
     openedModal,
+    zoomLevel,
     setPosition,
     closeModal,
     setRefreshBtn,
+    setZoomLevel,
   } = useMapStore();
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -24,6 +26,15 @@ const PlayceMap: React.FC = () => {
 
   // 반드시 null 포함!
   const mapRef = useRef<kakao.maps.Map | null>(null);
+
+  useEffect(() => {
+    if (mapRef.current) {
+      const map = mapRef.current;
+      if (typeof map.getLevel === "function") {
+        map.setLevel(zoomLevel);
+      }
+    }
+  }, [zoomLevel]);
 
   const getCurPosition = () => {
     const map = mapRef.current;
@@ -56,6 +67,10 @@ const PlayceMap: React.FC = () => {
               return;
             }
             setPosition(pos);
+          }}
+          onZoomChanged={(map) => {
+            const newZoomLevel = map.getLevel();
+            setZoomLevel(newZoomLevel);
           }}
         >
           {restaurants.map((restaurant) => (
