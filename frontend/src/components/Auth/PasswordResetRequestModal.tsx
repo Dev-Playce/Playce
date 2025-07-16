@@ -15,10 +15,10 @@ const PasswordResetRequestModal = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<{ email: string }>();
+  } = useForm<{ email: string; name: string }>();
 
-  const onSubmit = async (data: { email: string }) => {
-    await userPasswordResetRequest(data);
+  const onSubmit = async (data: { email: string; name: string }) => {
+    await userPasswordResetRequest(data); // { email, name }
     setIsPasswordResetModalOpen(false);
   };
 
@@ -40,6 +40,14 @@ const PasswordResetRequestModal = () => {
               {...register("email", { required: true })}
             />
             {errors.email && <ErrorText message="이메일을 입력해주세요" />}
+          </fieldset>
+          <fieldset>
+            <InputText
+              placeholder="이름"
+              type="text"
+              {...register("name", { required: true })}
+            />
+            {errors.name && <ErrorText message="이름을 입력해주세요" />}
           </fieldset>
           <Button type="submit" className="mt-5" scheme="primary">
             비밀번호 초기화 메일 발송
