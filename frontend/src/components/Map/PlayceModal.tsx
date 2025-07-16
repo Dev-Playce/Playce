@@ -73,7 +73,7 @@ const PlayceModal = ({
       yAnchor={yAnchor}
     >
       <div
-        className="relative flex flex-row w-[440px] max-w-full min-h-[170px] bg-white border border-gray-200 shadow-lg px-6 py-5 font-pretendard text-[15px] items-end"
+        className="relative flex flex-row w-[440px] max-w-full min-h-[170px] bg-white border border-gray-200 shadow-lg px-4 py-5 font-pretendard text-[15px] items-end"
         style={{ boxSizing: "border-box" }}
       >
         {/* 닫기 버튼 */}
