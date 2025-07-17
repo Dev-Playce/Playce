@@ -23,7 +23,7 @@ export const normalizeRegionName = (name: string): string => {
 };
 
 /**
- * 주소를 기반으로 위치(위도, 경도) 및 지역(Region) 엔티티 정보를 가지고 옮
+ * 주소를 기반으로 위치(위도, 경도) 및 지역(Region) 엔티티 정보를 가져옴
  * @param address - 주소 문자열
  * @param bigRegionRepo  - BigRegion Repository
  * @param smallRegionRepo - SmallRegion Repository
@@ -64,8 +64,7 @@ export const getLocationDataFromAddress = async (
   const findBigRegion = await bigRegionRepo.findOne({
     where: { name: Equal(searchBigRegionName) },
   });
-  // if (!findBigRegion) throw createError('유효하지 않은 지역-대분류입니다.', 400);
-  if (!findBigRegion){
+  if (!findBigRegion) {
     log('유효하지 않은 지역-대분류');
     throw createError('유효하지 않은 지역-대분류입니다.', 400);
   }
@@ -73,7 +72,7 @@ export const getLocationDataFromAddress = async (
   // DB에서 지역 소분류 id 찾기
   let searchSmallRegionName = smallRegionName;
   if (smallRegionName.includes(' ') && smallRegionName.split(' ')[1]) {
-    searchSmallRegionName = smallRegionName.split(' ')[0]; // 소분류 이름에서 공백 이후 부분 제거
+    searchSmallRegionName = smallRegionName.split(' ')[0];
   }
   const findSmallRegion = await smallRegionRepo.findOne({
     where: {
@@ -81,7 +80,7 @@ export const getLocationDataFromAddress = async (
       bigRegion: findBigRegion
     }
   });
-  // if (!findSmallRegion) throw createError('유효하지 않은 지역-소분류입니다.', 400);
+
   if (!findSmallRegion) {
     log('유효하지 않은 지역-소분류');
     throw createError('유효하지 않은 지역-소분류입니다.', 400);

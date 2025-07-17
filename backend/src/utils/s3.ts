@@ -19,7 +19,6 @@ export const uploadToS3 = multer({
   storage: multerS3({
     s3,
     bucket: process.env.AWS_S3_BUCKET_NAME!,
-    // acl: 'public-read',
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: (_req, file, cb) => {
       const filename = `${Date.now()}-${file.originalname}`;
@@ -42,7 +41,7 @@ export const uploadToS3 = multer({
 export const deleteS3Object = async (url: string) => {
   try {
     const bucket = process.env.AWS_S3_BUCKET_NAME!;
-    const key = decodeURIComponent(new URL(url).pathname.slice(1)); // images/파일명.jpg
+    const key = decodeURIComponent(new URL(url).pathname.slice(1));
 
     await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
     console.log(`🗑️ S3 이미지 삭제 완료: ${key}`);

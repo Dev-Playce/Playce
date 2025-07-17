@@ -18,7 +18,7 @@ export const createBroadcastSuccessTest = (token, newBroadcast, cleanupAfterTest
     },
   };
 
-  const res = http.post(url, JSON.stringify(payload), params); // 요청 보내기
+  const res = http.post(url, JSON.stringify(payload), params);
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
@@ -52,8 +52,6 @@ export const createBroadcastSuccessTest = (token, newBroadcast, cleanupAfterTest
       });
     }
   }
-
-  // sleep(1);
   return newBroadcastId;
 };
 
@@ -66,12 +64,6 @@ export default function (data) {
   const newBroadcast = createBroadcast({ 
     vu: __VU,
     iter: __ITER,
-    // overrides: {
-    //   store_id: 1,
-    //   sport_id: 1,
-    //   leagueid: 1,
-    //   etc: ''
-    // },
   });
 
   createBroadcastSuccessTest(data.token, newBroadcast, true); // 테스트 후 DB 초기화(true)

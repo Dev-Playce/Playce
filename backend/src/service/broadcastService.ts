@@ -64,7 +64,6 @@ const createBroadcast = async (data: any, userId: number) => {
 
   // Redis 캐시 무효화
   await deleteCacheByPattern(`store:${store.id}:owner:*`); // 식당 상세 조회
-  // await deleteCache(`store:mypage:${userId}`); // 내 식당 목록 조회
   await deleteCache(`broadcasts:store:${store.id}`); // 중계 일정 목록 조회
   await deleteCacheByPattern('search:filters:*'); // 통합 검색
 
@@ -104,10 +103,9 @@ const updateBroadcast = async (broadcastId: number, data: any, userId: number) =
   log(`✅ 중계 일정 수정 완료 (broadcastId: ${broadcast.id})`);
 
   // Redis 캐시 무효화
-  await deleteCacheByPattern(`store:${broadcast.store.id}:owner:*`); // 식당 상세 조회
-  // await deleteCache(`store:mypage:${userId}`); // 내 식당 목록 조회
-  await deleteCache(`broadcasts:store:${broadcast.store.id}`); // 중계 일정 목록 조회
-  await deleteCacheByPattern('search:filters:*'); // 통합 검색
+  await deleteCacheByPattern(`store:${broadcast.store.id}:owner:*`);
+  await deleteCache(`broadcasts:store:${broadcast.store.id}`);
+  await deleteCacheByPattern('search:filters:*');
 
   return broadcast;
 };
@@ -127,10 +125,9 @@ const deleteBroadcast = async (broadcastId: number, userId: number) => {
   log("✅ 중계 일정 삭제 완료");
 
   // Redis 캐시 무효화
-  await deleteCacheByPattern(`store:${broadcast.store.id}:owner:*`); // 식당 상세 조회
-  // await deleteCache(`store:mypage:${userId}`); // 내 식당 목록 조회
-  await deleteCache(`broadcasts:store:${broadcast.store.id}`); // 중계 일정 목록 조회
-  await deleteCacheByPattern('search:filters:*'); // 통합 검색
+  await deleteCacheByPattern(`store:${broadcast.store.id}:owner:*`);
+  await deleteCache(`broadcasts:store:${broadcast.store.id}`);
+  await deleteCacheByPattern('search:filters:*');
 };
 
 // 중계 일정 목록 조회 (Redis 캐시 사용)
@@ -159,7 +156,7 @@ const getBroadcastsByStore = async (storeId: number) => {
     etc: b.etc,
   }));
 
-  await setCache(cacheKey, responseData); // 기본 TTL 적용
+  await setCache(cacheKey, responseData);
   log(`✅ 조회 완료 - ${broadcasts.length}건 (캐시 저장)`);
 
   return responseData;

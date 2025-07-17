@@ -1,7 +1,7 @@
 import Redis from "ioredis";
 
 export const redisClient = new Redis({
-    host: process.env.REDIS_HOST || 'playce-redis', // 로컬 : 'playce-redis'
+    host: process.env.REDIS_HOST || 'playce-redis',
     port: Number(process.env.REDIS_PORT) || 6379,
 });
 
@@ -13,7 +13,7 @@ redisClient.on('error', (err) => {
     console.error('❌ Redis 연결 오류:', err);
 });
 
-const DEFAULT_TTL_SECONDS = 60 * 1; // 기본 TTL: 5분 (60초 * 5)
+const DEFAULT_TTL_SECONDS = 60 * 1;
 
 /**
  * Redis에서 캐시 값 조회 (JSON 파싱 포함)
@@ -55,12 +55,12 @@ export const deleteCache = async (key: string): Promise<void> => {
 };
 
 export const deleteCacheByPattern = async (pattern: string): Promise<void> => {
-  try {
-    const keys = await redisClient.keys(pattern);
-    if (keys.length > 0) {
-      await redisClient.del(...keys);
+    try {
+        const keys = await redisClient.keys(pattern);
+        if (keys.length > 0) {
+            await redisClient.del(...keys);
+        }
+    } catch (error) {
+        console.error(`❌ Redis deleteCacheByPattern 실패 (pattern: ${pattern})`, error);
     }
-  } catch (error) {
-    console.error(`❌ Redis deleteCacheByPattern 실패 (pattern: ${pattern})`, error);
-  }
 };

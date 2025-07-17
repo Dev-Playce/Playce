@@ -32,8 +32,6 @@ export const updateBroadcastSuccessTest = (token, broadcastId, updateData) => {
       message: json?.message,
     });
   }
-
-  // sleep(1);
 };
 
 export function setup () {
@@ -43,8 +41,6 @@ export function setup () {
   const updateData = {
     match_date: '2025-07-21',
     match_time: '09:00',
-    // sport_id: 1,
-    // league_id: 1,
     team_one: '팀 1',
     team_two: '팀 2',
     etc: '수정 테스트',

@@ -5,7 +5,7 @@ import { Sport } from "../entities/Sport";
 import { League } from "../entities/League";
 import { Brackets } from "typeorm";
 import { getCache, setCache } from "../utils/redis";
-import crypto from "crypto"; // 해시 생성용
+import crypto from "crypto";
 
 const searchService = {
   // 현재 위치 기반 검색 (redis 캐시 사용 X)
@@ -149,13 +149,6 @@ const searchService = {
       query.andWhere("league.name IN (:...leagues)", { leagues });
     }
 
-    // if (team) {
-    //   query.andWhere(
-    //     "broadcast.teamOne = :team OR broadcast.teamTwo = :team",
-    //     { team }
-    //   );
-    // }
-
     if (small_regions.length > 0) {
       const matchedSmallRegions = await smallRegionRepo
         .createQueryBuilder("smallRegion")
@@ -222,7 +215,7 @@ const searchService = {
       };
     });
 
-    await setCache(cacheKey, response); // TTL 기본값 사용
+    await setCache(cacheKey, response);
     console.log(`[Redis Cache] Cache set for key: ${cacheKey}`);
     return response;
   },

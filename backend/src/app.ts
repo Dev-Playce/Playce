@@ -52,9 +52,6 @@ app.use("/search", searchRoutes);
 app.use("/broadcasts", broadcastRoutes);
 app.use("/favorites", favoriteRoutes);
 app.use("/staticdata", staticdataRoutes);
-
-// SPA 대응용 (정적 파일, API 라우터 모두 아닌 경우 index.html 응답)
-// 이 라우터는 404 미들웨어보다 **앞**에 둬야 합니다.
 app.get('/{*any}', (req, res, next) => {
   const indexPath = path.resolve(__dirname, "../../public", "index.html");
   res.sendFile(indexPath, (err) => {
