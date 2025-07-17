@@ -131,7 +131,7 @@ const userService = {
 
     await sendMail({
       to: email,
-      subject: "비밀번호 재설정",
+      subject: "비밀번호 재설정 요청",
       html,
     });
 
@@ -169,7 +169,7 @@ const userService = {
 
       log("🔐 비밀번호 초기화 완료");
     } catch (err) {
-      console.error("❌ 비밀번호 초기화 실패:", err);
+      log("❌ 비밀번호 초기화 실패:", err);
       throw createError("유효하지 않거나 만료된 토큰입니다.", 400);
     }
   },

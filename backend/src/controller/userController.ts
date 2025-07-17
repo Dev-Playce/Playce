@@ -29,7 +29,7 @@ const userController = {
       next(error);
     }
   },
-  
+
   requestResetPassword: async (
     req: Request,
     res: Response,
