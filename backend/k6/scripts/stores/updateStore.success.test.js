@@ -1,12 +1,18 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
-import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
+import { check } from 'k6';
+import { BASE_URL, STORE_ID } from '../../config.js';
 import { encodeMultipart, getOptions, parseJson } from '../../utils/common.js';
 import { getTokenOrFail } from '../../utils/auth.js';
 
 const CONTEXT = '식당 수정';
 export const options = getOptions();
 
+/**
+ * 식당 수정 - 테스트 함수
+ * @param {string} token - 인증 토큰
+ * @param {number} storeId - 수정할 식당 ID
+ * @param {object} updateData - 수정할 데이터 객체
+ */
 export const updateStoreSuccessTest = (token, storeId, updateData) => {
   const url = `${BASE_URL}/stores/${storeId}`;
 
@@ -25,11 +31,12 @@ export const updateStoreSuccessTest = (token, storeId, updateData) => {
   const params = {
     headers: {
       'Content-Type': `multipart/form-data; boundary=${boundary}`,
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   };
 
-  const res = http.patch(url, payload, params); // 요청 보내기
+  // 식당 수정 요청
+  const res = http.patch(url, payload, params); 
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
@@ -37,6 +44,7 @@ export const updateStoreSuccessTest = (token, storeId, updateData) => {
     [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('식당이 수정되었습니다.'),
   });
 
+  // 요청 실패 시 에러 로그 출력
   if (!success) {
     console.error(`❌ ${CONTEXT} - 실패`, {
       status: res.status,
@@ -44,18 +52,16 @@ export const updateStoreSuccessTest = (token, storeId, updateData) => {
       message: json?.message,
     });
   }
-
-  // sleep(1);
 };
 
 export function setup () {
   const token = getTokenOrFail();
-  const storeId = __ENV.STORE_ID || 1;
+  const storeId = STORE_ID || 1;
   return { token, storeId };
 }
 
 export default function (data) {
-  const updateData = {
+  const updateData = { // 수정할 식당 mock 데이터 생성
     store_name: `수정된 식당 이름 ${new Date().toISOString()}`,
     // address: '',
     phone: '010-1234-5678',

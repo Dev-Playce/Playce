@@ -17,8 +17,7 @@ const swaggerDefinition = {
         description: "로컬 개발 서버",
       },
     ],
-    // 토큰 인증 
-    components: {
+    components: { // 토큰 인증 
         securitySchemes: {
             bearerAuth: {
                 type: 'http',

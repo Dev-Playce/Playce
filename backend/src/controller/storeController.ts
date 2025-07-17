@@ -22,14 +22,15 @@ const storeController = {
       };
 
       const newStoreId = await storeService.createStore(userId, createData);
+      const imgMessage = imgUrls.length > 0 
+        ? ` (이미지 ${imgUrls.length}개 업로드됨)` 
+        : "";
 
-      const imgMessage =
-        imgUrls.length > 0 ? ` (이미지 ${imgUrls.length}개 업로드됨)` : "";
       log("✅ [식당 등록] 성공");
       return success(
         res,
         `식당이 등록되었습니다.${imgMessage}`,
-        { id: newStoreId},
+        { id: newStoreId },
         201
       );
     } catch (error) {
@@ -53,7 +54,6 @@ const storeController = {
         imgUrls = req.body.img_urls;
       }
 
-
       const newImageUrls = files?.map((file) => file.location) || [];
       const allImgUrls = [...imgUrls, ...newImageUrls];
       const updateData = {
@@ -62,10 +62,9 @@ const storeController = {
       };
       await storeService.updateStore(userId, storeId, updateData);
 
-      const imgMessage =
-        allImgUrls.length > 0
-          ? ` (총 ${allImgUrls.length}개 이미지가 등록됨)`
-          : "";
+      const imgMessage = allImgUrls.length > 0
+        ? ` (총 ${allImgUrls.length}개 이미지가 등록됨)`
+        : "";
 
       log("✅ [식당 수정] 성공");
       return success(res, `식당이 수정되었습니다.${imgMessage}`);
@@ -91,11 +90,7 @@ const storeController = {
     }
   },
   // 4. 식당 상세 조회
-  getStoreDetail: async (
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction
-  ) => {
+  getStoreDetail: async ( req: AuthRequest, res: Response, next: NextFunction ) => {
     try {
       log("\n🍴 [식당 상세 조회] 요청");
       const userId: number | undefined = req.user?.userId;

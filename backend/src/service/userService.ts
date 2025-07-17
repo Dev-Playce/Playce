@@ -1,224 +1,179 @@
+import { Request } from "express";
 import { AppDataSource } from "../data-source";
-import { Store } from "../entities/Store";
-import { SmallRegion } from "../entities/SmallRegion";
-import { Sport } from "../entities/Sport";
-import { League } from "../entities/League";
-import { Brackets } from "typeorm";
-import { getCache, setCache } from "../utils/redis";
+import { User } from "../entities/User";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { createError } from "../utils/errorUtils";
+import { sendMail } from "../utils/email";
+import { log } from "../utils/logUtils";
+import { deleteCache, getCache, setCache } from "../utils/redis";
 import crypto from "crypto";
 
-const searchService = {
-  // 현재 위치 기반 검색 (redis 캐시 사용 X)
-  getNearbyStores: async (lat: number, lng: number, radius: number = 5) => {
-    const storeRepo = AppDataSource.getRepository(Store);
+const userRepository = AppDataSource.getRepository(User);
 
-    const stores = await storeRepo
-      .createQueryBuilder("store")
-      .leftJoinAndSelect("store.images", "image", "image.isMain = true")
-      .leftJoinAndSelect("store.broadcasts", "broadcast")
-      .leftJoinAndSelect("broadcast.sport", "sport")
-      .leftJoinAndSelect("broadcast.league", "league")
-      .addSelect(`
-        (6371 * acos(
-          cos(radians(:lat))
-          * cos(radians(store.lat))
-          * cos(radians(store.lng) - radians(:lng))
-          + sin(radians(:lat))
-          * sin(radians(store.lat))
-        ))
-      `, "distance")
-      .where(`
-        (6371 * acos(
-          cos(radians(:lat))
-          * cos(radians(store.lat))
-          * cos(radians(store.lng) - radians(:lng))
-          + sin(radians(:lat))
-          * sin(radians(store.lat))
-        )) <= :radius
-      `, { lat, lng, radius })
-      .getMany();
+const userService = {
+  join: async (req: Request) => {
+    const { email, password, name, nickname, phone } = req.body;
 
-    return stores.map((store) => ({
-      store_id: store.id,
-      store_name: store.storeName,
-      type: store.type,
-      main_img: store.images[0]?.imgUrl ?? null,
-      address: store.address,
-      lat: store.lat,
-      lng: store.lng,
-      broadcasts: store.broadcasts.map((b) => ({
-        match_date: b.matchDate,
-        match_time: b.matchTime.slice(0, 5),
-        sport: b.sport.name,
-        league: b.league.name,
-        team_one: b.teamOne,
-        team_two: b.teamTwo,
-        etc: b.etc,
-      })),
-    }));
-  },
-
-  // 통합 검색
-  searchStores: async (filters: {
-    search?: string;
-    sports?: string[];
-    leagues?: string[];
-    team?: string;
-    big_regions?: string[];
-    small_regions?: string[];
-    sort?: "date" | "name" | "distance";
-  }) => {
-    //  캐시 키 생성
-    const filtersHash = crypto
-      .createHash("md5")
-      .update(JSON.stringify(filters))
-      .digest("hex");
-    const cacheKey = `search:filters:${filtersHash}`;
-
-    const cached = await getCache(cacheKey);
-    if (cached) {
-      console.log(`[Redis Cache] Cache hit for key: ${cacheKey}`);
-      return cached;
+    const existingEmail = await userRepository.findOneBy({ email });
+    if (existingEmail) {
+      throw createError("이미 존재하는 이메일입니다.", 409);
     }
+    log("유효성 검사 완료 - 이메일 중복 없음");
 
-    const {
-      search,
-      sports = [],
-      leagues = [],
-      team,
-      big_regions = [],
-      small_regions = [],
-      sort,
-    } = filters;
+    const formatPhone = (phone: string): string => {
+      const onlyDigits = phone.replace(/\D/g, "");
+      return onlyDigits.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+    };
 
-    const storeRepo = AppDataSource.getRepository(Store);
-    const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
-    const sportRepo = AppDataSource.getRepository(Sport);
-    const leagueRepo = AppDataSource.getRepository(League);
+    const formattedPhone = formatPhone(phone);
 
-    const query = storeRepo
-      .createQueryBuilder("store")
-      .leftJoinAndSelect("store.images", "image", "image.isMain = true")
-      .leftJoinAndSelect("store.broadcasts", "broadcast")
-      .leftJoinAndSelect("broadcast.sport", "sport")
-      .leftJoinAndSelect("broadcast.league", "league")
-      .leftJoinAndSelect("store.bigRegion", "bigRegion")
-      .leftJoinAndSelect("store.smallRegion", "smallRegion");
-
-    if (search) {
-      query.andWhere(
-        new Brackets(qb => {
-          qb.where("store.storeName LIKE :search", { search: `%${search}%` })
-            .orWhere("store.address LIKE :search", { search: `%${search}%` })
-            .orWhere("broadcast.teamOne LIKE :search", { search: `%${search}%` })
-            .orWhere("broadcast.teamTwo LIKE :search", { search: `%${search}%` });
-        })
-      );
+    const existingPhone = await userRepository.findOneBy({
+      phone: formattedPhone,
+    });
+    if (existingPhone) {
+      throw createError("이미 등록된 전화번호입니다.", 409);
     }
+    log("유효성 검사 완료 - 전화번호 중복 없음");
 
+    const hashPassword = await bcrypt.hash(password, 10);
+    log("비밀번호 해싱 완료");
 
-    if (sports.length > 0) {
-      const matchedSports = await sportRepo
-        .createQueryBuilder("sport")
-        .leftJoinAndSelect("sport.leagues", "league")
-        .where("sport.name IN (:...sports)", { sports })
-        .getMany();
-
-      const leaguesFromSports = matchedSports.flatMap((s) =>
-        s.leagues.map((l) => l.name)
-      );
-
-      const sportNames = Array.from(new Set(matchedSports.map((s) => s.name)));
-      const leagueNamesFromSport = Array.from(new Set(leaguesFromSports));
-
-      query.andWhere(
-        new Brackets((qb) => {
-          qb.where("sport.name IN (:...sportNames)", { sportNames });
-
-          if (leagues.length > 0) {
-            const extraLeagues = leagues.filter(
-              (l) => !leagueNamesFromSport.includes(l)
-            );
-            if (extraLeagues.length > 0) {
-              qb.orWhere("league.name IN (:...extraLeagues)", { extraLeagues });
-            }
-          }
-        })
-      );
-    } else if (leagues.length > 0 && !leagues.includes("전체") && !leagues.includes("all")) {
-      query.andWhere("league.name IN (:...leagues)", { leagues });
-    }
-
-    if (small_regions.length > 0) {
-      const matchedSmallRegions = await smallRegionRepo
-        .createQueryBuilder("smallRegion")
-        .leftJoinAndSelect("smallRegion.bigRegion", "bigRegion")
-        .where("smallRegion.name IN (:...smallRegions)", { smallRegions: small_regions })
-        .getMany();
-
-      const bigRegionsFromSmall = Array.from(
-        new Set(matchedSmallRegions.map(sr => sr.bigRegion.name))
-      );
-
-      query.andWhere(
-        new Brackets(qb => {
-          qb.where("smallRegion.name IN (:...smallRegions)", { smallRegions: small_regions });
-
-          if (big_regions.length > 0) {
-            const bigRegionsExtra = big_regions.filter(br => !bigRegionsFromSmall.includes(br));
-            if (bigRegionsExtra.length > 0) {
-              qb.orWhere("bigRegion.name IN (:...bigRegionsExtra)", { bigRegionsExtra });
-            }
-          }
-        })
-      );
-    } else if (big_regions.length > 0) {
-      query.andWhere("bigRegion.name IN (:...bigRegions)", { bigRegions: big_regions });
-    }
-
-    if (sort === "name") {
-      query.orderBy("store.storeName", "ASC");
-    } else if (sort === "date") {
-      query.orderBy("broadcast.matchDate", "ASC");
-    }
-
-    const stores = await query.getMany();
-
-    const response = stores.map((store) => {
-      const latestBroadcast = store.broadcasts
-        .slice()
-        .sort((a, b) => {
-          const aDate = new Date(`${a.matchDate}T${a.matchTime}`);
-          const bDate = new Date(`${b.matchDate}T${b.matchTime}`);
-          return bDate.getTime() - aDate.getTime();
-        })[0];
-
-      return {
-        id: store.id,
-        store_name: store.storeName,
-        img_url: store.images[0]?.imgUrl ?? null,
-        address: store.address,
-        lat: store.lat,
-        lng: store.lng,
-        broadcast: latestBroadcast
-          ? {
-            id: latestBroadcast.id,
-            match_date: latestBroadcast.matchDate,
-            match_time: latestBroadcast.matchTime?.slice(0, 5),
-            sport: latestBroadcast.sport?.name,
-            league: latestBroadcast.league?.name,
-            team_one: latestBroadcast.teamOne,
-            team_two: latestBroadcast.teamTwo,
-            etc: latestBroadcast.etc,
-          }
-          : null,
-      };
+    const newUser = userRepository.create({
+      email,
+      password: hashPassword,
+      name,
+      nickname,
+      phone: formattedPhone,
     });
 
-    await setCache(cacheKey, response);
-    console.log(`[Redis Cache] Cache set for key: ${cacheKey}`);
-    return response;
+    await userRepository.save(newUser);
+    log("[UserService] 회원가입 완료 - email:", email);
+
+    return newUser.id;
+  },
+
+  login: async (req: Request) => {
+    const { email, password } = req.body;
+
+    const user = await userRepository.findOneBy({ email });
+    if (!user) {
+      console.warn("⚠️ 존재하지 않는 사용자");
+      throw createError("이메일 또는 비밀번호가 일치하지 않습니다.", 401);
+    }
+    log("유효성 검사 완료 - 사용자 존재 확인");
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      console.warn("⚠️ 비밀번호 불일치");
+      throw createError("이메일 또는 비밀번호가 일치하지 않습니다.", 401);
+    }
+    log("유효성 검사 완료 - 비밀번호 일치");
+
+    const jwtSecret = process.env.PRIVATE_KEY;
+    if (!jwtSecret) {
+      throw createError("서버 설정 오류: JWT 비밀키가 없습니다.", 500);
+    }
+
+    const token = jwt.sign({ userId: user.id, email: user.email }, jwtSecret, {
+      expiresIn: "1h",
+    });
+
+    const redisKey = `login:token:${token}`;
+    await setCache(redisKey, user.id, 3600);
+    log(`[Login] Redis에 토큰 저장: ${redisKey}`);
+
+    const cachedUserId = await getCache(redisKey);
+    log(`[Login] Redis에서 토큰 조회: ${cachedUserId}`);
+
+    log(
+      `[UserService] 로그인 성공 - userId: ${user.id}, Redis Key: ${redisKey}`
+    );
+    return token;
+  },
+
+  requestResetPassword: async (email: string, name: string) => {
+    log("👤 유저 : 3. 비밀번호 초기화 요청");
+
+    const userByEmail = await userRepository.findOneBy({ email });
+    if (!userByEmail) {
+      throw createError("이메일 또는 이름이 일치하지 않습니다.", 404);
+    }
+
+    if (userByEmail.name !== name) {
+      throw createError("이메일 또는 이름이 일치하지 않습니다.", 404);
+    }
+
+    log("✅ 사용자 존재 확인 - 이메일 & 이름:", email);
+
+    const token = crypto.randomUUID();
+    const expirationMinutes = 15;
+    const expirationSeconds = expirationMinutes * 60;
+
+    await setCache(`reset-password:${token}`, email, expirationSeconds);
+    log("🔐 Redis에 비밀번호 초기화 토큰 저장 완료");
+
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const resetUrl = `${clientUrl}/reset-password/${token}`;
+
+    const html = `
+  <p>비밀번호를 재설정하려면 아래 링크를 클릭하세요:</p>
+  <a href="${resetUrl}">${resetUrl}</a>
+  <p>이 링크는 ${expirationMinutes}분 동안만 유효합니다.</p>
+`;
+
+    await sendMail({
+      to: email,
+      subject: "비밀번호 재설정",
+      html,
+    });
+
+    log("📩 비밀번호 재설정 이메일 전송 완료 - 수신자:", email);
+  },
+
+  resetPassword: async (resetToken: string, newPassword: string) => {
+    log("👤 유저 : 4. 비밀번호 초기화");
+
+    try {
+      const email = await getCache<string>(`reset-password:${resetToken}`);
+
+      if (!email) {
+        throw createError("유효하지 않거나 만료된 토큰입니다.", 400);
+      }
+      log("✅ 토큰 검증 성공 - 이메일:", email);
+
+      const user = await userRepository.findOneBy({ email });
+      if (!user) {
+        throw createError("해당 사용자를 찾을 수 없습니다.", 404);
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await userRepository.update({ email }, { password: hashedPassword });
+
+      await deleteCache(`reset-password:${resetToken}`);
+
+      log("🔐 비밀번호 초기화 완료");
+    } catch (err) {
+      console.error("❌ 비밀번호 초기화 실패:", err);
+      throw createError("유효하지 않거나 만료된 토큰입니다.", 400);
+    }
+  },
+
+  getMyInfo: async (userId: number) => {
+    const user = await userRepository.findOne({
+      where: { id: userId },
+      select: ["email", "name", "nickname", "phone"],
+    });
+
+    log("[UserService] 사용자 정보 조회 성공");
+    log("응답 데이터:", user);
+    return user;
+  },
+
+  updateNickname: async (userId: number, newNickname: string) => {
+    await userRepository.update({ id: userId }, { nickname: newNickname });
+    log("[UserService] 닉네임 변경 완료 - nickname:", newNickname);
   },
 };
 
-export default searchService;
+export default userService;

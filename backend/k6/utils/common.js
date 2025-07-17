@@ -1,6 +1,6 @@
 /**
  * k6 부하 테스트 옵션 설정
- * @param {number} allowStatusCode - 성공으로 처리하는 status code (기본값: undefined)
+ * @param {number | number[]} allowStatusCode - 성공으로 처리할 status code (기본값: undefined)
  * @returns {Object} - k6 부하 테스트 옵션
  */
 export const getOptions = (allowStatusCode = undefined) => {
@@ -10,7 +10,7 @@ export const getOptions = (allowStatusCode = undefined) => {
 
   let options;
 
-  if (selectIndex === 4) {
+  if (selectIndex === 4) { // 4 : 점진적 증가 부하 테스트
     options = {
       stages: [
         { duration: '1m', target: 10 },
@@ -19,7 +19,7 @@ export const getOptions = (allowStatusCode = undefined) => {
         { duration: '2m', target: 0 },
       ],
     };
-  } else {
+  } else { // 0, 1, 2, 3 : 고정 부하 테스트
     options = {
       vus: vusOption[selectIndex],           // 가상 사용자 수
       duration: durationOption[selectIndex], // 테스트 시간
@@ -31,7 +31,7 @@ export const getOptions = (allowStatusCode = undefined) => {
     http_req_duration: ['p(95)<500'], // 95% 요청 응답시간이 500ms 이하
   };
 
-  // 성공으로 처리할 status code가 있다면 설정
+  // 200, 201 외에 성공으로 처리할 status code가 있다면 설정
   if (allowStatusCode) {
     options.ext = {
       loadimpact: {
@@ -59,6 +59,7 @@ export const parseJson = (res, context = '') => {
       error: error.message,
       body: res.body,
     });
+
     return null;
   }
 };
@@ -75,7 +76,6 @@ export const encodeMultipart = (data, boundary = '----WebKitFormBoundary7MA4YWxk
   for (const key in data) {
     const value = data[key];
 
-    // 배열은 반복해서 처리
     if (Array.isArray(value)) {
       value.forEach((item) => {
         lines.push(`--${boundary}`);
@@ -95,6 +95,7 @@ export const encodeMultipart = (data, boundary = '----WebKitFormBoundary7MA4YWxk
   lines.push('');
 
   const payload = lines.join('\r\n');
+  
   return {
     payload,
     boundary,
