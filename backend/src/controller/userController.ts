@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import userService from "../service/userService";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import { success } from "../utils/response";
-import { logApiError } from "../utils/errorUtils";
+import { createError, logApiError } from "../utils/errorUtils";
 import { log } from "../utils/logUtils";
 
 const userController = {
@@ -29,7 +29,7 @@ const userController = {
       next(error);
     }
   },
-  
+
   requestResetPassword: async (
     req: Request,
     res: Response,
@@ -55,7 +55,7 @@ const userController = {
       const { newPassword } = req.body;
 
       if (!token || !newPassword) {
-        throw new Error("토큰과 새 비밀번호가 필요합니다.");
+        throw createError("토큰과 새 비밀번호가 필요합니다.", 400);
       }
 
       await userService.resetPassword(token, newPassword);

@@ -1,25 +1,29 @@
 import path from "path";
-import dotenv from 'dotenv';
-if (process.env.NODE_ENV === 'test') {
-  dotenv.config({ path: '.env.test' });
+import dotenv from "dotenv";
+if (process.env.NODE_ENV === "test") {
+  dotenv.config({ path: ".env.test" });
 } else {
   dotenv.config();
 }
-console.log(`설정 : .env${process.env.NODE_ENV ? `.${process.env.NODE_ENV} 파일` : " 파일"}, log(${process.env.LOG_ENABLED !== 'false' ? '활성화' : '비활성화'}), 식당 관련 지역 데이터(${process.env.MOCK_GEOCODING === 'true' ? 'mock 데이터 사용' : 'kakaoAPI 사용'})`);
+console.log(
+  `설정 : .env${
+    process.env.NODE_ENV ? `.${process.env.NODE_ENV} 파일` : " 파일"
+  }, log(${
+    process.env.LOG_ENABLED !== "false" ? "활성화" : "비활성화"
+  }), 식당 관련 지역 데이터(${
+    process.env.MOCK_GEOCODING === "true" ? "mock 데이터 사용" : "kakaoAPI 사용"
+  })`
+);
 
 import "reflect-metadata";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import logger from "./utils/logger";
 
-// TypeORM 설정
 import { AppDataSource } from "./data-source";
-
-// 스웨거
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger";
 
-// 라우터
 import userRoutes from "./routes/userRoutes";
 import storeRoutes from "./routes/storeRoutes";
 import searchRoutes from "./routes/searchRoutes";
@@ -27,24 +31,27 @@ import broadcastRoutes from "./routes/broadcastRoutes";
 import favoriteRoutes from "./routes/favoriteRoutes";
 import staticdataRoutes from "./routes/staticdataRoutes";
 
-// 헬퍼
 import { fail } from "./utils/response";
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 
-// ✅ CORS 허용
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://3.35.146.155:3000', 'http://13.125.106.55'],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://3.35.146.155:3000",
+      "http://13.125.106.55",
+    ],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
-// 정적 파일 제공 (빌드된 프론트 파일)
 app.use(express.static(path.resolve(__dirname, "../../public")));
 
-// API 라우터 등록
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/users", userRoutes);
 app.use("/stores", storeRoutes);
@@ -52,7 +59,7 @@ app.use("/search", searchRoutes);
 app.use("/broadcasts", broadcastRoutes);
 app.use("/favorites", favoriteRoutes);
 app.use("/staticdata", staticdataRoutes);
-app.get('/{*any}', (req, res, next) => {
+app.get("/{*any}", (req, res, next) => {
   const indexPath = path.resolve(__dirname, "../../public", "index.html");
   res.sendFile(indexPath, (err) => {
     if (err) {
@@ -61,13 +68,10 @@ app.get('/{*any}', (req, res, next) => {
   });
 });
 
-
-// 정의되지 않은 API 라우터 -> 404 에러 처리
 app.use((req: Request, res: Response, next: NextFunction) => {
   return fail(res, "Not Found", 404);
 });
 
-// 전역 에러 핸들러
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error("🚨 전역 에러:", err);
 
@@ -80,7 +84,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 AppDataSource.initialize()
   .then(() => {
     console.log("📦 DB 연결 성공(TypeORM)");
-    app.listen(port, '0.0.0.0', () => {
+    app.listen(port, "0.0.0.0", () => {
       logger.info("✅ 서버 실행됨 (CloudWatch 연동 확인)");
       console.log(`🚀 서버 실행 중 : http://3.35.146.155:${port}`);
       console.log(`💡 Swagger 문서 :  http://3.35.146.155:${port}/api-docs`);

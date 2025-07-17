@@ -7,15 +7,11 @@ import { createError } from "../utils/errorUtils";
 import { sendMail } from "../utils/email";
 import { log } from "../utils/logUtils";
 import { deleteCache, getCache, setCache } from "../utils/redis";
-import crypto from 'crypto';
-
-
-require("dotenv").config();
+import crypto from "crypto";
 
 const userRepository = AppDataSource.getRepository(User);
 
 const userService = {
-  // 1. 회원가입
   join: async (req: Request) => {
     const { email, password, name, nickname, phone } = req.body;
 
@@ -56,7 +52,7 @@ const userService = {
 
     return newUser.id;
   },
-  // 2. 로그인
+
   login: async (req: Request) => {
     const { email, password } = req.body;
 
@@ -74,18 +70,17 @@ const userService = {
     }
     log("유효성 검사 완료 - 비밀번호 일치");
 
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      process.env.PRIVATE_KEY as string,
-      { expiresIn: "1h" }
-    );
+    const jwtSecret = process.env.PRIVATE_KEY;
+    if (!jwtSecret) {
+      throw createError("서버 설정 오류: JWT 비밀키가 없습니다.", 500);
+    }
 
-    // Redis에 토큰 저장, TTL 3600초 (1시간)
+    const token = jwt.sign({ userId: user.id, email: user.email }, jwtSecret, {
+      expiresIn: "1h",
+    });
+
     const redisKey = `login:token:${token}`;
     await setCache(redisKey, user.id, 3600);
-    // await redisClient.set(redisKey, String(user.id), {
-    //   EX: 3600,
-    // });
     console.log(`[Login] Redis에 토큰 저장: ${redisKey}`);
 
     const cachedUserId = await getCache(redisKey);
@@ -96,18 +91,15 @@ const userService = {
     );
     return token;
   },
-  // 3. 비밀번호 초기화 요청
+
   requestResetPassword: async (email: string, name: string) => {
     log("👤 유저 : 3. 비밀번호 초기화 요청");
 
-    // 1) 이메일로 사용자 조회
     const userByEmail = await userRepository.findOneBy({ email });
     if (!userByEmail) {
-      // 이메일 없으면 바로 에러 (메시지는 동일하게)
       throw createError("이메일 또는 이름이 일치하지 않습니다.", 404);
     }
 
-    // 2) 이메일은 존재하지만 이름이 다르면 에러
     if (userByEmail.name !== name) {
       throw createError("이메일 또는 이름이 일치하지 않습니다.", 404);
     }
@@ -138,17 +130,11 @@ const userService = {
 
     log("📩 비밀번호 재설정 이메일 전송 완료 - 수신자:", email);
   },
-  // 4. 비밀번호 초기화
+
   resetPassword: async (resetToken: string, newPassword: string) => {
     log("👤 유저 : 4. 비밀번호 초기화");
 
-    const jwtSecret = process.env.PRIVATE_KEY;
-    if (!jwtSecret) {
-      throw new Error("JWT 시크릿 키가 설정되지 않았습니다.");
-    }
-
     try {
-      // Redis에서 토큰에 매핑된 이메일 조회
       const email = await getCache<string>(`reset-password:${resetToken}`);
 
       if (!email) {
@@ -156,13 +142,11 @@ const userService = {
       }
       log("✅ 토큰 검증 성공 - 이메일:", email);
 
-      // 사용자 존재 확인
       const user = await userRepository.findOneBy({ email });
       if (!user) {
         throw createError("해당 사용자를 찾을 수 없습니다.", 404);
       }
 
-      // 비밀번호 해싱 후 업데이트
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       await userRepository.update({ email }, { password: hashedPassword });
 
@@ -174,7 +158,7 @@ const userService = {
       throw createError("유효하지 않거나 만료된 토큰입니다.", 400);
     }
   },
-  // 5. 내 정보 조회
+
   getMyInfo: async (userId: number) => {
     const user = await userRepository.findOne({
       where: { id: userId },
@@ -186,7 +170,6 @@ const userService = {
     return user;
   },
 
-  // 6. 닉네임 변경
   updateNickname: async (userId: number, newNickname: string) => {
     await userRepository.update({ id: userId }, { nickname: newNickname });
     log("[UserService] 닉네임 변경 완료 - nickname:", newNickname);
