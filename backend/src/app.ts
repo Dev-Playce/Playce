@@ -36,12 +36,17 @@ import { fail } from "./utils/response";
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 
-// ✅ CORS 허용
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://3.35.146.155:3000'], // 배포 시 도메인 설정 가능
-  credentials: true,
-}));
-
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://3.35.146.155:3000",
+      "http://13.125.106.55",
+    ],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 

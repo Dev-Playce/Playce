@@ -18,7 +18,7 @@ const storeController = {
 
       const createData = {
         ...req.body,
-        img_urls: imgUrls, // ✅ S3 URL 포함
+        img_urls: imgUrls,
       };
 
       const newStoreId = await storeService.createStore(userId, createData);
@@ -48,7 +48,6 @@ const storeController = {
 
       let imgUrls: string[] = [];
       if (typeof req.body.img_urls === "string") {
-        // 쉼표로 구분된 문자열을 배열로 분리
         imgUrls = req.body.img_urls.split(",").map((s: string) => s.trim());
       } else if (Array.isArray(req.body.img_urls)) {
         imgUrls = req.body.img_urls;
