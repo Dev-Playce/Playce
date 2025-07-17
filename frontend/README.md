@@ -28,7 +28,7 @@
 - 프로젝트는 **SPA** 구조로 구성되며, 주요 UI는 다음과 같은 **레이아웃 기반으로 구동**됩니다:
 
 ```
-![alt text](MainPage.png)
+<img src="./public/MainPage.png" width="120"/>
 ```
 
 ---
@@ -92,17 +92,17 @@
 
 ## 📁 프로젝트 구조
 
-```
-frontend/
-├── assets/            # 이미지 및 정적 파일
-├── components/        # 공통 UI 컴포넌트 (Button, Modal 등)
-├── hooks/             # 커스텀 훅
-├── pages/             # 페이지 라우트 구성
-├── stores/            # Zustand 상태 관리
-├── types/             # 전역 타입 정의
-├── utils/             # axios 인스턴스, qs, 유틸 함수들
-├── App.tsx            # SPA 루트 컴포넌트
-└── main.tsx           # 앱 진입점
+```plaintext
+📦 frontend/src
+├── api          # 서버 통신 (fetch/axios 모듈화)
+├── components   # 공통 컴포넌트 및 UI 요소
+├── constants    # 상수 데이터 (위치 좌표 등)
+├── data         # 지역/스포츠 분류 데이터 및 관련 유틸 함수
+├── hooks        # 커스텀 훅
+├── pages        # 라우팅되는 주요 페이지
+├── stores       # Zustand 기반 전역 상태 관리
+├── types        # TypeScript 타입 정의
+├── utils        # 유틸 함수 (좌표 변환, 시간 포맷, 중계 검색 결과 정렬 등)
 ```
 
 ---
@@ -163,17 +163,15 @@ Fix: 중계 탭에서 지난 경기 표시 오류 수정
 
 ## 📦 배포
 
-- 프론트엔드는 **Vercel**을 통해 정적 배포 예정입니다.
-- `.env` 설정을 포함한 환경변수 관리를 주의하세요.
+- 작성 예정
 
 ---
 
 ## 📌 기타
 
-- Kakao Maps API Key는 `.env` 파일에 포함되며 `.gitignore`로 관리됩니다.
-- API 호출은 `axios`, 쿼리 직렬화는 `qs`를 활용합니다.
-- UI는 `Figma` 기반 시안에 맞춰 제작되었으며, 모든 화면은 반응형 대응을 고려하여 설계되었습니다.
 - 모든 페이지는 **React Router 기반 SPA 구조**로 구성되어 빠른 화면 전환이 가능합니다.
+- API 연동은 백엔드 Swagger 명세 기반으로 이루어졌으며, axios와 qs를 활용해 HTTP 요청 및 파라미터 직렬화를 처리합니다.
+- UI는 `Figma` 기반 시안에 맞춰 제작되었으며, 향후 화면은 반응형 대응을 고려하여 개발할 예정입니다.
 
 ---
 
