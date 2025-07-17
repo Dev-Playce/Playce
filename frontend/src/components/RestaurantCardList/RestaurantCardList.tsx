@@ -89,7 +89,6 @@ export default function RestaurantCardList({
                 {store.address}
               </div>
             </div>
-            {/* 삭제 버튼만 별도 노출 */}
             {showDelete && (
               <button
                 onClick={(e) => {

@@ -7,7 +7,6 @@ import Tag from "../Common/Tag";
 const SportPanel = () => {
   const { sport, selectedLeagues, setSport, setSelectedLeagues } =
     useSportStore();
-
   const { data: sports = [] } = useSports();
   const selectedSportId = sports.find((s) => s.name === sport)?.id;
   const { data: leagues = [] } = useLeagues(selectedSportId);

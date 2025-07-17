@@ -10,10 +10,7 @@ const SearchResultList = () => {
   const results = useSearchStore((state) => state.results);
   const sort = useSearchStore((state) => state.sort);
   const setSort = useSearchStore((state) => state.setSort);
-
-  // 상세보기용 state 추가
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
-
   const sortedResults = sortSearchResults(results, sort);
 
   if (!hasSearched && !isSearching) return null;

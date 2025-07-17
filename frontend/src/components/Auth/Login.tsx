@@ -57,7 +57,6 @@ const LoginModal = () => {
           <Button type="submit" className="mt-5" scheme="primary">
             로그인
           </Button>
-          {/* 중앙 정렬된 비밀번호 찾기 링크 */}
           <div className="flex justify-center mt-2">
             <button
               type="button"

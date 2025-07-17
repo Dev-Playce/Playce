@@ -19,7 +19,6 @@ export default function FavoriteSidebar() {
 
   const visibleFavorites = expanded ? favorites : favorites.slice(0, 3);
 
-  // 상세보기 버튼 클릭 시 storeId만 저장
   const handleDetail = (store_id: number) => {
     setSelectedStoreId(store_id);
   };
