@@ -1,0 +1,13 @@
+services:
+  redis:
+    image: redis:7-alpine # 사용할 Redis 이미지 (가볍고 안정적)
+    container_name: playce-redis # 컨테이너 이름 지정 (선택 사항)
+    ports:
+      - "6379:6379" # 로컬 6379 포트를 컨테이너의 6379 포트에 연결
+    command: redis-server --appendonly yes # Redis 서버 시작 시 AOF(Append Only File) 영속성 활성화
+    volumes:
+      - redis_data:/data # Redis 데이터를 영구적으로 저장할 볼륨 마운트
+    restart: always #컨테이너 자동 재시작
+
+volumes:
+  redis_data: # Redis 데이터 볼륨 정의

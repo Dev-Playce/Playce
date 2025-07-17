@@ -44,30 +44,3 @@ export const seedSportLeagues = async () => {
     console.log("✅ 종목 & 리그 데이터 시드 완료");
 
 };
-
-// const seed = async () => {
-//   const dataSource = await AppDataSource.initialize();
-
-//   try {
-//     for (const [sportName, leagues] of Object.entries(sportsData)) {
-//       const sport = dataSource.manager.create(Sport, { name: sportName });
-//       await dataSource.manager.save(sport);
-
-//       for (const leagueName of leagues) {
-//         const league = dataSource.manager.create(League, {
-//           name: leagueName,
-//           sport,
-//         });
-//         await dataSource.manager.save(league);
-//       }
-//     }
-
-//     console.log("✅ 종목 & 리그 데이터 시드 완료");
-//   } catch (error) {
-//     console.error("❌ 시드 에러:", error);
-//   } finally {
-//     await dataSource.destroy();
-//   }
-// };
-
-// seed();

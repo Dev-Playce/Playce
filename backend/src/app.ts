@@ -1,4 +1,12 @@
-import "dotenv/config";
+// import "dotenv/config";
+import dotenv from 'dotenv';
+if (process.env.NODE_ENV === 'test') {
+  dotenv.config({ path: '.env.test'});
+} else {
+  dotenv.config();
+}
+console.log(`설정 : .env${process.env.NODE_ENV ? `.${process.env.NODE_ENV} 파일` : " 파일"}, log(${process.env.LOG_ENABLED !== 'false' ? '활성화' : '비활성화'}), 식당 관련 지역 데이터(${process.env.MOCK_GEOCODING === 'true' ? 'mock 데이터 사용' : 'kakaoAPI 사용'})`);
+
 import "reflect-metadata";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
@@ -24,7 +32,6 @@ import { fail } from "./utils/response";
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
-// const port = process.env.PORT || 3000;
 
 // ✅ CORS 허용
 app.use(cors({
@@ -60,8 +67,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   return fail(res, message, status);
 });
 
-
-
 AppDataSource.initialize()
   .then(() => {
     console.log("📦 DB 연결 성공(TypeORM)");
@@ -74,5 +79,3 @@ AppDataSource.initialize()
   .catch((error: any) => {
     console.error("❌ DB 연결 실패:", error);
   });
-
-

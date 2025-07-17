@@ -54,6 +54,18 @@ const staticdataController = {
       next(error);
     }
   },
+
+  getBusinessNumbers: async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      log("\n📍 [사업자등록번호 조회] 요청");
+      const data = await staticdataService.getBusinessNumbers();
+      log("✅ [사업자등록번호 조회] 성공");
+      return success(res, "사업자등록번호 조회 성공", data);
+    } catch (error) {
+      logApiError("사업자등록번호 조회", error);
+      next(error);
+    }
+  },
 };
 
 export default staticdataController;

@@ -183,4 +183,43 @@ router.get("/sports", staticdataController.getSports); // 종목 조회
  */
 router.get("/leagues/:sport_id", staticdataController.getLeagues); // 리그 조회
 
+/**
+ * @swagger
+ * /staticdata/businessNumbers:
+ *  get:
+ *    summary: 사업자등록번호 조회
+ *    tags: [StaticData]
+ *    responses:
+ *      200:
+ *        description: 사업자등록번호 조회 성공
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                success:
+ *                  type: boolean
+ *                  example: true
+ *                message:
+ *                  type: string
+ *                  example: 사업자등록번호 조회 성공
+ *                data:
+ *                  type: array
+ *                  items:
+ *                    type: object
+ *                    properties:
+ *                      id:
+ *                        type: integer
+ *                        example: 1
+ *                      business_number:
+ *                        type: string
+ *                        example: 111-11-12345
+ *                      is_valid:
+ *                        type: boolean
+ *                        example: true
+ *      404:
+ *        description: 사업자등록번호를 찾을 수 없습니다.
+ */
+router.get("/businessNumbers", staticdataController.getBusinessNumbers); // 사업자등록번호 조회
+
 export default router;

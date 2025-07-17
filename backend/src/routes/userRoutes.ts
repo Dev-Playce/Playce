@@ -95,11 +95,11 @@ router.post("/join", JoinValidator, userController.join); // 1. 회원가입
  *              email:
  *                type: string
  *                format: email
- *                example: user@mail.com
+ *                example: hong@mail.com
  *              password:
  *                type: string
  *                format: password
- *                example: your_password
+ *                example: 111111
  *    responses:
  *      200:
  *        description: 로그인 성공
@@ -139,11 +139,15 @@ router.post("/login", LoginValidator, userController.login); // 2. 로그인
  *            type: object
  *            required:
  *              - email
+ *              - name
  *            properties:
  *              email:
  *                type: string
  *                format: email
  *                example: user@mail.com
+ *              name:
+ *                type: string
+ *                example: 홍길동
  *    responses:
  *      201:
  *        description: 비밀번호 초기화 메일 전송 성공
@@ -159,7 +163,7 @@ router.post("/login", LoginValidator, userController.login); // 2. 로그인
  *                  type: string
  *                  example: "메일이 전송되었습니다."
  *      400:
- *        description: 이메일 누락 또는 잘못된 형식
+ *        description: 이메일 또는 이름 누락 또는 잘못된 형식
  *      404:
  *        description: 가입되지 않은 이메일 주소
  */

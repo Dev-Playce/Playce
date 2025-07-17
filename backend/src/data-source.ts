@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import "dotenv/config";
+// import "dotenv/config";
 import { DataSource } from "typeorm";
 import { User } from "./entities/User";
 import { Store } from "./entities/Store";
@@ -13,6 +13,14 @@ import { BigRegion } from "./entities/BigRegion";
 import { SmallRegion } from "./entities/SmallRegion";
 import path from "path";
 
+import * as dotenv from 'dotenv';
+if (process.env.NODE_ENV === 'test') {
+  dotenv.config({ path: path.resolve(__dirname, '..', '.env.test') });
+} else {
+  dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+}
+
+
 export const AppDataSource = new DataSource({
   type: "mysql",
   host: process.env.DB_HOST,
@@ -21,7 +29,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   synchronize: false,
-  logging: true,
+  logging: false,
   entities: [
     User,
     Store,
