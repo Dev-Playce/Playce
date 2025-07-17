@@ -31,8 +31,6 @@ export const getFavoritesSuccessTest = (token) => {
       message: json?.message,
     });
   }
-
-  // sleep(1);
 };
 
 export function setup () {

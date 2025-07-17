@@ -56,7 +56,7 @@ const router = Router();
  *       409:
  *         description: 이미 즐겨찾기에 추가된 식당
  */
-router.post("/:store_id", authenticate, favoriteController.addFavorite); // 1. 즐겨찾기 추가
+router.post("/:store_id", authenticate, favoriteController.addFavorite);
 
 /**
  * @swagger
@@ -92,7 +92,7 @@ router.post("/:store_id", authenticate, favoriteController.addFavorite); // 1. �
  *       404:
  *         description: 즐겨찾기 항목 또는 사용자를 찾을 수 없음
  */
-router.delete("/:store_id", authenticate, favoriteController.removeFavorite); // 2. 즐겨찾기 삭제
+router.delete("/:store_id", authenticate, favoriteController.removeFavorite); 
 
 /**
  * @swagger
@@ -147,6 +147,6 @@ router.delete("/:store_id", authenticate, favoriteController.removeFavorite); //
  *       404:
  *         description: 사용자를 찾을 수 없음
  */
-router.get("/", authenticate, favoriteController.getFavorites); // 3. 즐겨찾기 목록 조회
+router.get("/", authenticate, favoriteController.getFavorites); 
 
 export default router;

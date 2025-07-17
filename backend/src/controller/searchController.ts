@@ -32,7 +32,6 @@ const searchController = {
     try {
       log("\n🔍 [통합 검색] 요청");
 
-      // 쿼리 파싱 + 배열 처리
       const parseToArray = (param: any) => {
         if (Array.isArray(param)) return param;
         if (typeof param === "string" && param.length > 0) return [param];

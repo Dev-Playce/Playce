@@ -5,7 +5,7 @@ import { getOptions, parseJson } from '../../utils/common.js';
 import { getTokenOrFail } from '../../utils/auth.js';
 
 const CONTEXT = '즐겨찾기 추가';
-export const options = getOptions(); // 중복 추가(409) 허용?
+export const options = getOptions();
 
 export const addFavoriteSuccessTest = (token, storeId, cleanupAfterTest = false) => {
   const url = `${BASE_URL}/favorites/${storeId}`;
@@ -20,11 +20,9 @@ export const addFavoriteSuccessTest = (token, storeId, cleanupAfterTest = false)
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
-    [`[${CONTEXT}] 성공 : status is 201`]: (r) => r.status === 201, //|| r.status === 409,
+    [`[${CONTEXT}] 성공 : status is 201`]: (r) => r.status === 201,
     [`[${CONTEXT}] 성공 메시지 확인`]: () => 
       json?.success === true && json?.message?.includes('즐겨찾기가 추가되었습니다.'),
-      // || json?.message?.includes('즐겨찾기가 추가되었습니다.')
-      // || json?.message?.includes('이미 즐겨찾기에 추가된 식당입니다.'), // 거의 동시에 추가되기 때문에 허용하지 않으면 실패 많음
   });
 
   if (!success) {
@@ -53,8 +51,6 @@ export const addFavoriteSuccessTest = (token, storeId, cleanupAfterTest = false)
       });
     }
   }
-
-  // sleep(1);
   return storeId;
 }
 

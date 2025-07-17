@@ -10,16 +10,16 @@ const bigRegionsData = [
   "광주",
   "대전",
   "울산",
-  "세종", //세종특별자치시
+  "세종",
   "경기",
-  "강원", //강원특별자치도
+  "강원",
   "충북",
   "충남",
-  "전북", //전북특별자치도  
+  "전북",
   "전남",
   "경북",
   "경남",
-  "제주", //제주특별자치도
+  "제주",
 ];
 
 const smallRegionsMap: { [key: string]: string[] } = {
@@ -94,8 +94,6 @@ export const seedRegions = async () => {
   for (const bigRegionName of bigRegionsData) {
     const bigRegion = bigRegionRepo.create({ name: bigRegionName });
     await bigRegionRepo.save(bigRegion);
-    // console.log(`   ✅ 지역-대분류 삽입 성공: ${bigRegionName}`);
-
     const smallRegions = smallRegionsMap[bigRegionName] || [];
 
     for (const smallRegionName of smallRegions) {
@@ -104,7 +102,6 @@ export const seedRegions = async () => {
         bigRegion,
       });
       await smallRegionRepo.save(smallRegion);
-      // console.log(`   ✅ 지역-소분류 삽입 성공: ${smallRegionName} (종목: ${bigRegionName})`); 
     }
   }
 

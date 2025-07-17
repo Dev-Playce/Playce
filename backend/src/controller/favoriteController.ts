@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import favoriteService from "../service/favoriteService";
 import { success } from "../utils/response";
@@ -6,7 +6,6 @@ import { logApiError } from "../utils/errorUtils";
 import { log } from "../utils/logUtils";
 
 const favoriteController = {
-  // 1. 즐겨찾기 추가
   addFavorite: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       log("\n⭐ [즐겨찾기 추가] 요청");
@@ -23,7 +22,6 @@ const favoriteController = {
     }
   },
 
-  // 2. 즐겨찾기 삭제
   removeFavorite: async (
     req: AuthRequest,
     res: Response,
@@ -44,7 +42,6 @@ const favoriteController = {
     }
   },
 
-  // 3. 즐겨찾기 목록 조회
   getFavorites: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       log("\n⭐ [즐겨찾기 목록 조회] 요청");

@@ -16,7 +16,7 @@ export const getBroadcastsByStoreSuccessTest = (token, storeId) => {
     },
   };
 
-  const res = http.get(url, params); // 요청 보내기
+  const res = http.get(url, params);
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
@@ -31,8 +31,6 @@ export const getBroadcastsByStoreSuccessTest = (token, storeId) => {
       message: json?.message,
     });
   }
-
-  // sleep(1);
 };
 
 export function setup () {
