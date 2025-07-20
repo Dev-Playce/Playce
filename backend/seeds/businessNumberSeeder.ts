@@ -51,7 +51,7 @@ const generateBusinessNumbers = (count: number) => {
 
 const businessNumbers = [
   ...initialBusinessNumbers,
-  ...generateBusinessNumbers(500),
+  ...generateBusinessNumbers(100), // 사업자등록번호 생성 개수 설정
 ];
 
 export const seedBusinessNumbers = async () => {
