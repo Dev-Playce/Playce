@@ -1,13 +1,7 @@
 import { Router } from "express";
 import storeController from "../controller/storeController";
-import {
-  authenticate,
-  optionalAuthenticate,
-} from "../middlewares/authMiddleware";
-import {
-  createStoreValidator,
-  updateStoreValidator,
-} from "../middlewares/storeValidator";
+import { authenticate, optionalAuthenticate } from "../middlewares/authMiddleware";
+import { createStoreValidator, updateStoreValidator } from "../middlewares/storeValidator";
 import { uploadToS3 } from "../utils/s3";
 
 const router = Router();
@@ -112,13 +106,7 @@ const router = Router();
  *       409:
  *         description: 이미 등록된 사업자등록번호
  */
-router.post(
-  "/",
-  authenticate,
-  uploadToS3.array("images", 5),
-  createStoreValidator,
-  storeController.createStore
-); // 식당 등록 (토큰 검사)
+router.post("/", authenticate, uploadToS3.array("images", 5), createStoreValidator, storeController.createStore); // 1. 식당 등록
 
 /**
  * @swagger
@@ -162,7 +150,7 @@ router.post(
  *       404:
  *         description: 사용자를 찾을 수 없음
  */
-router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식당 목록 조회 (🔒) <- 라우팅 순서 문제로 위치 수정
+router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식당 목록 조회 <- 라우팅 순서 문제로 위치 수정
 
 /**
  * @swagger
@@ -244,13 +232,7 @@ router.get("/mypage", authenticate, storeController.getMyStores); // 5. 내 식�
  *       404:
  *         description: 식당/사용자를 찾을 수 없음
  */
-router.patch(
-  "/:storeId",
-  authenticate,
-  uploadToS3.array("images", 5),
-  updateStoreValidator,
-  storeController.updateStore
-); // 2. 식당 수정 (🔒)
+router.patch("/:storeId", authenticate, uploadToS3.array("images", 5), updateStoreValidator, storeController.updateStore); // 2. 식당 수정
 
 /**
  * @swagger
@@ -278,7 +260,7 @@ router.patch(
  *       404:
  *         description: 식당/사용자를 찾을 수 없음
  */
-router.delete("/:storeId", authenticate, storeController.deleteStore); // 3. 식당 삭제 (🔒)
+router.delete("/:storeId", authenticate, storeController.deleteStore); // 3. 식당 삭제
 
 /**
  * @swagger
@@ -373,6 +355,6 @@ router.delete("/:storeId", authenticate, storeController.deleteStore); // 3. 식
  *       404:
  *         description: 식당을 찾을 수 없음
  */
-router.get("/:storeId", optionalAuthenticate, storeController.getStoreDetail); // 4. 식당 상세 조회 (🔓 optional 토큰 검사)
+router.get("/:storeId", optionalAuthenticate, storeController.getStoreDetail); // 4. 식당 상세 조회 (optional 토큰 검사)
 
 export default router;

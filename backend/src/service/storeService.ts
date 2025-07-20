@@ -8,7 +8,7 @@ import { getLocationDataFromAddress } from "../utils/locationUtils";
 import { createError } from "../utils/errorUtils";
 import { deleteS3Object } from "../utils/s3";
 import { log } from "../utils/logUtils";
-import { getCache, setCache, deleteCache, deleteCacheByPattern } from "../utils/redis";
+import { getCache, setCache, deleteCacheByPattern } from "../utils/redis";
 
 const storeService = {
   // 1. 식당 등록
@@ -46,11 +46,10 @@ const storeService = {
         `- 사업자등록번호(id: ${findBusinessNumber.id}, number: ${findBusinessNumber.businessNumber})`
       );
 
-      // 주소-위치-지역 변환 및 DB 조회
+      // 지역 관련 데이터 생성 및 DB 조회
       const bigRegionRepo = AppDataSource.getRepository(BigRegion);
       const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
 
-      // const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(address, bigRegionRepo, smallRegionRepo);
       const { lat, lng, bigRegion, smallRegion } =
         await getLocationDataFromAddress(
           address,
@@ -61,7 +60,7 @@ const storeService = {
         `- 지역 : 대분류(${bigRegion.id}, ${bigRegion.name}), 소분류(${smallRegion.id}, ${smallRegion.name}), 위도(${lat}), 경도(${lng})`
       );
 
-      // stores에 정보 저장
+      // stores에 데이터 저장
       const storeRepo = AppDataSource.getRepository(Store);
       const newStore = storeRepo.create({
         user: { id: userId },
@@ -101,7 +100,6 @@ const storeService = {
 
       // Redis 캐시 무효화
       await deleteCacheByPattern(`store:${saveStore.id}:owner:*`); // 식당 상세 조회
-      // await deleteCache(`store:mypage:${userId}`); // 내 식당 목록 조회
       await deleteCacheByPattern('search:filters:*'); // 통합 검색
 
       return saveStore.id;
@@ -121,13 +119,12 @@ const storeService = {
 
     try {
       const storeRepo = AppDataSource.getRepository(Store);
-
       const storeToUpdate = await storeRepo.findOne({
         where: { id: storeId },
         relations: ["user"],
       });
 
-      // 식당 유효성 검사
+      // 유효성 검사
       if (!storeToUpdate)
         throw createError("해당 식당을 찾을 수 없습니다.", 404);
       log("- 식당 유효성 검사 완료 : DB에 있는지");
@@ -173,11 +170,9 @@ const storeService = {
         storeToUpdate.description = updateData.description;
 
       if (updateData.address) {
-        // 주소 -> location, bigRegion, smallRegion 같이 수정
         const bigRegionRepo = AppDataSource.getRepository(BigRegion);
         const smallRegionRepo = AppDataSource.getRepository(SmallRegion);
 
-        // const { location, bigRegion, smallRegion } = await getLocationDataFromAddress(
         const { lat, lng, bigRegion, smallRegion } =
           await getLocationDataFromAddress(
             updateData.address,
@@ -186,13 +181,13 @@ const storeService = {
           );
 
         storeToUpdate.address = updateData.address;
-        // storeToUpdate.location = location;
         storeToUpdate.lat = lat;
         storeToUpdate.lng = lng;
         storeToUpdate.bigRegion = bigRegion;
         storeToUpdate.smallRegion = smallRegion;
       }
 
+      // 이미지 업데이트 (DB, S3)
       if (updateData.img_urls) {
         const storeImageRepo = AppDataSource.getRepository(StoreImage);
 
@@ -206,7 +201,6 @@ const storeService = {
         const urlsToDelete = oldUrls.filter((url) => !newUrls.includes(url));
         const urlsToAdd = newUrls.filter((url) => !oldUrls.includes(url));
 
-        // 삭제할 이미지 → S3 및 DB에서 삭제
         await Promise.all(urlsToDelete.map((url) => deleteS3Object(url)));
         if (urlsToDelete.length > 0) {
           await storeImageRepo
@@ -217,7 +211,6 @@ const storeService = {
             .execute();
         }
 
-        // 추가할 이미지 DB에 저장
         const newImages = urlsToAdd.map((url: string) =>
           storeImageRepo.create({
             store: storeToUpdate,
@@ -227,7 +220,6 @@ const storeService = {
         );
         await storeImageRepo.save(newImages);
 
-        // 대표 이미지 재설정: img_urls 첫 번째 URL 기준
         await storeImageRepo.update(
           { store: { id: storeId } },
           { isMain: false }
@@ -249,7 +241,6 @@ const storeService = {
 
       // Redis 캐시 무효화
       await deleteCacheByPattern(`store:${storeId}:owner:*`); // 식당 상세 조회
-      // await deleteCache(`store:mypage:${userId}`); // 내 식당 목록 조회
       await deleteCacheByPattern('search:filters:*'); // 통합 검색
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -276,30 +267,23 @@ const storeService = {
       throw createError("해당 식당에 대한 삭제 권한이 없습니다.", 403);
     log("- 식당 소유권 확인");
 
-    // 1. 기존 이미지들 S3에서 삭제
+    // DB에서 데이터 삭제
     const images = await storeImageRepo.find({
       where: { store: { id: storeId } },
     });
 
     await Promise.all(images.map((img) => deleteS3Object(img.imgUrl)));
-
-    // 2. DB에서 이미지 삭제
     await storeImageRepo.delete({ store: { id: storeId } });
-
-    // 3. DB에서 store 삭제
     await storeRepo.remove(storeToDelete);
 
     // Redis 캐시 무효화
     await deleteCacheByPattern(`store:${storeId}:owner:*`); // 식당 상세 조회
-    // await deleteCache(`store:mypage:${userId}`); // 내 식당 목록 조회
     await deleteCacheByPattern('search:filters:*'); // 통합 검색
     return;
   },
   // 4. 식당 상세 조회
   getStoreDetail: async (userId: number | undefined, storeId: number) => {
-    // DB 조회
     const storeRepo = AppDataSource.getRepository(Store);
-
     const store = await storeRepo.findOne({
       where: { id: storeId },
       relations: [
@@ -315,7 +299,6 @@ const storeService = {
     log("- store 유효성 검사");
 
     // Redis 캐시 확인
-    // const CACHE_KEY = `store:${storeId}`;
     const isOwner = !!userId && userId === store.user.id;
     const CACHE_KEY = `store:${storeId}:owner:${isOwner ? "true" : "false"}`;
     const cached = await getCache(CACHE_KEY);
@@ -325,6 +308,7 @@ const storeService = {
       return cached;
     }
 
+    // DB 조회
     const imgUrlsData = store.images.map((img) => img.imgUrl);
     const broadcastData = store.broadcasts.map((bc) => ({
       match_date: bc.matchDate,
@@ -359,15 +343,6 @@ const storeService = {
   },
   // 5. 내 식당 목록 (redis 캐시 X)
   getMyStores: async (userId: number) => {
-    // Redis 캐시 확인
-    // const CACHE_KEY = `store:mypage:${userId}`;
-    // const cached = await getCache(CACHE_KEY);
-
-    // if (cached) {
-    //   log('- Redis 캐시에서 내 식당 목록 조회 : ', cached);
-    //   return cached;
-    // }
-
     // DB 조회
     const storeRepo = AppDataSource.getRepository(Store);
 
@@ -388,10 +363,8 @@ const storeService = {
         address: store.address,
       };
     });
-    log("- DB에서 내 식당 목록 조회 : ", responseData);
 
-    // Redis 캐시에 저장
-    // await setCache(CACHE_KEY, responseData);
+    log("- DB에서 내 식당 목록 조회 : ", responseData);
     return responseData;
   },
 };

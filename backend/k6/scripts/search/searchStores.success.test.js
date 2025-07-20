@@ -1,11 +1,15 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
 
 const CONTEXT = '통합 검색';
 export const options = getOptions();
 
+/**
+ * 통합 검색 - 테스트 함수
+ * @param {object} query - 통합 검색 조건 객체 
+ */
 export const searchStoresSuccessTest = (query = {}) => {
   const queryString = Object.entries(query)
     .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
@@ -18,7 +22,8 @@ export const searchStoresSuccessTest = (query = {}) => {
     },
   };
 
-  const res = http.get(url, params); // 요청 보내기
+  // 통합 검색 요청
+  const res = http.get(url, params);
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
@@ -26,6 +31,7 @@ export const searchStoresSuccessTest = (query = {}) => {
     [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('통합 검색 성공'),
   });
 
+  // 요청 실패 시 에러 로그 출력
   if (!success) {
     console.error(`❌ ${CONTEXT} - 실패`, {
       status: res.status,
@@ -33,12 +39,10 @@ export const searchStoresSuccessTest = (query = {}) => {
       message: json?.message,
     });
   }
-
-  // sleep(1);
 };
 
 export function setup () {
-  const query = {
+  const query = { // 통합 검색을 위한 검색 조건 생성
     // search: '플레이스',
     // sport: '축구',
     // league: 'K League',

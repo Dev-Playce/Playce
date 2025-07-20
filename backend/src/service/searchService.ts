@@ -5,7 +5,7 @@ import { Sport } from "../entities/Sport";
 import { League } from "../entities/League";
 import { Brackets } from "typeorm";
 import { getCache, setCache } from "../utils/redis";
-import crypto from "crypto"; // 해시 생성용
+import crypto from "crypto";
 import { log } from "../utils/logUtils";
 
 const searchService = {
@@ -149,13 +149,6 @@ const searchService = {
     } else if (leagues.length > 0 && !leagues.includes("전체") && !leagues.includes("all")) {
       query.andWhere("league.name IN (:...leagues)", { leagues });
     }
-
-    // if (team) {
-    //   query.andWhere(
-    //     "broadcast.teamOne = :team OR broadcast.teamTwo = :team",
-    //     { team }
-    //   );
-    // }
 
     if (small_regions.length > 0) {
       const matchedSmallRegions = await smallRegionRepo

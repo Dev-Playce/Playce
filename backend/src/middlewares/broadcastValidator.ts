@@ -25,8 +25,6 @@ export const createBroadcastValidator = [
 ];
 
 export const updateBroadcastValidator = [
-  // body("store_id").optional()
-  //   .isInt({ min: 1 }).withMessage("식당은 1 이상의 정수여야 합니다."),
   body("sport_id").optional({ checkFalsy: true })
     .isInt({ min: 1 }).withMessage("스포츠는 1 이상의 정수여야 합니다."),
   body("league_id").optional({ checkFalsy: true })

@@ -1,6 +1,6 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
+import { BASE_URL, DEFAULT_HEADERS, EMAIL, PASSWORD } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
 
 const CONTEXT = '로그인';
@@ -39,8 +39,8 @@ export const loginSuccessTest =  (loginUser) => {
 
 export default function () {
   const loginUser = {
-    email: __ENV.EMAIL || 'hong@mail.com',
-    password: __ENV.PASSWORD || '111111'
+    email: EMAIL || 'hong@mail.com',
+    password: PASSWORD || '111111'
   };
 
   loginSuccessTest(loginUser);

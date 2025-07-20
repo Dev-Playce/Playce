@@ -1,7 +1,10 @@
-import { SharedArray } from 'k6/data';
 import http from 'k6/http';
 import { BASE_URL } from '../config.js';
 import { parseJson } from './common.js';
+
+// =====================
+// 공통 유틸 함수 (랜덤 숫자/문자열 생성, 사업자등록번호 조회 등)
+// =====================
 
 /**
  * 지정된 자릿수의 랜덤 숫자 문자열을 생성하는 함수
@@ -22,6 +25,7 @@ const getUniqueId = (length = 16) => {
   const timestamp = Date.now(); // 예: 1720245908321
   const randomString = Math.random().toString(36).substring(2, 8); // 예: 'f3r2z9'
   const uniqueId = `${timestamp}${randomString}`; // 예: '1720245908321f3r2z9'
+
   return uniqueId.slice(0, length);
 };
 
@@ -35,11 +39,33 @@ const getRandomPassword = (length = 6) => {
   return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 };
 
-// ----- mock 데이터 생성 함수들 -----
+/**
+ * 사업자등록번호 목록을 조회하는 함수
+ * @returns {string[]} - 사업자등록번호 목록
+ */
+export const getBusinessNumbers = () => {
+  const url = `${BASE_URL}/staticdata/businessNumbers`;
+
+  const res = http.get(url);
+  const json = parseJson(res, '사업자등록번호 조회');
+
+  if (res.status === 200 && json?.success && Array.isArray(json?.data)) {
+    return json.data;
+  }
+  else {
+    console.error('❌ 사업자등록번호 조회 실패');
+    return [];
+  }
+};
+
+// =====================
+// Mock 데이터 생성 함수 (유저, 식당, 중계 일정)
+// =====================
+
 /**
  * 유저 mock 데이터를 생성하는 함수
  * @param {Object} overrides - 기본값을 덮어쓸 객체 
- * @param {boolean} isPasswordRandom - 비밀번호를 랜덤으로 생성할지 여부 (기본값: false)
+ * @param {boolean} isPasswordRandom - 비밀번호를 랜덤으로 생성할지 여부 (기본값: false -> '000000'으로 비밀번호 설정)
  * @returns {object} - 유저 데이터 객체
  */
 export const createUser = (overrides = {}, isPasswordRandom = false) => {
@@ -56,21 +82,6 @@ export const createUser = (overrides = {}, isPasswordRandom = false) => {
     phone: `010-${getRandomNumber(4)}-${getRandomNumber(4)}`,
     ...overrides
   };
-};
-
-export const getBusinessNumbers = () => {
-  const url = `${BASE_URL}/staticdata/businessNumbers`;
-
-  const res = http.get(url);
-  const json = parseJson(res, '사업자등록번호 조회');
-
-  if (res.status === 200 && json?.success && Array.isArray(json?.data)) {
-    return json.data;
-  }
-  else {
-    console.error('❌ 사업자등록번호 조회 실패');
-    return [];
-  }
 };
 
 /**
@@ -118,8 +129,8 @@ export const createBroadcast = ({ vu = 1, iter = 0, overrides = {} } = {}) => {
   const uniqueSuffix = `${vu}-${iter}`;
   
   const today = new Date();
-  const match_date = today.toISOString().slice(0, 10); // YYYY-MM-DD 형식
-  const match_time = today.toTimeString().slice(0, 5); // HH:MM 형식
+  const match_date = today.toISOString().slice(0, 10); // 현재 날짜 : YYYY-MM-DD 형식
+  const match_time = today.toTimeString().slice(0, 5); // 현재 시간 : HH:MM 형식
 
   return {
     store_id: overrides.store_id || 1,

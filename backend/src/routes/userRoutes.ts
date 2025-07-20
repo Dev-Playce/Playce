@@ -74,7 +74,7 @@ const router = Router();
  *        description: 중복된 이메일 또는 전화번호 입력
  */
 
-router.post("/join", JoinValidator, userController.join); // 1. 회원가입
+router.post("/join", JoinValidator, userController.join); 
 
 /**
  * @swagger
@@ -122,7 +122,7 @@ router.post("/join", JoinValidator, userController.join); // 1. 회원가입
  *      401:
  *        description: 이메일 또는 비밀번호 불일치
  */
-router.post("/login", LoginValidator, userController.login); // 2. 로그인
+router.post("/login", LoginValidator, userController.login); 
 
 /**
  * @swagger
@@ -171,7 +171,7 @@ router.post(
   "/reset",
   ResetPasswordRequestValidator,
   userController.requestResetPassword
-); // 3. 비밀번호 초기화 요청
+); 
 
 /**
  * @swagger
@@ -225,7 +225,7 @@ router.patch(
   "/reset/:token",
   ResetPasswordValidator,
   userController.resetPassword
-); // 4. 비밀번호 초기화
+); 
 
 /**
  * @swagger
@@ -270,7 +270,7 @@ router.patch(
  *      404:
  *        description: 사용자를 찾을 수 없음
  */
-router.get("/me", authenticate, userController.getMyInfo); // 5. 내 정보 조회
+router.get("/me", authenticate, userController.getMyInfo);
 
 /**
  * @swagger
@@ -318,6 +318,6 @@ router.patch(
   authenticate,
   NicknameValidator,
   userController.updateNickname
-); // 6. 닉네임 변경
+); 
 
 export default router;

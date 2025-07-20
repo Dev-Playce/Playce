@@ -1,11 +1,17 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
-import { BASE_URL, DEFAULT_HEADERS } from '../../config.js';
+import { check } from 'k6';
+import { BASE_URL, DEFAULT_HEADERS, LAT, LNG, RADIUS } from '../../config.js';
 import { getOptions, parseJson } from '../../utils/common.js';
 
 const CONTEXT = '현재 위치 기반 식당 검색';
 export const options = getOptions();
 
+/**
+ * 현재 위치 기반 식당 검색 - 테스트 함수
+ * @param {number} lat - 위도
+ * @param {number} lng - 경도
+ * @param {number} radius - 검색 반경
+ */
 export const getNearbyStoresSuccessTest = (lat, lng, radius) => {
   const url = `${BASE_URL}/search/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
   const params = {
@@ -14,7 +20,8 @@ export const getNearbyStoresSuccessTest = (lat, lng, radius) => {
     },
   };
 
-  const res = http.get(url, params); // 요청 보내기
+  // 현재 위치 기반 식당 검색 요청
+  const res = http.get(url, params);
   const json = parseJson(res, CONTEXT);
 
   const success = check(res, {
@@ -22,6 +29,7 @@ export const getNearbyStoresSuccessTest = (lat, lng, radius) => {
     [`[${CONTEXT}] 성공 메시지 확인`]: () => json?.success === true && json?.message?.includes('현재 위치 기반 검색 성공'),
   });
 
+  // 요청 실패 시 에러 로그 출력
   if (!success) {
     console.error(`❌ ${CONTEXT} - 실패`, {
       status: res.status,
@@ -29,14 +37,12 @@ export const getNearbyStoresSuccessTest = (lat, lng, radius) => {
       message: json?.message,
     });
   }
-
-  // sleep(1);
 };
 
 export function setup () {
-  const lat = __ENV.LAT || 37.5665; // 서울시청 위도
-  const lng = __ENV.LNG || 126.978; // 서울시청 경도
-  const radius = __ENV.RADIUS || 1000; // 기본 반경 1000m
+  const lat = LAT || 37.5665; // 서울시청 위도
+  const lng = LNG || 126.978; // 서울시청 경도
+  const radius = RADIUS || 1000; // 기본 반경 1000m
   
   return { lat, lng, radius };
 }
