@@ -36,14 +36,17 @@ import { fail } from "./utils/response";
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 
+const BACKEND_LOCAL_URL = process.env.BACKEND_LOCAL_URL || "http://localhost:3000";
+const BACKEND_PROD_URL = process.env.BACKEND_PROD_URL;
+
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://3.35.146.155:3000",
-      "http://13.125.106.55",
-    ],
+      BACKEND_LOCAL_URL,
+      BACKEND_PROD_URL,
+      process.env.FRONTEND_LOCAL_URL,
+      process.env.FRONTEND_PROD_URL,
+    ].filter(Boolean) as string[],
     credentials: true,
   })
 );
@@ -86,8 +89,8 @@ AppDataSource.initialize()
     console.log("📦 DB 연결 성공(TypeORM)");
     app.listen(port, "0.0.0.0", () => {
       logger.info("✅ 서버 실행됨 (CloudWatch 연동 확인)");
-      console.log(`🚀 서버 실행 중 : http://3.35.146.155:${port}`);
-      console.log(`💡 Swagger 문서 :  http://3.35.146.155:${port}/api-docs`);
+      console.log(`🚀 서버 실행 중 : ${BACKEND_PROD_URL || BACKEND_LOCAL_URL}`);
+      console.log(`💡 Swagger 문서 : ${BACKEND_PROD_URL || BACKEND_LOCAL_URL}/api-docs`);
     });
   })
   .catch((error: any) => {

@@ -1,5 +1,10 @@
 import "reflect-metadata";
 import { AppDataSource } from "../src/data-source";
+
+import { seedBusinessNumbers } from "./businessNumberSeeder";
+import { seedRegions } from "./regionSeeder";
+import { seedSportLeagues } from "./sportLeagueSeeder";
+
 import { seedUsers } from "./userSeeder";
 import { seedStores } from "./storeSeeder";
 import { seedBroadcasts } from "./broadcastSeeder";
@@ -11,13 +16,23 @@ const resetDB = async () => {
 
   try {
     await queryRunner.startTransaction();
+
     await queryRunner.query(`SET FOREIGN_KEY_CHECKS = 0;`);
+
     await queryRunner.query(`TRUNCATE TABLE stores_images`);
     await queryRunner.query(`TRUNCATE TABLE favorites`);
     await queryRunner.query(`TRUNCATE TABLE broadcasts`);
     await queryRunner.query(`TRUNCATE TABLE stores`);
     await queryRunner.query(`TRUNCATE TABLE users`);
+
+    // await queryRunner.query(`TRUNCATE TABLE business_numbers`);
+    // await queryRunner.query(`TRUNCATE TABLE small_regions`);
+    // await queryRunner.query(`TRUNCATE TABLE big_regions`);
+    // await queryRunner.query(`TRUNCATE TABLE sports`);
+    // await queryRunner.query(`TRUNCATE TABLE leagues`);
+
     await queryRunner.query(`SET FOREIGN_KEY_CHECKS = 1;`);
+
     await queryRunner.commitTransaction();
     console.log('📦 DB 초기화 완료');
   } catch (error) {
@@ -31,6 +46,10 @@ const resetDB = async () => {
 
 const runSeeders = async () => {
   try {
+    // await seedBusinessNumbers();
+    // await seedRegions();
+    // await seedSportLeagues();
+
     await seedUsers();
     await seedStores();
     await seedBroadcasts();

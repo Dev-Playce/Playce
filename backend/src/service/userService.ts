@@ -113,7 +113,7 @@ const userService = {
     await setCache(`reset-password:${token}`, email, expirationSeconds);
     log("🔐 Redis에 비밀번호 초기화 토큰 저장 완료");
 
-    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const clientUrl = process.env.FRONTEND_LOCAL_URL || "http://localhost:5173";
     const resetUrl = `${clientUrl}/reset-password/${token}`;
 
     const html = `

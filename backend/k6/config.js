@@ -1,5 +1,5 @@
 // 테스트할 API의 기본 URL
-export const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000';
+export const BASE_URL = __ENV.BACKEND_LOCAL_URL || 'http://localhost:3000';
 
 // 공통 요청 헤더
 export const DEFAULT_HEADERS = {

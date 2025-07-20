@@ -9,11 +9,11 @@ const swaggerDefinition = {
     },
     servers: [
       {
-          url: "http://3.35.146.155:3000",
+          url: process.env.BACKEND_PROD_URL,
           description: "EC2 배포 서버",
       },
       {
-        url: `http://localhost:${process.env.PORT || 3000}`,
+        url: process.env.BACKEND_LOCAL_URL,
         description: "로컬 개발 서버",
       },
     ],
