@@ -24,19 +24,96 @@
 ---
 
 ## 📁 프로젝트 구조
-
-```plaintext
-📦 frontend/src
-├── api          # 서버 통신 (fetch/axios 모듈화)
-├── components   # 공통 컴포넌트 및 UI 요소
-├── constants    # 상수 데이터 (위치 좌표 등)
-├── data         # 지역/스포츠 분류 데이터 및 관련 유틸 함수
-├── hooks        # 커스텀 훅
-├── pages        # 라우팅되는 주요 페이지
-├── stores       # Zustand 기반 전역 상태 관리
-├── types        # TypeScript 타입 정의
-├── utils        # 유틸 함수 (좌표 변환, 시간 포맷, 중계 검색 결과 정렬 등)
 ```
+📦 frontend/src
+├── api                # 서버 통신 axios/fetch 모듈
+├── components         # 기능별/공통 UI 컴포넌트 
+│   ├── AppHeader              # 전체 상단 헤더/로고
+│   ├── Auth                   # 로그인, 회원가입, 인증 관련
+│   ├── Common                 # Button, Modal, Toast, 별점 등 공용 UI
+│   ├── FavoriteSidebar        # 즐겨찾기 사이드바, 별도 UI
+│   ├── Map                    # 지도, 핀, 마커, 위치 기반 연동
+│   ├── Mypage                 # 내 정보, 내 식당/중계 관리, 마이페이지
+│   ├── RestaurantCardList     # 검색/오늘중계 등 식당 리스트형 카드
+│   ├── RestaurantDetail       # 상세보기(탭/이미지/메뉴/중계)
+│   ├── Search                 # 통합검색 패널 및 컨트롤
+│   ├── Select                 # 드롭다운, 필터 등 선택 UI
+│   └── TodayBroadcasts        # 오늘의 중계일정, 스포츠 탭/경기카드 등
+├── constants          # 상수 데이터 (기본 위치, 맵 반경 등)
+├── data               # 지역, 스포츠, 리그 분류/매핑 유틸
+├── hooks              # 커스텀 훅 (상태/이벤트/UI 공통 처리)
+├── pages              # 라우팅되는 주요 페이지(메인, 마이, 상세)
+├── stores             # Zustand 기반 글로벌 상태 관리
+├── types              # TS 타입 정의
+├── utils              # 유틸(좌표 변환, 시간 포맷, 쿼리 등)
+```
+---
+
+## 🗂️ Zustand stores 상태 관리 구조 (`stores/`)
+
+Playce 프론트엔드의 전역 상태 관리는 **Zustand** 기반으로 각 도메인별 store를 분리해 확장성과 유지보수성을 높였습니다.
+
+아래는 실제 `stores/` 디렉토리 구조와 주요 기능별 설명입니다.
+
+```
+stores/
+├── authStore.ts             # 로그인/회원인증/모달상태/토큰저장
+├── bookmarkStore.ts         # 북마크(즐겨찾기) 리스트 상태
+├── broadcastFormStore.ts    # 중계 일정 등록/수정 폼 상태
+├── broadcastStore.ts        # 중계 일정 일정(캘린더·리스트·탭) 상태
+├── favoriteStore.ts         # 백엔드 연동 즐겨찾기(서버) 리스트
+├── mapStore.ts              # 지도 상태(좌표, 가게목록, 모달, 줌 등)
+├── mypageStore.ts           # 마이페이지(탭, 내 식당, 중계 편집) 상태
+├── regionStore.ts           # 지역(시/구) 선택, 토글/필터
+├── searchStore.ts           # 검색 키워드, 지역/종목 필터, 결과관리
+├── sportStore.ts            # 종목/리그 필터 상태 관리
+```
+
+---
+
+### 🧩 스토어별 상태/기능 요약
+
+#### `authStore.ts`
+- 로그인/회원가입 모달 on/off, isLoggedIn, 비밀번호 재설정
+- JWT 토큰 저장/삭제 (로그인/로그아웃 → 전역 연동)
+
+#### `bookmarkStore.ts`
+- 북마크(즐겨찾기) 식당 목록 관리 (add/remove)
+- 로컬 상태 기반 즐겨찾기 관리 (프론트 단)
+
+#### `favoriteStore.ts`
+- 서버 API와 연동된 즐겨찾기(찜) 식당 관리
+- `fetch`, `add`, `remove` 등 비동기 처리
+
+#### `broadcastFormStore.ts`
+- 중계 일정 폼 입력값 관리 (날짜, 종목, 리그, 팀명 등)
+- 등록/수정을 위한 폼 리셋 및 필드 상태 관리
+
+#### `broadcastStore.ts`
+- 중계 일정 조회 및 필터링 (년/월/일/식당/뷰타입 등)
+- 뷰(탭, 캘린더) 선택 및 리스트/스크롤 참조값 관리
+
+#### `mapStore.ts`
+- 지도 중심좌표, 식당 리스트, 줌레벨, 모달 상태
+- 지도 refresh, 재탐색, 식당/중계 동기화, 줌 관리
+
+#### `mypageStore.ts`
+- 마이페이지 탭 상태, 내 식당 편집, 서브페이지 상태
+- 내 식당 수정/상세 보기 상태 관리
+
+#### `regionStore.ts`
+- 시/구 단위 지역 선택 (다중/토글 방식)
+- 지역 필터 초기화 및 선택 상태 저장
+
+#### `searchStore.ts`
+- 검색어, 지역/종목/리그, 정렬/필터 등 검색 상태 전반 관리
+- 검색 트리거, 결과 리스트, 초기화 기능 포함
+
+#### `sportStore.ts`
+- 종목/리그 단위 선택 및 필터 상태 관리
+- 전체 초기화, 다중선택 등 UI 필터링 기능과 연동
+
+---
 
 ## 🚀 주요 기능
 
