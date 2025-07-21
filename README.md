@@ -5,15 +5,13 @@
 &nbsp;&nbsp;1.1 <a href="#11-기획-의도">기획 의도</a><br>
 &nbsp;&nbsp;1.2 <a href="#12-프로젝트-소개">프로젝트 소개</a><br>
 
-2. <a href="#-2-주요-기능--시연-영상">주요 기능 & 시연 영상</a><br>
-&nbsp;&nbsp;2.1 <a href="#21-주요-기능">주요 기능</a><br>
-&nbsp;&nbsp;2.2 <a href="#22-시연-영상">시연 영상</a><br>
+2. <a href="#-2-주요-기능">주요 기능</a><br>
 
 3. <a href="#️-3-기술-스택-및-아키텍처">기술 스택 및 아키텍처</a><br>
 &nbsp;&nbsp;3.1 <a href="#31-기술-스택">기술 스택</a><br>
 &nbsp;&nbsp;3.2 <a href="#32-아키텍처">아키텍처</a><br>
 
-4. <a href="#️-4-erd--api-명세">ERD & API 명세</a><br>
+1. <a href="#️-4-erd--api-명세">ERD & API 명세</a><br>
 &nbsp;&nbsp;4.1 <a href="#41-erd">ERD</a><br>
 &nbsp;&nbsp;4.2 <a href="#42-api-명세">API 명세</a><br>
 
@@ -61,96 +59,108 @@ PLAYCE는 PLAY(스포츠 경기)와 PLACE(장소)의 합성어로<br>
   - 집에서 혼자 보는 경기에서 벗어나, 식당에서 함께 응원하며 경기를 시청하는 문화를 활성화할 수 있음
   - 특정 구단 팬을 위한 정기 응원 모임, 단체 관람 등의 다양한 스포츠 문화를 창출할 수 있으며, 지역 기반 스포츠 커뮤니티 플랫폼으로 확장 가능
 
-# 🚀 2. 주요 기능 & 시연 영상
-## 2.1 주요 기능
+# 🚀 2. 주요 기능
 <table border="1" cellpadding="5" cellspacing="0">
   <tr>
-    <td rowspan="2">(사진 추가)</td>
+    <td style="width:33%; text-align:center; vertical-align:middle;">
+      <img src="readme-assets/2-1-1_map.png" alt="지도 이미지" style="max-width:100%; max-height:100%; display:block;">
+    </td>
+    <td style="width:33%; text-align:center; vertical-align:middle;">
+      <img src="readme-assets/2-1-2_sidebar.png" alt="사이드바 이미지" style="max-width:100%; max-height:100%; display:block;">
+    </td>
+    <td style="width:33%; text-align:center; vertical-align:middle;">
+      <img src="readme-assets/2-1-3_search.png" alt="사이드바 검색 이미지" style="max-width:100%; max-height:100%; display:block;">
+    </td>
+  </tr>
+  <tr>
     <th>지도</th>
+    <th>사이드바</th>
+    <th>사이드바 - 검색</th>
   </tr>
   <tr>
     <td>
       - 카카오맵 API로 지도 서비스 제공<br>
-      - 지도 위의 마커를 클릭하면 식당 기본 정보 확인 가능
+      - 마커를 클릭 시 식당 기본 정보 확인 가능
     </td>
-  </tr>
-
-  <tr>
-    <td rowspan="2">(사진 추가)</td>
-    <th>사이드바</th>
-  </tr>
-  <tr>
     <td>
       - 검색<br>
       - 즐겨찾기 목록<br>
       - 오늘의 중계 일정 목록<br>
       - 식당 상세정보 확인
     </td>
-  </tr>
-
-  <tr>
-    <td rowspan="2">(사진 추가)</td>
-    <th>사이드바 - 검색</th>
-  </tr>
-  <tr>
     <td>
       - 필터링 : 식당 이름, 지역, 경기(종목, 리그)<br>
       - 정렬 : 거리순, 날짜순<br>
-      - 클릭하면 해당 식당의 상세 정보 확인 가능, 해당 식당 위치를 중심으로 지도 이동<br>
+      - 클릭 시 상세 정보 확인 및 지도 중심 이동
     </td>
   </tr>
 
   <tr>
-    <td rowspan="2">(사진 추가)</td>
+    <td align="center" valign="middle">
+      <img src="readme-assets/2-1-4_storeDetail.png" alt="사이드바 상세보기 이미지" style="max-width:100%; max-height:100%; display:block;">
+    </td>
+    <td width="400" align="center" valign="middle">
+      <img src="readme-assets/2-1-5_mypage.png" alt="마이페이지 이미지" style="max-width:100%; max-height:100%; display:block;">
+    </td>
+    <td width="400" align="center" valign="middle">
+      <img src="readme-assets/2-1-6_stores.png" alt="식당 관리 이미지" style="max-width:100%; max-height:100%; display:block;">
+    </td>
+  </tr>
+  <tr>
     <th>사이드바 - 식당 상세 정보</th>
+    <th>마이페이지</th>
+    <th>마이페이지 - 식당 관리</th>
   </tr>
   <tr>
     <td>
-      - 지도 마커에서 식당 상세보기 클릭, 즐겨찾기 또는 검색 결과에서 식당 클릭 시 확인 가능<br>
+      - 지도 마커 또는 검색 결과 클릭 시 진입<br>
       - 기본 정보 : 업종, 위치, 영업 시간 등<br>
       - 상세 정보 : 메뉴, 사진, 중계 일정 등
     </td>
-  </tr>
-
-  <tr>
-    <td rowspan="2">(사진 추가)</td>
-    <th>마이페이지</th>
-  </tr>
-  <tr>
     <td>
       - 로그인 시 접근 가능<br>
-      - 즐겨찾기 : 즐겨찾기한 식당 목록 조회, 삭제 가능<br>
-      - 내 정보 : 이메일, 이름 등 개인 정보 조회 가능<br>
-      - 식당 관리 : 식당/중계 일정의 목록 조회, 등록, 수정, 삭제 가능
+      - 즐겨찾기 : 목록 조회, 삭제<br>
+      - 내 정보 : 이메일, 이름 등 개인 정보 조회<br>
+      - 식당 관리 : 식당/중계 일정의 목록 조회, 등록, 수정, 삭제
+    </td>
+    <td>
+      - 우측 하단의 (+) 버튼으로 새로운 식당 등록<br>
+      - 기존에 등록한 식당 관리 가능 : 중계 일정 관리, 식당 수정/삭제
     </td>
   </tr>
 
   <tr>
-    <td rowspan="2">(사진 추가)</td>
-    <th>마이페이지 - 식당 등록</th>
+    <td width="400" align="center" valign="middle">
+      <img src="readme-assets/2-1-7_createStore.png" alt="식당 등록 이미지" style="max-width:100%; max-height:100%; display:block;">
+    </td>
+    <td align="center" valign="middle">
+      <img src="readme-assets/2-1-8_broadcasts.png" alt="중계 일정 관리 이미지" style="max-width:100%; max-height:100%; display:block;">
+    </td>
+    <td align="center" valign="middle">
+      <img src="readme-assets/2-1-9_createUpdateBroadcast.png" alt="중계 일정  등록, 수정 이미지" style="max-width:100%; max-height:100%; display:block;">
+    </td>
+  </tr>
+  <tr>
+    <th>마이페이지 - 식당 등록/수정</th>
+    <th>마이페이지 - 중계 일정 관리</th>
+    <th>마이페이지 - 중계 일정 등록/수정</th>
   </tr>
   <tr>
     <td>
-      - 입력 정보 : 가게명, 사업자등록번호, 주소, 전화번호, 영업시간, 업종, 메뉴, (소개), 사진<br>
-      - 사업자등록번호, 주소 : 유효성 검사 진행, 존재하지 않는 정보를 입력할 수 없음
+      - 등록 시 입력 정보 : 가게명, 사업자등록번호, 주소, 전화번호, 영업시간, 업종, 메뉴, (소개), 사진<br>
+      - 사업자등록번호, 주소 : 유효성 검사 진행, 존재하지 않는 정보를 입력할 수 없음<br>
+      - 수정 시 기존 입력값 자동 불러오기
     </td>
-  </tr>
-
-  <tr>
-    <td rowspan="2">(사진 추가)</td>
-    <th>마이페이지 - 중계 일정 목록 조회</th>
-  </tr>
-  <tr>
     <td>
       - 탭리스트 : 날짜별 중계 정보 확인 가능<br>
       - 캘린더 : 한눈에 중계 일정 확인 가능
     </td>
+    <td>
+      - 등록 시 입력 정보 : 날짜, 시간, 종목, 리그, (팀, 기타)<br>
+      - 수정 시 기존 입력값 자동 불러오기
+    </td>
   </tr>
 </table>
-
-## 2.2 시연 영상
-[▶ 시연 영상 보기](readme-assets/demo.mp4)
-※ 시연 영상이 브라우저에서 재생되지 않는 경우, 링크를 클릭해 파일을 다운로드해 주세요.
 
 # 🛠️ 3. 기술 스택 및 아키텍처
 ## 3.1 기술 스택
