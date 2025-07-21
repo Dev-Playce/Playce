@@ -203,7 +203,6 @@ const PlayceModal = ({
           </div>
         </div>
 
-        {/* 우측: 이미지 - 더 크게, 위로 조금 더 올라온 느낌으로 */}
         <div className="flex flex-col justify-end items-end h-full min-h-[120px] w-[136px] pl-0">
           <div className="w-[136px] h-[136px] rounded-lg overflow-hidden bg-gray-100 self-end shadow">
             <img

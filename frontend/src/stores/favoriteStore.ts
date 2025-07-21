@@ -29,7 +29,7 @@ const useFavoriteStore = create<
     await removeFavorite(store_id);
     await get().fetchFavorites();
   },
-  resetFavorites: () => set({ favorites: [] }), // 추가!
+  resetFavorites: () => set({ favorites: [] }),
 }));
 
 export default useFavoriteStore;

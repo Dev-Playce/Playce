@@ -6,7 +6,6 @@ import EmptyMessage from "./EmptyMessage";
 import useBroadcastStore from "../../stores/broadcastStore";
 import useMypageStore from "../../stores/mypageStore";
 
-// 날짜를 "7월 9일" 형식으로 변환
 function getKoreanDateString(dateStr: string): string {
   const date = new Date(dateStr);
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
@@ -29,7 +28,6 @@ function compareDate(a: string, b: string): number {
 }
 
 function compareTime(a: string, b: string): number {
-  // "21:00" < "23:00" 등 문자열 오름차순 정렬
   return a.localeCompare(b);
 }
 

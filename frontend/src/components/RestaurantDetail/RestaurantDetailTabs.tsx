@@ -4,7 +4,6 @@ import { FaUtensils } from "react-icons/fa";
 import Button from "../Common/Button";
 import classNames from "classnames";
 
-// 사진 탭 추가
 const TABS = ["홈", "메뉴", "사진", "중계"] as const;
 type Tab = (typeof TABS)[number];
 
