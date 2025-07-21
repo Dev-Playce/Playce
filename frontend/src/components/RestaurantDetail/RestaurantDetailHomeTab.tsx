@@ -19,7 +19,6 @@ export default function RestaurantDetailHomeTab({
       <h2
         className={classNames(
           "text-2xl font-bold",
-          // description이 없으면 mb-0, 있으면 mb-2
           detail.description ? "mb-2" : "mb-1"
         )}
       >

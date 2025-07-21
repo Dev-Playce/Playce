@@ -47,9 +47,7 @@ export default function TodayBroadcastSidebar() {
   );
   const [selectedSport, setSelectedSport] = useState<string>("");
 
-  // ⭐ 첫 종목 자동 선택(useEffect에서 setSelectedSport 자동실행)
   useEffect(() => {
-    // 종목 목록이 바뀔 때만, 또는 selectedSport가 사라졌을 때만 자동 세팅
     if (!SPORTS.includes(selectedSport)) {
       if (SPORTS.length > 0) setSelectedSport(SPORTS[0]);
       else setSelectedSport("");
